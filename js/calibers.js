@@ -26,7 +26,7 @@ export function init() {
     wrap.innerHTML = list.map((c, i) => {
       const freq = c.vph ? `${(c.vph / 7200).toFixed(c.vph % 7200 ? 2 : 0)} Hz` : '32 kHz';
       const meterW = key === 'pr' ? c.pr / maxPR * 100 : key === 'jewels' ? c.jewels / 47 * 100 : key === 'vph' ? (c.vph ? Math.log(c.vph / 15000) / Math.log(110000 / 15000) * 100 : 100) : (c.year - 1940) / 85 * 100;
-      return `<article class="cal reveal in">
+      return `<article class="cal">
         ${movementIcon(c, CALIBERS.indexOf(c))}
         <div><span class="maker">${c.maker} · ${c.year}</span><h4>${c.name}</h4><p>${c.note}</p></div>
         <div class="spec">
@@ -41,4 +41,5 @@ export function init() {
   }
   document.querySelectorAll('#calSort button').forEach(b => b.onclick = () => { key = b.dataset.k; document.querySelectorAll('#calSort button').forEach(x => x.classList.toggle('active', x === b)); render(); });
   render();
+  window.mwReveal?.(wrap.children); window.mwRefresh?.();
 }

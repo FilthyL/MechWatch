@@ -62,7 +62,7 @@ const rotorTex = () => canvasTex(1024, (g, s) => {
 const dialTex = () => canvasTex(1024, (g, s) => {
   const c = s / 2;
   const rg = g.createRadialGradient(c * .9, c * .8, 10, c, c, c);
-  rg.addColorStop(0, '#2a4f93'); rg.addColorStop(.6, '#12295a'); rg.addColorStop(1, '#071330');
+  rg.addColorStop(0, '#7a4a24'); rg.addColorStop(.6, '#3a200d'); rg.addColorStop(1, '#170a03');
   g.fillStyle = rg; g.fillRect(0, 0, s, s);
   g.save(); g.translate(c, c);
   for (let i = 0; i < 900; i++) { g.rotate(TAU / 900); g.strokeStyle = `rgba(${Math.random() > .5 ? '255,255,255' : '0,0,0'},${.02 + Math.random() * .05})`; g.beginPath(); g.moveTo(0, 0); g.lineTo(c, 0); g.stroke(); }
@@ -152,7 +152,7 @@ export function init() {
   const viewer = document.getElementById('viewer');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .92;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .9;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
@@ -165,9 +165,9 @@ export function init() {
   canvas.style.touchAction = 'pan-y';
 
   // lights
-  scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x1a1410, .55));
-  const key = new THREE.DirectionalLight(0xfff1dc, 2.2); key.position.set(40, 80, 50); scene.add(key);
-  const rim = new THREE.DirectionalLight(0x9cc0ff, 1.4); rim.position.set(-60, 10, -40); scene.add(rim);
+  scene.add(new THREE.HemisphereLight(0xffe6c4, 0x22120a, .6));
+  const key = new THREE.DirectionalLight(0xffe2b8, 2.3); key.position.set(40, 80, 50); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xffb866, 1.5); rim.position.set(-60, 10, -40); scene.add(rim);
   const under = new THREE.DirectionalLight(0xffd8a0, .7); under.position.set(10, -60, 30); scene.add(under);
 
   // materials
@@ -535,7 +535,13 @@ export function init() {
     document.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('active', x === b));
     camTarget = new THREE.Vector3(...views[b.dataset.view]);
   }));
-  controls.addEventListener('start', () => { camTarget = null; });
+  let userCam = false;
+  controls.addEventListener('start', () => { camTarget = null; userCam = true; });
+  document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { userCam = true; }));
+  const scrubMode = !!window.gsap && matchMedia('(min-width: 861px)').matches;
+  const camAt = p => { const az = (-30 + 62 * p) * Math.PI / 180, elv = (5 + 13 * p) * Math.PI / 180, R = 158; camera.position.set(R * Math.cos(elv) * Math.sin(az), R * Math.sin(elv), R * Math.cos(elv) * Math.cos(az)); };
+  window.MW3D = { scrub(p) { intro = false; explodeTarget = Math.min(1, Math.max(0, (p - .05) / .7)) * .82; slider.value = Math.round(explodeTarget * 1000); if (!userCam) { camTarget = null; camAt(p); } } };
+  if (scrubMode) { intro = false; explodeTarget = 0; explode = 0; slider.value = 0; camAt(0); if (window.MW3D_progress != null) window.MW3D.scrub(window.MW3D_progress); }
   let showLabels = true, running = true;
   document.getElementById('toggleLabels').onclick = e => { showLabels = !showLabels; e.currentTarget.classList.toggle('active', showLabels); labelsEl.classList.toggle('off', !showLabels); leadersEl.classList.toggle('off', !showLabels); };
   document.getElementById('toggleRun').onclick = e => { running = !running; e.currentTarget.classList.toggle('active', running); };
@@ -599,6 +605,7 @@ export function init() {
 
   function updateLabels() {
     if (!showLabels) return;
+    const lo = Math.min(1, explode * 3); labelsEl.style.opacity = lo; leadersEl.style.opacity = lo;
     center.set(0, 0, 0).project(camera);
     const cxScr = (center.x + 1) / 2 * W;
     const items = order.map(id => {

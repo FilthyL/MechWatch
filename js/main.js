@@ -1,30 +1,11 @@
 import { el, h, polar, metalDefs, TAU, rad } from './util.js';
 import { TIMELINE, ANATOMY, GLOSSARY } from './data.js';
+import { initCinema } from './cinema.js';
 
 const $ = s => document.querySelector(s);
 const T0 = performance.now();
 
-/* ═════════════ NAV, PROGRESS, CLOCK ═════════════ */
-const nav = $('#nav'), bar = $('#progressBar');
-const links = [...document.querySelectorAll('.nav-links a')];
-const sections = links.map(a => document.querySelector(a.getAttribute('href')));
-function onScroll() {
-  const y = scrollY, H = document.documentElement.scrollHeight - innerHeight;
-  nav.classList.toggle('scrolled', y > 30);
-  bar.style.width = (y / H * 100) + '%';
-  let cur = -1;
-  sections.forEach((s, i) => { if (s && s.getBoundingClientRect().top < innerHeight * .4) cur = i; });
-  links.forEach((a, i) => a.classList.toggle('active', i === cur));
-}
-addEventListener('scroll', onScroll, { passive: true }); onScroll();
-$('#navBurger').onclick = () => $('#navLinks').classList.toggle('open');
-links.forEach(a => a.addEventListener('click', () => $('#navLinks').classList.remove('open')));
-setInterval(() => { $('#navTime').textContent = new Date().toLocaleTimeString('en-GB'); }, 250);
-
-/* ═════════════ REVEAL ═════════════ */
-const revealIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealIO.unobserve(e.target); } }), { threshold: .12 });
-function reveal(sel) { document.querySelectorAll(sel).forEach((n, i) => { n.classList.add('reveal'); n.style.transitionDelay = (i % 4) * 80 + 'ms'; revealIO.observe(n); }); }
-reveal('.chapter-head, .panel, .facts, .anatomy-wrap, .flow li, .bp-sheet, .bp-notes, .tech-strip > div, .tri, .gl');
+/* (nav, reveal & choreography live in cinema.js) */
 
 /* ═════════════ HERO WATCH ═════════════ */
 export function buildDressWatch(svg, { scale = 1, strap = true, id = 'hw' } = {}) {
@@ -32,13 +13,13 @@ export function buildDressWatch(svg, { scale = 1, strap = true, id = 'hw' } = {}
   const defs = svg.querySelector('defs');
   defs.insertAdjacentHTML('beforeend', `
     <radialGradient id="${id}-dial" cx=".45" cy=".35" r=".75">
-      <stop offset="0" stop-color="#21407a"/><stop offset=".55" stop-color="#0f2349"/><stop offset="1" stop-color="#060e22"/>
+      <stop offset="0" stop-color="#6a4120"/><stop offset=".55" stop-color="#341d0c"/><stop offset="1" stop-color="#160b04"/>
     </radialGradient>
     <linearGradient id="${id}-sheen" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#9cc0ff" stop-opacity=".22"/><stop offset=".55" stop-color="#9cc0ff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#ffd59a" stop-opacity=".2"/><stop offset=".55" stop-color="#ffd59a" stop-opacity=".2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="${id}-strap" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#1b0f08"/><stop offset=".5" stop-color="#3a2214"/><stop offset="1" stop-color="#1b0f08"/>
+      <stop offset="0" stop-color="#120804"/><stop offset=".5" stop-color="#2a1609"/><stop offset="1" stop-color="#120804"/>
     </linearGradient>
     <linearGradient id="${id}-fadeT" x1="0" y1="1" x2="0" y2="0"><stop offset=".3" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
     <mask id="${id}-strapMask"><rect x="-260" y="-260" width="520" height="520" fill="url(#${id}-fadeV)"/></mask>
@@ -76,7 +57,7 @@ export function buildDressWatch(svg, { scale = 1, strap = true, id = 'hw' } = {}
   const dial = el('g', { 'clip-path': `url(#${id}-dialClip)` }, g);
   el('circle', { r: 174, fill: `url(#${id}-dial)` }, dial);
   // rose-engine guilloché
-  const gu = el('g', { fill: 'none', stroke: '#bcd2ff', 'stroke-opacity': .075, 'stroke-width': .8 }, dial);
+  const gu = el('g', { fill: 'none', stroke: '#ffd9a0', 'stroke-opacity': .09, 'stroke-width': .8 }, dial);
   for (let k = 0; k < 46; k++) {
     const r0 = 14 + k * 2.75; let d = '';
     for (let i = 0; i <= 240; i++) {
@@ -136,7 +117,7 @@ export function buildDressWatch(svg, { scale = 1, strap = true, id = 'hw' } = {}
   const secH = el('g', { filter: `url(#${id}-shadow)` }, g);
   el('rect', { x: -1, y: -162, width: 2, height: 210, fill: '#f0d690' }, secH);
   el('circle', { cy: 38, r: 7, fill: '#f0d690' }, secH);
-  el('circle', { cy: 38, r: 3.2, fill: '#0d1a36' }, secH);
+  el('circle', { cy: 38, r: 3.2, fill: '#2a170a' }, secH);
   el('path', { d: 'M0 -162 l3 14 h-6z', fill: '#c2183b' }, secH);
   el('circle', { r: 7, fill: G }, g);
   el('circle', { r: 2.4, fill: '#7a5a22' }, g);
@@ -218,11 +199,6 @@ const beatEl = $('#heroBeat'), sinceEl = $('#heroSince');
       <div class="tl-year">${e.y}</div><h4>${e.t}</h4><p>${e.d}</p>`);
     tl.appendChild(card);
   });
-  let down = false, sx = 0, sl = 0, moved = false;
-  tl.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; down = true; moved = false; sx = e.clientX; sl = tl.scrollLeft; tl.classList.add('drag'); });
-  addEventListener('pointermove', e => { if (!down) return; const dx = e.clientX - sx; if (Math.abs(dx) > 3) moved = true; tl.scrollLeft = sl - dx; });
-  addEventListener('pointerup', () => { down = false; tl.classList.remove('drag'); });
-  tl.addEventListener('wheel', e => { if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { const max = tl.scrollWidth - tl.clientWidth; if ((e.deltaY > 0 && tl.scrollLeft < max - 2) || (e.deltaY < 0 && tl.scrollLeft > 2)) { tl.scrollLeft += e.deltaY; e.preventDefault(); } } }, { passive: false });
 })();
 
 /* ═════════════ ANATOMY ═════════════ */
@@ -324,7 +300,7 @@ const beatEl = $('#heroBeat'), sinceEl = $('#heroSince');
 /* ═════════════ LAZY MODULES ═════════════ */
 const lazy = (sel, loader) => {
   const node = $(sel); let done = false;
-  const io = new IntersectionObserver(es => { if (es[0].isIntersecting && !done) { done = true; io.disconnect(); loader().catch(err => console.error(sel, err)); } }, { rootMargin: '600px' });
+  const io = new IntersectionObserver(es => { if (es[0].isIntersecting && !done) { done = true; io.disconnect(); loader().catch(err => console.error(sel, err)); } }, { rootMargin: '1200px' });
   io.observe(node);
 };
 lazy('#quartz', () => import('./quartz.js').then(m => m.init()));
@@ -334,4 +310,6 @@ lazy('#blueprints', () => import('./blueprints.js').then(m => m.init()));
 lazy('#complications', () => import('./complications.js').then(m => m.init()));
 lazy('#calibers', () => import('./calibers.js').then(m => m.init()));
 lazy('#digital', () => import('./digital.js').then(m => m.init()));
-lazy('#atlas', () => import('./atlas.js').then(m => m.init()));
+lazy('#vault', () => import('./atlas.js').then(m => m.init()));
+
+initCinema();

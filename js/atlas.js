@@ -150,23 +150,73 @@ export function renderWatch(w, id) {
   return s + `</svg>`;
 }
 
+
+// A glass cloche on a walnut plinth, the watch strapped around a leather display cushion.
+export function renderVitrine(w, i) {
+  const id = 'v' + i;
+  const inner = renderWatch(w, 'w' + i).replace(/^<svg[^>]*>/, `<svg x="76" y="104" width="148" height="160" viewBox="-120 -130 240 260">`);
+  const cushion = w.case === 'gold' || w.case === 'rose' ? ['#2a1a12', '#5a3a26', '#7a5236'] : w.case === 'carbon' || w.case === 'ti' ? ['#121212', '#2c2c2c', '#3c3c3c'] : ['#2a120d', '#5a2a1c', '#74402a'];
+  return `<svg viewBox="0 0 300 380" xmlns="http://www.w3.org/2000/svg"><defs>
+    <radialGradient id="${id}bg" cx=".5" cy=".38" r=".75"><stop offset="0" stop-color="#4a1d14"/><stop offset=".6" stop-color="#22100b"/><stop offset="1" stop-color="#110705"/></radialGradient>
+    <linearGradient id="${id}sp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe2b0" stop-opacity=".32"/><stop offset=".7" stop-color="#ffd59a" stop-opacity=".06"/><stop offset="1" stop-color="#ffd59a" stop-opacity="0"/></linearGradient>
+    <radialGradient id="${id}fl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd59a" stop-opacity=".45"/><stop offset="1" stop-color="#ffd59a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="${id}cu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${cushion[0]}"/><stop offset=".35" stop-color="${cushion[2]}"/><stop offset=".55" stop-color="${cushion[1]}"/><stop offset="1" stop-color="${cushion[0]}"/></linearGradient>
+    <linearGradient id="${id}wrap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".85"/><stop offset=".13" stop-color="#000" stop-opacity="0"/><stop offset=".87" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".85"/></linearGradient>
+    <linearGradient id="${id}wd" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1e110a"/><stop offset=".3" stop-color="#4a2c18"/><stop offset=".55" stop-color="#6a4224"/><stop offset=".8" stop-color="#3a2212"/><stop offset="1" stop-color="#1e110a"/></linearGradient>
+    <linearGradient id="${id}br" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6b5022"/><stop offset=".45" stop-color="#f0d9a2"/><stop offset=".6" stop-color="#c9a35a"/><stop offset="1" stop-color="#6b5022"/></linearGradient>
+    <linearGradient id="${id}gl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <filter id="${id}bl" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
+    <clipPath id="${id}cc"><rect x="70" y="118" width="160" height="134" rx="26"/></clipPath>
+    <clipPath id="${id}dc"><path d="M44 322 V96 Q44 34 150 30 Q256 34 256 96 V322 Z"/></clipPath>
+  </defs>
+  <rect width="300" height="380" fill="url(#${id}bg)"/>
+  <g class="spot"><path d="M136 0 H164 L250 330 H50 Z" fill="url(#${id}sp)" filter="url(#${id}bl)"/><ellipse cx="150" cy="322" rx="120" ry="22" fill="url(#${id}fl)"/></g>
+  <!-- plinth -->
+  <path d="M36 322 V352 Q150 372 264 352 V322" fill="url(#${id}wd)"/>
+  <ellipse cx="150" cy="322" rx="114" ry="14" fill="#3a2212"/>
+  <ellipse cx="150" cy="321" rx="110" ry="12" fill="#2a170b" stroke="url(#${id}br)" stroke-width="1.4"/>
+  <path d="M36 344 Q150 364 264 344" fill="none" stroke="url(#${id}br)" stroke-width="1.2" opacity=".8"/>
+  <rect x="112" y="333" width="76" height="13" rx="1.5" fill="url(#${id}br)"/>
+  <text x="150" y="342.5" text-anchor="middle" font-family="Cinzel, serif" font-size="6" letter-spacing="1.2" fill="#3a2810">${w.b.toUpperCase().slice(0, 22)}</text>
+  <!-- stand -->
+  <path d="M138 250 L134 320 H166 L162 250 Z" fill="url(#${id}br)"/>
+  <ellipse cx="150" cy="320" rx="26" ry="5" fill="#2a170b" stroke="url(#${id}br)" stroke-width=".8"/>
+  <!-- cushion (horizontal cylinder) -->
+  <ellipse cx="150" cy="258" rx="66" ry="6" fill="#000" opacity=".45"/>
+  <rect x="70" y="118" width="160" height="134" rx="26" fill="url(#${id}cu)"/>
+  <path d="M84 124 Q150 116 216 124" stroke="#fff" stroke-opacity=".08" stroke-width="3" fill="none"/>
+  <g class="piece"><g clip-path="url(#${id}cc)">${inner}<rect x="70" y="118" width="160" height="134" fill="url(#${id}wrap)"/></g></g>
+  <!-- glass cloche -->
+  <g class="dome">
+    <path d="M44 322 V96 Q44 34 150 30 Q256 34 256 96 V322" fill="rgba(255,246,230,.035)" stroke="rgba(255,236,200,.42)" stroke-width="1.2"/>
+    <path d="M58 300 V104 Q60 56 112 44" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M242 290 V110" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M110 40 Q150 32 190 40" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linecap="round"/>
+    <g clip-path="url(#${id}dc)"><rect class="glint" style="--gd:${(i % 7) * .9}s" x="-40" y="0" width="70" height="380" fill="url(#${id}gl)" transform="skewX(-18)"/></g>
+    <ellipse cx="150" cy="322" rx="106" ry="9" fill="none" stroke="rgba(255,236,200,.35)"/>
+    <circle cx="150" cy="22" r="8" fill="url(#${id}br)"/><rect x="146" y="28" width="8" height="5" fill="url(#${id}br)"/>
+  </g>
+</svg>`;
+}
+
 export function init() {
   // trinity
   const tri = [['Patek Philippe', '1839 · Geneva', 'Calatrava, Nautilus, grand complications. The benchmark of the secondary market and keeper of the Patek Philippe Seal, stricter than the Geneva hallmark.'], ['Audemars Piguet', '1875 · Le Brassus', 'Founded in the Vallée de Joux by Jules-Louis Audemars and Edward-Auguste Piguet. Masters of complications; creators of the Royal Oak.'], ['Vacheron Constantin', '1755 · Geneva', 'The oldest manufacture in uninterrupted production. Les Cabinotiers makes unique pieces, including the most complicated watches ever built.']];
-  document.getElementById('trinity').innerHTML = tri.map(([n, y, p], i) => `<div class="tri reveal in"><p class="tag mono">Holy Trinity · ${['I', 'II', 'III'][i]}</p><h3>${n}</h3><p class="yr">${y}</p><p>${p}</p></div>`).join('');
+  document.getElementById('trinity').innerHTML = tri.map(([n, y, p], i) => `<div class="tri"><p class="tag mono">Holy Trinity · ${['I', 'II', 'III'][i]}</p><h3>${n}</h3><p class="yr">${y}</p><p>${p}</p></div>`).join('');
 
   const grid = document.getElementById('atlasGrid'), count = document.getElementById('atlasCount');
   const catEl = document.getElementById('atlasCat');
   catEl.innerHTML = CATS.map((c, i) => `<button data-c="${c}" class="${i ? '' : 'active'}">${c}</button>`).join('');
   let cat = 'All', q = '', sort = 'price-desc';
-  const svgs = WATCHES.map((w, i) => renderWatch(w, 'w' + i));
+  const svgs = WATCHES.map((w, i) => renderVitrine(w, i));
+  let firstRender = true;
   function render() {
     let list = WATCHES.map((w, i) => ({ w, i })).filter(({ w }) => (cat === 'All' || w.cat.includes(cat)) && (!q || `${w.b} ${w.m} ${w.ref} ${w.cal} ${w.mat}`.toLowerCase().includes(q)));
     list.sort((A, B) => { const a = A.w, b = B.w; if (sort === 'year') return a.y - b.y; const pa = a.price ?? 1e12, pb = b.price ?? 1e12; return sort === 'price-asc' ? pa - pb : pb - pa; });
     const sum = list.filter(x => x.w.price).reduce((s, x) => s + x.w.price, 0);
     count.textContent = `${list.length} reference${list.length === 1 ? '' : 's'} · combined indicative retail ${usd(sum)}${list.some(x => !x.w.price) ? ' + price-on-request pieces' : ''}`;
     grid.innerHTML = list.map(({ w, i }) => `<article class="watch-card">
-      <div class="wc-art">${svgs[i]}<span class="wc-cat">${w.cat[0]}</span><span class="wc-yr">${w.y}</span></div>
+      <div class="vitrine">${svgs[i]}<span class="cat">${w.cat[0]} · ${w.y}</span></div>
       <div class="wc-body">
         <span class="wc-brand">${w.b}</span>
         <h4 class="wc-model">${w.m}</h4>
@@ -179,6 +229,8 @@ export function init() {
         <p class="wc-note">${w.note}</p>
         <div class="wc-price"><b>${w.price ? '≈ ' + usd(w.price) : 'On request'}</b><span>${w.price ? 'Indicative retail' : 'Unique / bespoke'}</span></div>
       </div></article>`).join('') || `<p class="muted">No references match.</p>`;
+    if (firstRender) { firstRender = false; window.mwReveal?.(grid.children); }
+    window.mwRefresh?.();
   }
   catEl.onclick = e => { const b = e.target.closest('button'); if (!b) return; cat = b.dataset.c; catEl.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b)); render(); };
   document.getElementById('atlasSearch').oninput = e => { q = e.target.value.toLowerCase().trim(); render(); };
@@ -191,5 +243,6 @@ export function init() {
   ae.innerHTML = AUCTIONS.map(a => `<div class="auc"><span class="y">${a.y}</span><div><b>${a.t}</b><small>${a.s}</small></div><span class="p">$${a.p.toFixed(a.p < 10 ? 2 : 1)}M</span><div class="bar"><i data-w="${a.p / max * 100}"></i></div></div>`).join('');
   new IntersectionObserver((es, io) => { if (es[0].isIntersecting) { ae.querySelectorAll('i').forEach(i => i.style.width = i.dataset.w + '%'); io.disconnect(); } }, { threshold: .2 }).observe(ae);
   // houses
+  window.mwReveal?.(document.querySelectorAll('.tri'));
   document.getElementById('houseGrid').innerHTML = [...HOUSES].sort((a, b) => a.y - b.y).map(h => `<div class="house"><span class="m">${h.y} · ${h.c}</span><h5>${h.n}</h5><p>${h.p}</p></div>`).join('');
 }

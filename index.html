@@ -4,213 +4,239 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MechWatch — The Anatomy of Time</title>
-<meta name="description" content="A watch nerd's atlas: anatomy, quartz, a 3D exploded mechanical movement, the Swiss lever escapement, blueprints of iconic watch types, complications, legendary calibers, digital watches and a luxury index.">
-<meta name="theme-color" content="#07080a">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%2307080a' stroke='%23d4b06a' stroke-width='4'/%3E%3Cpath d='M32 14v18l11 7' stroke='%23d4b06a' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta name="description" content="A watch nerd's atlas of mechanical horology: anatomy, a 3D exploded movement, the Swiss lever escapement, blueprints of iconic watch types, working complications, legendary calibres and a vault of haute horlogerie.">
+<meta name="theme-color" content="#140d07">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23140d07' stroke='%23c9a35a' stroke-width='4'/%3E%3Cpath d='M32 14v18l11 7' stroke='%23c9a35a' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<script src="vendor/gsap/gsap.min.js"></script>
+<script src="vendor/gsap/ScrollTrigger.min.js"></script>
+<script src="vendor/gsap/SplitText.min.js"></script>
 <script type="importmap">
 { "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }
 </script>
 </head>
-<body>
+<body class="is-intro">
 
+<!-- film layers -->
+<canvas id="dust" aria-hidden="true"></canvas>
 <div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="cursor" id="cursor" aria-hidden="true"><span></span></div>
 <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+<!-- opening titles -->
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="bar bar-t"></div><div class="bar bar-b"></div>
+  <div class="intro-card">
+    <p class="intro-pre">A MechWatch Picture</p>
+    <p class="intro-sub">in ten movements</p>
+  </div>
+  <div class="flare" id="flare"></div>
+  <button class="intro-skip" id="introSkip">Skip intro</button>
+</div>
 
 <header class="nav" id="nav">
   <a class="brand" href="#top" aria-label="MechWatch home">
-    <svg viewBox="0 0 40 40" width="28" height="28" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="20" r="13" fill="none" stroke="currentColor" stroke-width=".6" opacity=".6"/><path d="M20 8v12l8 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="20" cy="20" r="1.6" fill="currentColor"/></svg>
+    <svg viewBox="0 0 40 40" width="30" height="30" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="20" cy="20" r="13.5" fill="none" stroke="currentColor" stroke-width=".5" stroke-dasharray="1 1.6"/><path d="M20 8v12l8 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="20" cy="20" r="1.6" fill="currentColor"/></svg>
     <span>Mech<em>Watch</em></span>
   </a>
   <nav class="nav-links" id="navLinks">
-    <a href="#history">History</a>
-    <a href="#anatomy">Anatomy</a>
-    <a href="#quartz">Quartz</a>
-    <a href="#movement">Movement 3D</a>
-    <a href="#escapement">Escapement</a>
-    <a href="#blueprints">Blueprints</a>
-    <a href="#complications">Complications</a>
-    <a href="#calibers">Calibers</a>
-    <a href="#digital">Digital</a>
-    <a href="#atlas">Luxury Index</a>
-    <a href="#glossary">Glossary</a>
+    <a href="#history"><i>I</i>Prologue</a>
+    <a href="#anatomy"><i>II</i>Anatomy</a>
+    <a href="#quartz"><i>III</i>Quartz</a>
+    <a href="#movement"><i>IV</i>Movement</a>
+    <a href="#escapement"><i>V</i>Escapement</a>
+    <a href="#blueprints"><i>VI</i>Blueprints</a>
+    <a href="#complications"><i>VII</i>Complications</a>
+    <a href="#calibers"><i>VIII</i>Calibres</a>
+    <a href="#digital"><i>IX</i>Digital</a>
+    <a href="#vault"><i>X</i>The Vault</a>
+    <a href="#garbage" class="nav-bin">Smartwatches</a>
   </nav>
-  <div class="nav-time mono" id="navTime" title="Your local time">--:--:--</div>
+  <div class="nav-time" id="navTime" title="Your local time">--:--:--</div>
   <button class="nav-burger" id="navBurger" aria-label="Open menu"><span></span><span></span></button>
 </header>
 
 <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
 <section class="hero" id="top">
-  <div class="hero-bg" aria-hidden="true"><canvas id="heroCanvas"></canvas></div>
+  <div class="hero-bg" aria-hidden="true"><canvas id="heroCanvas"></canvas><div class="beam"></div></div>
   <div class="hero-inner">
     <div class="hero-copy">
-      <p class="eyebrow mono">Atlas of Horology · Vol. I</p>
-      <h1 class="display">The Anatomy<br><em>of Time</em></h1>
-      <p class="lede">From a single quartz crystal humming at 32,768 Hz to a grand complication of more than a thousand hand-finished parts — a field guide to how watches work, written for people who notice the bevels.</p>
-      <div class="hero-cta">
-        <a class="btn btn-gold" href="#movement">Dissect a movement</a>
-        <a class="btn btn-ghost" href="#blueprints">See the blueprints</a>
+      <p class="eyebrow"><span>Atlas of Horology</span><span class="orn">✦</span><span>Volume I</span></p>
+      <h1 class="display" id="heroTitle">The Anatomy<br><em>of Time</em></h1>
+      <p class="lede" id="heroLede">A mainspring, a balance, a train of wheels and a few rubies — and from them, the second. A field guide to the mechanical watch, written for people who notice the bevels.</p>
+      <div class="hero-cta" id="heroCta">
+        <a class="btn btn-brass" href="#movement"><span>Dissect a movement</span></a>
+        <a class="btn btn-line" href="#vault"><span>Enter the vault</span></a>
       </div>
-      <dl class="hero-stats mono">
+      <dl class="hero-stats" id="heroStats">
         <div><dt>Frequency</dt><dd>4 Hz · 28,800 vph</dd></div>
-        <div><dt>Beat</dt><dd id="heroBeat">0</dd></div>
-        <div><dt>Since you arrived</dt><dd id="heroSince">0.000 s</dd></div>
+        <div><dt>Beats since you arrived</dt><dd id="heroBeat">0</dd></div>
+        <div><dt>Elapsed</dt><dd id="heroSince">0.000 s</dd></div>
       </dl>
     </div>
-    <div class="hero-watch">
+    <div class="hero-watch" id="heroWatchWrap">
+      <div class="halo" aria-hidden="true"></div>
       <svg id="heroWatch" viewBox="-260 -260 520 520" role="img" aria-label="A live watch dial showing your local time"></svg>
-      <p class="hero-caption mono">Live · seconds hand steps 8× per second, as a 28,800 vph movement does.</p>
+      <p class="hero-caption">Live — the seconds hand advances eight times a second, as a 28,800 vph movement does.</p>
     </div>
   </div>
-  <a class="scroll-cue mono" href="#history"><span></span>Scroll — the movement begins</a>
+  <a class="scroll-cue" href="#history"><span></span>Scroll</a>
 </section>
 
-<!-- ═══════════════════════════ I · HISTORY ═══════════════════════════ -->
-<section class="chapter" id="history" data-level="1">
+<!-- ═══════════════════════════ I · PROLOGUE ═══════════════════════════ -->
+<section class="chapter" id="history">
   <div class="chapter-head">
-    <p class="chapter-no mono">Chapter I</p>
+    <span class="roman" aria-hidden="true">I</span>
+    <p class="chapter-no">Chapter I · Prologue</p>
     <h2 class="display">Five centuries,<br><em>in one wrist</em></h2>
-    <p class="chapter-intro">Every watch on this page descends from a handful of inventions. Drag the timeline — or scroll it — to travel from the first spring-driven clocks to watches that sync with atomic time.</p>
-    <div class="complexity mono" aria-label="Complexity level 1 of 6"><span>Complexity</span><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="chapter-intro">Every watch in this book descends from a handful of inventions — the spring, the balance, the jewel, the lever. Scroll, and travel from Nuremberg to the Moon.</p>
+    <div class="complexity"><span>Complexity</span><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
   </div>
-  <div class="timeline" id="timeline"></div>
+  <div class="timeline-pin" id="timelinePin"><div class="timeline" id="timeline"></div></div>
 </section>
 
 <!-- ═══════════════════════════ II · ANATOMY ═══════════════════════════ -->
-<section class="chapter" id="anatomy" data-level="1">
+<section class="chapter" id="anatomy">
   <div class="chapter-head">
-    <p class="chapter-no mono">Chapter II</p>
+    <span class="roman" aria-hidden="true">II</span>
+    <p class="chapter-no">Chapter II · Anatomy</p>
     <h2 class="display">Reading the<br><em>outside first</em></h2>
-    <p class="chapter-intro">Before we open the caseback, learn the vocabulary of the exterior. Hover or tap any pointer.</p>
-    <div class="complexity mono"><span>Complexity</span><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="chapter-intro">Before we open the caseback, the vocabulary of the exterior. Hover or tap any pointer.</p>
+    <div class="complexity"><span>Complexity</span><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div>
   </div>
   <div class="anatomy-wrap">
     <svg id="anatomySvg" viewBox="0 0 1000 760" role="img" aria-label="Labelled diagram of a watch exterior"></svg>
-    <aside class="anatomy-card" id="anatomyCard">
-      <p class="mono tag">Select a part</p>
+    <aside class="anatomy-card frame" id="anatomyCard">
+      <p class="tag">Select a part</p>
       <h3>Exterior parts</h3>
-      <p>Each pointer marks a component you can see without tools. Hover to read what it does and what to look for when judging finishing quality.</p>
+      <p>Each pointer marks a component you can see without tools.</p>
     </aside>
   </div>
 </section>
 
 <!-- ═══════════════════════════ III · QUARTZ ═══════════════════════════ -->
-<section class="chapter" id="quartz" data-level="2">
+<section class="chapter" id="quartz">
   <div class="chapter-head">
-    <p class="chapter-no mono">Chapter III</p>
+    <span class="roman" aria-hidden="true">III</span>
+    <p class="chapter-no">Chapter III · The Crystal</p>
     <h2 class="display">Quartz:<br><em>a crystal that counts</em></h2>
-    <p class="chapter-intro">A sliver of quartz, cut into a tuning fork, flexes 32,768 times a second when voltage is applied. That number is 2<sup>15</sup> — so fifteen flip-flops halving the signal yield exactly one pulse per second.</p>
-    <div class="complexity mono"><span>Complexity</span><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div>
+    <p class="chapter-intro">A sliver of quartz cut into a tuning fork flexes 32,768 times a second when voltage is applied. That number is 2<sup>15</sup> — so fifteen flip-flops halving the signal yield exactly one pulse per second. Simple, brilliant, and the reason the 1970s almost ended Swiss watchmaking.</p>
+    <div class="complexity"><span>Complexity</span><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div>
   </div>
   <div class="quartz-grid">
-    <div class="quartz-stage panel">
+    <div class="frame quartz-stage">
       <svg id="quartzSvg" viewBox="0 0 900 420" role="img" aria-label="Animated quartz movement signal chain"></svg>
       <div class="quartz-controls">
-        <label class="mono">Time dilation <input type="range" id="quartzSlow" min="0" max="100" value="0"></label>
-        <span class="mono" id="quartzReadout">—</span>
+        <label>Time dilation <input type="range" id="quartzSlow" min="0" max="100" value="0"></label>
+        <span class="num" id="quartzReadout">—</span>
       </div>
     </div>
-    <div class="divider panel">
-      <p class="mono tag">Binary divider · 15 stages</p>
+    <div class="frame divider">
+      <p class="tag">Binary divider · 15 stages</p>
       <div class="ff-row" id="ffRow"></div>
-      <p class="small">Each stage toggles at half the rate of the one before it. Stage 15 flips once per second and fires the Lavet stepping motor, which advances the seconds hand by one step.</p>
+      <p class="small">Each stage toggles at half the rate of the one before. Stage 15 flips once per second and fires the Lavet stepping motor, which advances the seconds hand one step.</p>
     </div>
   </div>
   <div class="facts">
-    <div class="fact"><b>±15 s</b><span>per month — a typical quartz tolerance (≈ ±0.5 s/day)</span></div>
-    <div class="fact"><b>±5 s</b><span>per <em>year</em> — thermocompensated HAQ quartz (e.g. Grand Seiko 9F, Citizen 0100 claims ±1 s/yr)</span></div>
-    <div class="fact"><b>1969</b><span>Seiko Astron 35SQ — the first quartz wristwatch, sold on Christmas Day in Tokyo</span></div>
-    <div class="fact"><b>~1 µW</b><span>Average power drawn by a modern analogue quartz calibre — a coin cell lasts years</span></div>
+    <div class="fact"><b>±15 s</b><span>per month — typical quartz tolerance</span></div>
+    <div class="fact"><b>±5 s</b><span>per <em>year</em> — thermocompensated high-accuracy quartz</span></div>
+    <div class="fact"><b>1969</b><span>Seiko Astron 35SQ, the first quartz wristwatch, on sale Christmas Day in Tokyo</span></div>
+    <div class="fact"><b>~1 µW</b><span>average power of an analogue quartz calibre — a coin cell lasts years</span></div>
   </div>
 </section>
 
 <!-- ═══════════════════════════ IV · MOVEMENT 3D ═══════════════════════════ -->
-<section class="chapter chapter-dark" id="movement" data-level="3">
+<section class="chapter chapter-dark" id="movement">
   <div class="chapter-head">
-    <p class="chapter-no mono">Chapter IV · The Centrepiece</p>
+    <span class="roman" aria-hidden="true">IV</span>
+    <p class="chapter-no">Chapter IV · The Centrepiece</p>
     <h2 class="display">An automatic movement,<br><em>dissected</em></h2>
-    <p class="chapter-intro">A 3D model of a self-winding, centre-seconds calibre at 28,800 vph — modelled on the classic Swiss three-hand architecture. Pull it apart, orbit it, and click any component. The gears turn at their true relative ratios.</p>
-    <div class="complexity mono"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+    <p class="chapter-intro">Thirty-one components of a self-winding, centre-seconds calibre at 28,800 vph. Keep scrolling and it comes apart in your hands; then orbit it and click any part. The gears turn at their true ratios.</p>
+    <div class="complexity"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
   </div>
+  <div class="viewer-pin" id="viewerPin">
   <div class="viewer" id="viewer">
     <canvas id="movementCanvas"></canvas>
     <svg class="leaders" id="leaders"></svg>
     <div class="labels" id="labels"></div>
     <div class="viewer-ui">
       <div class="viewer-top">
-        <div class="seg mono" role="tablist" aria-label="View presets">
+        <div class="seg" role="tablist" aria-label="View presets">
           <button data-view="hero" class="active">¾ View</button>
           <button data-view="side">Elevation</button>
           <button data-view="top">Dial side</button>
           <button data-view="back">Caseback</button>
         </div>
-        <div class="seg mono">
+        <div class="seg">
           <button id="toggleLabels" class="active">Pointers</button>
           <button id="toggleRun" class="active">Running</button>
         </div>
       </div>
-      <div class="viewer-bot"><p class="viewer-hint mono">Drag to orbit · click any part or pointer to isolate it</p>
+      <div class="viewer-bot"><p class="viewer-hint" id="viewerHint">Scroll to disassemble · drag to orbit · click a part</p>
       <div class="explode-ctl">
-        <span class="mono">Assembled</span>
+        <span>Assembled</span>
         <input type="range" id="explode" min="0" max="1000" value="720" aria-label="Explode amount">
-        <span class="mono">Exploded</span>
+        <span>Exploded</span>
       </div></div>
     </div>
     <aside class="part-card" id="partCard" aria-live="polite">
-      <p class="mono tag" id="pcIndex">— / —</p>
+      <p class="tag" id="pcIndex">— / —</p>
       <h3 id="pcName">Click a part</h3>
-      <p id="pcDesc">Each pointer names a component. Click a label or the part itself to isolate it and read what it does.</p>
-      <dl class="mono" id="pcSpecs"></dl>
+      <p id="pcDesc">Each pointer names a component. Click a label or the part itself to isolate it.</p>
+      <dl id="pcSpecs"></dl>
       <div class="pc-nav"><button id="pcPrev" class="btn-mini">‹ Prev</button><button id="pcNext" class="btn-mini">Next ›</button></div>
     </aside>
-    <div class="viewer-loading mono" id="viewerLoading">Assembling 30 components…</div>
+    <div class="viewer-loading" id="viewerLoading">Assembling components…</div>
+  </div>
   </div>
   <div class="power-flow">
-    <h3 class="mono tag">The flow of energy</h3>
+    <h3 class="tag">The flow of energy</h3>
     <ol class="flow" id="flow">
       <li><b>Rotor</b><span>Wrist motion spins the oscillating weight</span></li>
       <li><b>Reversers</b><span>Both directions become one-way winding</span></li>
-      <li><b>Mainspring</b><span>Stores ~40 h of energy in a coiled alloy strip</span></li>
-      <li><b>Gear train</b><span>Centre → third → fourth wheel, stepping down torque, up speed</span></li>
-      <li><b>Escapement</b><span>Escape wheel + pallet fork release energy in measured packets</span></li>
-      <li><b>Balance</b><span>Oscillates 8 beats/s — the regulating heart</span></li>
-      <li><b>Hands</b><span>Motion works divide hours from minutes on the dial</span></li>
+      <li><b>Mainspring</b><span>Stores ~42 h of energy in a coiled alloy strip</span></li>
+      <li><b>Gear train</b><span>Centre → third → fourth wheel: torque down, speed up</span></li>
+      <li><b>Escapement</b><span>Releases energy in measured packets</span></li>
+      <li><b>Balance</b><span>Oscillates eight beats a second — the heart</span></li>
+      <li><b>Hands</b><span>Motion works divide hours from minutes</span></li>
     </ol>
   </div>
 </section>
 
-<!-- ═══════════════════════════ V · ESCAPEMENT ═══════════════════════════ -->
-<section class="chapter" id="escapement" data-level="3">
+<!-- ═══════════════════════════ IV · ESCAPEMENT ═══════════════════════════ -->
+<section class="chapter" id="escapement">
   <div class="chapter-head">
-    <p class="chapter-no mono">Chapter V</p>
+    <span class="roman" aria-hidden="true">V</span>
+    <p class="chapter-no">Chapter V · The Heartbeat</p>
     <h2 class="display">The Swiss lever<br><em>escapement</em></h2>
-    <p class="chapter-intro">The single most important mechanism in a mechanical watch: it lets the mainspring's energy escape one tooth at a time, while giving the balance a tiny push to keep it swinging. Slow it down and watch the five phases.</p>
-    <div class="complexity mono"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+    <p class="chapter-intro">The most important mechanism in the watch: it lets the mainspring's energy escape one tooth at a time while giving the balance a tiny push to keep it swinging. Slow it down and watch the five phases.</p>
+    <div class="complexity"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
   </div>
   <div class="esc-grid">
-    <div class="panel esc-stage">
+    <div class="frame esc-stage">
       <canvas id="escCanvas" width="900" height="640"></canvas>
       <div class="esc-controls">
-        <label class="mono">Speed <input type="range" id="escSpeed" min="2" max="100" value="12"></label>
-        <span class="mono" id="escSpeedOut">0.12×</span>
-        <button class="btn-mini" id="escSound">🔈 Tick sound: off</button>
+        <label>Speed <input type="range" id="escSpeed" min="2" max="100" value="12"></label>
+        <span class="num" id="escSpeedOut">0.12×</span>
+        <button class="btn-mini" id="escSound">Tick sound: off</button>
       </div>
     </div>
     <div class="esc-phases" id="escPhases">
-      <div class="phase" data-p="0"><b>01 · Locking</b><span>An escape tooth rests on the pallet stone's locking face. The train is frozen; the balance swings freely — the "detached" part of the detached lever.</span></div>
-      <div class="phase" data-p="1"><b>02 · Unlocking</b><span>The balance's impulse jewel (ruby pin) enters the fork slot and nudges the lever, sliding the stone off the tooth.</span></div>
-      <div class="phase" data-p="2"><b>03 · Impulse</b><span>The released tooth slides across the stone's angled impulse face, pushing the fork — which pushes the ruby pin — giving the balance its energy.</span></div>
-      <div class="phase" data-p="3"><b>04 · Drop</b><span>The tooth leaves the stone and the wheel jumps freely until the next tooth lands on the opposite pallet. This is the "tick".</span></div>
-      <div class="phase" data-p="4"><b>05 · Draw</b><span>Undercut locking faces pull the fork against its banking pin, holding it safely out of the balance's way until the return swing.</span></div>
+      <div class="phase" data-p="0"><b>I · Locking</b><span>An escape tooth rests on the pallet stone's locking face. The train is frozen; the balance swings freely — the "detached" part of the detached lever.</span></div>
+      <div class="phase" data-p="1"><b>II · Unlocking</b><span>The balance's impulse jewel enters the fork slot and nudges the lever, sliding the stone off the tooth.</span></div>
+      <div class="phase" data-p="2"><b>III · Impulse</b><span>The released tooth slides across the stone's angled impulse face, pushing the fork — which pushes the ruby pin — giving the balance its energy.</span></div>
+      <div class="phase" data-p="3"><b>IV · Drop</b><span>The tooth leaves the stone and the wheel jumps freely until the next tooth lands on the opposite pallet. This is the tick.</span></div>
+      <div class="phase" data-p="4"><b>V · Draw</b><span>Undercut locking faces pull the fork against its banking pin, holding it safely out of the balance's way until the return swing.</span></div>
     </div>
   </div>
-  <div class="beat-lab panel">
+  <div class="beat-lab frame">
     <div class="beat-head">
-      <h3 class="mono tag">Beat-rate laboratory</h3>
-      <div class="seg mono" id="beatSeg">
+      <h3 class="tag">Beat-rate laboratory</h3>
+      <div class="seg" id="beatSeg">
         <button data-vph="18000">18,000</button>
         <button data-vph="21600">21,600</button>
         <button data-vph="25200">25,200</button>
@@ -225,89 +251,94 @@
   </div>
 </section>
 
-<!-- ═══════════════════════════ VI · BLUEPRINTS ═══════════════════════════ -->
-<section class="chapter chapter-blueprint" id="blueprints" data-level="4">
+<!-- ═══════════════════════════ V · BLUEPRINTS ═══════════════════════════ -->
+<section class="chapter chapter-blueprint" id="blueprints">
   <div class="chapter-head">
-    <p class="chapter-no mono">Chapter VI · Drafting Office</p>
+    <span class="roman" aria-hidden="true">VI</span>
+    <p class="chapter-no">Chapter VI · The Drafting Office</p>
     <h2 class="display">Blueprints of the<br><em>great archetypes</em></h2>
-    <p class="chapter-intro">Ten watch families that defined the wrist. Each sheet is a parametric technical drawing — front elevation, side profile and section — with the dimensions that define the genre. Drawings are generic archetypes, not reproductions of any one manufacturer's design.</p>
-    <div class="complexity mono"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+    <p class="chapter-intro">Ten watch families that defined the wrist, drawn as an atelier would: front elevation, side profile and section, with the dimensions that define each genre. Generic archetypes — not reproductions of any one maker's design.</p>
+    <div class="complexity"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
   </div>
-  <div class="bp-tabs mono" id="bpTabs" role="tablist"></div>
-  <div class="bp-sheet" id="bpSheet">
-    <svg id="bpSvg" viewBox="0 0 1400 880" role="img" aria-label="Technical blueprint drawing"></svg>
+  <div class="bp-tabs" id="bpTabs" role="tablist"></div>
+  <div class="bp-table">
+    <div class="bp-sheet" id="bpSheet">
+      <svg id="bpSvg" viewBox="0 0 1400 880" role="img" aria-label="Technical blueprint drawing"></svg>
+    </div>
   </div>
   <div class="bp-notes" id="bpNotes"></div>
 </section>
 
-<!-- ═══════════════════════════ VII · COMPLICATIONS ═══════════════════════════ -->
-<section class="chapter chapter-rich" id="complications" data-level="5">
+<!-- ═══════════════════════════ VI · COMPLICATIONS ═══════════════════════════ -->
+<section class="chapter chapter-rich" id="complications">
   <div class="chapter-head">
-    <p class="chapter-no mono">Chapter VII</p>
+    <span class="roman" aria-hidden="true">VII</span>
+    <p class="chapter-no">Chapter VII · Complications</p>
     <h2 class="display">Complications,<br><em>working</em></h2>
-    <p class="chapter-intro">Anything beyond hours, minutes and seconds is a complication. Every module below is live — computed from your clock, the Moon's actual synodic cycle, and the Gregorian calendar. Press the pushers. Strike the repeater.</p>
-    <div class="complexity mono"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+    <p class="chapter-intro">Anything beyond hours, minutes and seconds is a complication. Every module below is live — computed from your clock, the Moon's real synodic cycle and the Gregorian calendar. Press the pushers. Strike the repeater.</p>
+    <div class="complexity"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
   </div>
   <div class="comp-grid" id="compGrid">
-    <article class="comp panel" id="cChrono">
-      <header><span class="mono tag">Chronograph</span><span class="parts mono">+ ~100 parts</span></header>
+    <article class="comp frame" id="cChrono">
+      <header><span class="tag">Chronograph</span><span class="parts">+ ~100 parts</span></header>
       <svg viewBox="-120 -120 240 240" id="chronoSvg"></svg>
-      <div class="pushers"><button class="btn-mini" id="chronoStart">Start / Stop · 2 o'clock</button><button class="btn-mini" id="chronoReset">Reset · 4 o'clock</button></div>
-      <p>A stopwatch built into the movement. A column wheel or cam coordinates start, stop and reset; a clutch (horizontal or vertical) couples the chrono seconds to the running train. Shown: 1/8 s resolution, 30-minute counter.</p>
+      <div class="pushers"><button class="btn-mini" id="chronoStart">Start / Stop</button><button class="btn-mini" id="chronoReset">Reset</button></div>
+      <p>A stopwatch built into the movement. A column wheel coordinates start, stop and reset; a clutch couples the chronograph seconds to the running train. Shown: ⅛ s resolution, 30-minute counter.</p>
     </article>
-    <article class="comp panel" id="cMoon">
-      <header><span class="mono tag">Moon phase</span><span class="parts mono">Live · <span id="moonAge">—</span></span></header>
+    <article class="comp frame" id="cMoon">
+      <header><span class="tag">Moon phase</span><span class="parts">Live · <span id="moonAge">—</span></span></header>
       <svg viewBox="-120 -120 240 240" id="moonSvg"></svg>
-      <p>A 59-tooth disc advanced once per day carries two moons; each lunation is approximated as 29.5 days, drifting 1 day every 2 years 7 months. High-precision 135-tooth trains drift only 1 day in 122 years. Real synodic month: 29.530589 days.</p>
+      <p>A 59-tooth disc advanced once a day carries two moons; each lunation is approximated as 29.5 days and drifts a day every 2 years 7 months. Fine 135-tooth trains drift only a day in 122 years.</p>
     </article>
-    <article class="comp panel" id="cGmt">
-      <header><span class="mono tag">GMT / Dual time</span><span class="parts mono" id="gmtLabel">UTC</span></header>
+    <article class="comp frame" id="cGmt">
+      <header><span class="tag">GMT · Dual time</span><span class="parts" id="gmtLabel">UTC</span></header>
       <svg viewBox="-120 -120 240 240" id="gmtSvg"></svg>
-      <p>A fourth hand rotates once in 24 hours against a 24-hour bezel. The arrow-tipped hand here points to UTC; the bezel shows your offset. "True" GMT lets the local hour hand jump independently in 1-hour steps.</p>
+      <p>A fourth hand rotates once in 24 hours against a 24-hour bezel. The arrow-tipped hand here points to UTC. A "true" GMT lets the local hour hand jump independently in one-hour steps.</p>
     </article>
-    <article class="comp panel" id="cPerp">
-      <header><span class="mono tag">Perpetual calendar</span><span class="parts mono" id="perpLeap">—</span></header>
+    <article class="comp frame" id="cPerp">
+      <header><span class="tag">Perpetual calendar</span><span class="parts" id="perpLeap">—</span></header>
       <svg viewBox="-120 -120 240 240" id="perpSvg"></svg>
-      <p>A mechanical memory of the Gregorian calendar: a 48-month cam "knows" month lengths and leap years and needs no correction until 2100 — the secular year that skips its leap day.</p>
+      <p>A mechanical memory of the Gregorian calendar: a 48-month cam knows month lengths and leap years, and needs no correction until 2100 — the secular year that skips its leap day.</p>
     </article>
-    <article class="comp panel" id="cTourb">
-      <header><span class="mono tag">Tourbillon</span><span class="parts mono">1 rev / 60 s</span></header>
+    <article class="comp frame" id="cTourb">
+      <header><span class="tag">Tourbillon</span><span class="parts">1 rev / 60 s</span></header>
       <svg viewBox="-120 -120 240 240" id="tourbSvg"></svg>
-      <p>Abraham-Louis Breguet's 1801 patent: the entire escapement rides in a rotating cage, averaging out positional errors caused by gravity when a pocket watch sat vertical. Today: the ultimate display of finishing skill.</p>
+      <p>Breguet's 1801 patent: the whole escapement rides in a rotating cage, averaging out the errors gravity causes in vertical positions. Today: the ultimate display of finishing skill.</p>
     </article>
-    <article class="comp panel" id="cPower">
-      <header><span class="mono tag">Power reserve</span><span class="parts mono" id="prLabel">—</span></header>
+    <article class="comp frame" id="cPower">
+      <header><span class="tag">Power reserve</span><span class="parts" id="prLabel">—</span></header>
       <svg viewBox="-120 -120 240 240" id="powerSvg"></svg>
       <div class="pushers"><button class="btn-mini" id="windBtn">Wind the crown ↻</button></div>
-      <p>A differential gear compares barrel arbor (winding) and barrel drum (unwinding) rotation, driving a hand that shows how much energy remains in the mainspring.</p>
+      <p>A differential compares the barrel arbor (winding) with the barrel drum (unwinding), driving a hand that shows how much energy remains. Let it run down — the watch stops.</p>
     </article>
-    <article class="comp panel comp-wide" id="cRepeater">
-      <header><span class="mono tag">Minute repeater</span><span class="parts mono">Grand complication</span></header>
+    <article class="comp frame comp-wide" id="cRepeater">
+      <header><span class="tag">Minute repeater</span><span class="parts">Grand complication</span></header>
       <div class="rep-body">
         <svg viewBox="-120 -120 240 240" id="repSvg"></svg>
         <div>
-          <p>On demand, a slide on the case arms the strike train; snail-shaped cams read the hands' positions, and two hammers strike gongs coiled around the movement: <b>low tones for hours</b>, <b>ding-dong pairs for quarters</b>, <b>high tones for minutes</b>.</p>
-          <button class="btn btn-gold" id="repBtn">Strike the current time</button>
-          <p class="mono small" id="repOut">Press to hear it — uses Web Audio.</p>
+          <p>On demand, a slide on the case arms the strike train; snail-shaped cams read the hands, and two hammers strike gongs coiled around the movement: <b>low tones for hours</b>, <b>ding-dong pairs for quarters</b>, <b>high tones for minutes</b>.</p>
+          <button class="btn btn-brass" id="repBtn"><span>Strike the current time</span></button>
+          <p class="small" id="repOut">Press to hear it.</p>
         </div>
       </div>
     </article>
   </div>
-  <div class="hierarchy panel">
-    <h3 class="mono tag">The hierarchy of difficulty</h3>
+  <div class="hierarchy frame">
+    <h3 class="tag">The hierarchy of difficulty</h3>
     <div class="hier" id="hier"></div>
   </div>
 </section>
 
-<!-- ═══════════════════════════ VIII · CALIBERS ═══════════════════════════ -->
-<section class="chapter chapter-rich" id="calibers" data-level="5">
+<!-- ═══════════════════════════ VII · CALIBERS ═══════════════════════════ -->
+<section class="chapter chapter-rich" id="calibers">
   <div class="chapter-head">
-    <p class="chapter-no mono">Chapter VIII</p>
+    <span class="roman" aria-hidden="true">VIII</span>
+    <p class="chapter-no">Chapter VIII · The Engines</p>
     <h2 class="display">Legendary<br><em>calibres</em></h2>
-    <p class="chapter-intro">The engines that matter. Compare frequency, jewels and power reserve — and see how the industry pushed each one.</p>
-    <div class="complexity mono"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+    <p class="chapter-intro">The engines that matter. Compare frequency, jewels and power reserve — and see how the industry kept pushing.</p>
+    <div class="complexity"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
   </div>
-  <div class="cal-controls mono">
+  <div class="cal-controls">
     <span>Sort by</span>
     <div class="seg" id="calSort">
       <button data-k="year" class="active">Year</button>
@@ -320,105 +351,135 @@
 </section>
 
 <!-- ═══════════════════════════ IX · DIGITAL ═══════════════════════════ -->
-<section class="chapter chapter-digital" id="digital" data-level="6">
+<section class="chapter chapter-digital" id="digital">
   <div class="chapter-head">
-    <p class="chapter-no mono">Chapter IX</p>
-    <h2 class="display">Beyond the gear:<br><em>light, liquid crystal, silicon</em></h2>
-    <p class="chapter-intro">The quartz crisis rewrote the rules. Red LEDs that lit only on demand, liquid crystal that never sleeps, then computers on the wrist. Push the buttons — they work.</p>
-    <div class="complexity mono"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <span class="roman" aria-hidden="true">IX</span>
+    <p class="chapter-no">Chapter IX · Light &amp; Liquid Crystal</p>
+    <h2 class="display">Beyond the gear:<br><em>LED, LCD, hybrids</em></h2>
+    <p class="chapter-intro">Red diodes that lit only on demand, liquid crystal that never sleeps, and hybrids that marry a mainspring to a quartz brain. Push the buttons — they work.</p>
+    <div class="complexity"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
   </div>
   <div class="dig-grid">
-    <article class="panel dig-card">
-      <header><span class="mono tag">1970 · LED</span><span class="mono parts">Press to read</span></header>
+    <article class="frame dig-card">
+      <header><span class="tag">1970 · LED</span><span class="parts">Press to read</span></header>
       <div class="led-watch" id="ledWatch">
         <div class="led-glass"><div class="led-digits" id="ledDigits"></div></div>
         <button class="led-btn" id="ledBtn" aria-label="Show time">COMMAND</button>
       </div>
-      <p>Light-emitting diodes drew so much current that the display stayed dark until you pressed the button. Hamilton's Pulsar (1970) cost more than a Rolex at launch.</p>
+      <p>Light-emitting diodes drew so much current the display stayed dark until you pressed the button. Hamilton's Pulsar cost more than a Rolex at launch — the space-age status symbol of 1970.</p>
     </article>
-    <article class="panel dig-card dig-lcd">
-      <header><span class="mono tag">1973 · LCD</span><span class="mono parts" id="lcdModeLabel">TIME</span></header>
+    <article class="frame dig-card">
+      <header><span class="tag">1973 · LCD</span><span class="parts" id="lcdModeLabel">TIME</span></header>
       <div class="lcd-watch" id="lcdWatch">
         <div class="lcd-bezel">
-          <div class="lcd-top mono"><span>LIGHT</span><span>ALARM CHRONOGRAPH</span></div>
-          <div class="lcd-screen" id="lcdScreen">
-            <div class="lcd-small" id="lcdSmall"></div>
-            <div class="lcd-main" id="lcdMain"></div>
-          </div>
-          <div class="lcd-bot mono"><span>WATER RESIST</span><span>MODE</span></div>
+          <div class="lcd-top"><span>LIGHT</span><span>ALARM CHRONOGRAPH</span></div>
+          <div class="lcd-screen" id="lcdScreen"><div class="lcd-small" id="lcdSmall"></div><div class="lcd-main" id="lcdMain"></div></div>
+          <div class="lcd-bot"><span>WATER RESIST</span><span>MODE</span></div>
         </div>
         <button class="lcd-b lcd-b1" id="lcdLight" aria-label="Light">L</button>
         <button class="lcd-b lcd-b2" id="lcdMode" aria-label="Mode">M</button>
         <button class="lcd-b lcd-b3" id="lcdStart" aria-label="Start/stop">S</button>
       </div>
-      <p>Twisted-nematic liquid crystals between crossed polarisers rotate light 90° until a voltage untwists them — each black segment is just light that can no longer pass. Microwatts of power; years of battery. Buttons: <b>L</b> light, <b>M</b> mode, <b>S</b> start/stop.</p>
+      <p>Twisted-nematic crystals between crossed polarisers rotate light 90° until a voltage untwists them — each black segment is light that can no longer pass. Microwatts; years of battery. <b>L</b> light, <b>M</b> mode, <b>S</b> start/stop.</p>
     </article>
-    <article class="panel dig-card">
-      <header><span class="mono tag">2015 → · Smartwatch</span><span class="mono parts">AMOLED</span></header>
-      <div class="smart" id="smart"><canvas id="smartCanvas" width="400" height="480"></canvas></div>
-      <p>An application processor, sensors (optical heart rate, accelerometer, gyroscope, GNSS) and an OLED where each pixel is its own light. Accuracy is borrowed: the phone syncs it to network time, itself traceable to atomic clocks.</p>
+    <article class="frame dig-card">
+      <header><span class="tag">1999 · Spring Drive</span><span class="parts">Hybrid</span></header>
+      <div class="glide"><svg id="glideSvg" viewBox="-120 -120 240 240"></svg></div>
+      <p>Seiko's hybrid: a mainspring drives a glide wheel braked by an electromagnet and referenced to a quartz crystal. The result is the only truly continuous seconds hand in watchmaking — ±1 s a day.</p>
     </article>
   </div>
-  <div class="lcd-layers panel">
-    <h3 class="mono tag">Inside an LCD — exploded</h3>
+  <div class="lcd-layers frame">
+    <h3 class="tag">Inside an LCD — exploded</h3>
     <svg id="lcdLayers" viewBox="0 0 1100 340"></svg>
   </div>
   <div class="tech-strip">
-    <div><b>Spring Drive</b><span>Seiko, 1999. A mainspring drives a glide wheel braked electromagnetically, regulated by quartz. Truly continuous sweep, ±1 s/day.</span></div>
-    <div><b>Radio-controlled</b><span>Receivers pick up long-wave time signals (DCF77, MSF, WWVB, JJY) nightly and correct to the second.</span></div>
-    <div><b>GPS solar</b><span>Satellite time + position sets the zone automatically anywhere on Earth; light charges a lithium cell.</span></div>
     <div><b>Kinetic / Autoquartz</b><span>An automatic-style rotor spins a micro-generator, charging a capacitor that runs a quartz circuit.</span></div>
+    <div><b>Radio-controlled</b><span>Long-wave time signals (DCF77, MSF, WWVB, JJY) received nightly correct the watch to the second.</span></div>
+    <div><b>GPS solar</b><span>Satellite time and position set the zone anywhere on Earth; light charges a lithium cell.</span></div>
+    <div><b>Thermocompensated</b><span>A thermistor measures temperature and the IC corrects the crystal's drift — accuracy of seconds per year.</span></div>
   </div>
 </section>
 
-<!-- ═══════════════════════════ X · LUXURY ATLAS ═══════════════════════════ -->
-<section class="chapter chapter-lux" id="atlas" data-level="6">
+<!-- ═══════════════════════════ X · THE VAULT ═══════════════════════════ -->
+<section class="chapter chapter-lux" id="vault">
   <div class="chapter-head">
-    <p class="chapter-no mono">Chapter X · Haute Horlogerie</p>
-    <h2 class="display">The Luxury<br><em>Index</em></h2>
-    <p class="chapter-intro">A curated catalogue of the houses and references that define high watchmaking — with calibres, case specs and indicative retail prices. Filter, sort, compare. Dial renders are generated illustrations, not product photos.</p>
-    <div class="complexity mono"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <span class="roman" aria-hidden="true">X</span>
+    <p class="chapter-no">Chapter X · Haute Horlogerie</p>
+    <h2 class="display">The<br><em>Vault</em></h2>
+    <p class="chapter-intro">The houses and references that define high watchmaking, each under its own glass — with calibres, case specifications and indicative retail prices. Hover a cloche to lift it.</p>
+    <div class="complexity"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
   </div>
   <div class="trinity" id="trinity"></div>
   <div class="atlas-controls">
-    <input type="search" id="atlasSearch" class="mono" placeholder="Search brand, model, calibre…" aria-label="Search watches">
-    <div class="seg mono" id="atlasCat"></div>
-    <div class="seg mono" id="atlasSort">
+    <input type="search" id="atlasSearch" placeholder="Search house, model, calibre…" aria-label="Search watches">
+    <div class="seg" id="atlasCat"></div>
+    <div class="seg" id="atlasSort">
       <button data-s="price-asc">Price ↑</button>
       <button data-s="price-desc" class="active">Price ↓</button>
       <button data-s="year">Year</button>
     </div>
   </div>
-  <p class="mono small atlas-count" id="atlasCount"></p>
+  <p class="small atlas-count" id="atlasCount"></p>
   <div class="atlas-grid" id="atlasGrid"></div>
-  <div class="auctions panel">
-    <h3 class="mono tag">Hammer prices — the record book</h3>
+  <div class="auctions frame">
+    <h3 class="tag">Hammer prices — the record book</h3>
     <div id="auctions"></div>
-    <p class="small muted">Results as reported by the auction houses, including buyer's premium, in USD at the time of sale.</p>
+    <p class="small muted">As reported by the auction houses, including buyer's premium, in USD at the time of sale.</p>
   </div>
   <div class="houses">
-    <h3 class="mono tag">The houses</h3>
+    <h3 class="tag">The houses</h3>
     <div class="house-grid" id="houseGrid"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ THE BIN ═══════════════════════════ -->
+<section class="chapter chapter-bin" id="garbage">
+  <div class="chapter-head">
+    <span class="roman roman-bin" aria-hidden="true">✕</span>
+    <p class="chapter-no">Appendix · The Garbage List</p>
+    <h2 class="display">Smartwatches,<br><em>filed under protest</em></h2>
+    <p class="chapter-intro">Notifications, step counts, firmware updates and a charger every night. They tell the time — so does a microwave. Kept here for completeness. (It does work.)</p>
+  </div>
+  <div class="bin-grid">
+    <article class="reject reject-main" data-stamp="Needs charging">
+      <header><span class="tag">Exhibit A · 2015 · The smartwatch</span><span class="verdict">“Low battery. Again.”</span></header>
+      <div class="smart" id="smart"><canvas id="smartCanvas" width="400" height="480"></canvas></div>
+      <p>A phone that lost a fight with a wristband. Its accuracy is borrowed from the network, its battery lasts a day, and it will be e-waste in four years. A Patek will outlive your grandchildren.</p>
+    </article>
+    <div class="bin-side">
+      <article class="reject" data-stamp="Gimmick"><header><span class="tag">Exhibit B · Hybrid smartwatch</span><span class="verdict">“Real hands, fake soul.”</span></header><p>A quartz movement with Bluetooth that vibrates when your email arrives. All the charm of a watch, all the anxiety of a phone.</p></article>
+      <article class="reject" data-stamp="Not a watch"><header><span class="tag">Exhibit C · Fitness band</span><span class="verdict">“Congratulations, you stood up.”</span></header><p>A rubber strap that counts your steps and judges your sleep. Tells the time as an afterthought.</p></article>
+      <article class="reject" data-stamp="Obsolete"><header><span class="tag">Exhibit D · Planned obsolescence</span><span class="verdict">“This device is no longer supported.”</span></header><p>Mechanical watches from 1890 are still being serviced and worn. Your smartwatch's operating system will stop updating before its warranty ends.</p></article>
+    </div>
   </div>
 </section>
 
 <!-- ═══════════════════════════ GLOSSARY ═══════════════════════════ -->
 <section class="chapter" id="glossary">
   <div class="chapter-head">
-    <p class="chapter-no mono">Appendix</p>
-    <h2 class="display">Glossary<br><em>for the obsessed</em></h2>
-    <p class="chapter-intro">The words watch people use, defined properly.</p>
+    <span class="roman" aria-hidden="true">¶</span>
+    <p class="chapter-no">Glossary</p>
+    <h2 class="display">Words<br><em>for the obsessed</em></h2>
+    <p class="chapter-intro">The vocabulary of the bench, defined properly.</p>
   </div>
-  <input type="search" id="glossSearch" class="mono gloss-search" placeholder="Filter terms… (try ‘anglage’)" aria-label="Filter glossary">
+  <input type="search" id="glossSearch" class="gloss-search" placeholder="Filter terms… (try ‘anglage’)" aria-label="Filter glossary">
   <div class="gloss" id="gloss"></div>
 </section>
 
-<footer class="colophon">
-  <div class="col-watch"><svg id="footWatch" viewBox="-110 -110 220 220" aria-hidden="true"></svg></div>
-  <div>
+<!-- ═══════════════════════════ END CREDITS ═══════════════════════════ -->
+<footer class="credits" id="credits">
+  <div class="credits-roll" id="creditsRoll">
+    <p class="fin">Fin.</p>
+    <div class="credit"><span>Directed by</span><b>The Balance Wheel</b></div>
+    <div class="credit"><span>Produced by</span><b>The Mainspring</b></div>
+    <div class="credit"><span>Timing</span><b>The Escapement</b></div>
+    <div class="credit"><span>Leading role</span><b>The Tourbillon</b></div>
+    <div class="credit"><span>Supporting cast</span><b>25 Synthetic Rubies</b></div>
+    <div class="credit"><span>Finishing</span><b>Anglage, Perlage &amp; Côtes de Genève</b></div>
+    <div class="credit"><span>Not appearing</span><b>Smartwatches</b></div>
+    <div class="col-watch"><svg id="footWatch" viewBox="-110 -110 220 220" aria-hidden="true"></svg></div>
     <p class="display footer-title">Mech<em>Watch</em></p>
-    <p class="small muted">An independent educational atlas of horology. Brand and model names are used for identification and commentary only; all illustrations are original renders. Prices are indicative manufacturer retail and change frequently — check with an authorised dealer.</p>
-    <p class="mono small muted">Built with hand-written SVG, Canvas and three.js. No images were harmed.</p>
+    <p class="small muted">An independent educational atlas of horology. Brand and model names are used for identification and commentary only; all illustrations are original renders. Prices are indicative and change frequently — check with an authorised dealer.</p>
   </div>
 </footer>
 

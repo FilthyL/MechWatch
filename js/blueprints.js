@@ -46,7 +46,7 @@ function build(svg, b) {
   defs.innerHTML = `<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#cfe3ff" stroke-width="1" opacity=".7"/></pattern>
   <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="#9fc6ff"/></marker>
   <clipPath id="dialclip"><circle cx="0" cy="0" r="1"/></clipPath>`;
-  const S = Math.min(11.5, 620 / Math.max(b.L2L, b.D + 12));
+  const S = Math.min(10.5, 520 / b.L2L, 470 / (b.D + 14));
   const W = 1400, H = 880;
   const root = el('g', {}, svg);
   // ── sheet frame & zones
@@ -66,7 +66,7 @@ function build(svg, b) {
   el('text', { x: 62, y: 106, class: 'lbltxt fade', style: '--d:.3s' }, root).textContent = `FRONT ELEVATION  ·  SCALE ${(S / 4.5).toFixed(1)}:1  ·  ALL DIMENSIONS IN MM`;
 
   // ── front elevation
-  const cx = 460, cy = 470;
+  const cx = 440, cy = 478;
   const F = el('g', { transform: `translate(${cx} ${cy})` }, root);
   const r = b.D / 2 * S;
   const ln = (d, cls = 'ln draw') => el('path', { d, class: cls }, F);
@@ -118,7 +118,7 @@ function build(svg, b) {
       ln(`M0 ${-ri - 2} l-10 -${rr - ri + 2} h20 Z`);
       el('path', { d: `M${-(r - .8 * S)} 0 A${r - .8 * S} ${r - .8 * S} 0 0 0 ${r - .8 * S} 0 L${ri} 0 A${ri} ${ri} 0 0 1 ${-ri} 0 Z`, fill: 'url(#hatch)', stroke: 'none', class: 'fade', opacity: .45 }, F);
     } else {
-      const marks = [500, 400, 300, 250, 200, 180, 160, 140, 120, 110, 100, 90, 80, 75, 70, 65, 60];
+      const marks = [500, 300, 250, 200, 180, 160, 140, 120, 110, 100, 90, 80, 75, 70, 65, 60];
       marks.forEach(v => { const sec = 3600 / v; const a = sec * 6; const [x, y] = polar(rr, a); el('text', { x, y: y + 4, class: 'lbltxt fade', 'text-anchor': 'middle', transform: `rotate(${a} ${x} ${y})`, 'font-size': 11 }, F).textContent = v; });
     }
     var dialR = ri - .6 * S;
@@ -190,7 +190,7 @@ function build(svg, b) {
     L(`M0 ${sy + 6} L0 ${sy - DR * .2}`);
   } else if (b.dial === 'field') {
     minuteTrack(DR, true);
-    for (let i = 0; i < 12; i++) { const [x, y] = polar(DR * .72, i * 30); T(x, y + 10, i || 12, 28, { 'font-family': 'Inter', 'font-weight': 500 }); const [x2, y2] = polar(DR * .5, i * 30); T(x2, y2 + 4, i + 12 === 12 ? 24 : i + 12, 11); }
+    for (let i = 0; i < 12; i++) { const [x, y] = polar(DR * .72, i * 30); T(x, y + 10, i || 12, 28, { 'font-family': 'Inter', 'font-weight': 500 }); const [x2, y2] = polar(DR * .56, i * 30); T(x2, y2 + 4, i + 12 === 12 ? 24 : i + 12, 10); }
   } else if (b.dial === 'tapisserie') {
     const g = el('g', { opacity: .6 }, dial);
     const n = 14, st = DR * 2 / n; let d = '';
@@ -212,7 +212,6 @@ function build(svg, b) {
     digits.forEach((dg, k) => seg(-w + 22 + k * (w * 2 - 50) / 4 + (k > 1 ? 14 : 0), -h + 34, 2.1, dg));
     el('circle', { cx: 0, cy: -h + 60, r: 3, class: 'fillc fade' }, dial); el('circle', { cx: 0, cy: -h + 86, r: 3, class: 'fillc fade' }, dial);
     T(-w + 40, -h + 22, 'PM', 10); T(w - 50, -h + 22, 'MO 9', 10);
-    T(0, -h - 18, 'LIGHT          ALARM CHRONOGRAPH', 10); T(0, h + 28, 'WATER RESIST      MODE', 10);
   } else if (b.dial === 'tourbillon') {
     minuteTrack(DR, false);
     for (let i = 0; i < 12; i++) { if (i >= 5 && i <= 7) continue; const [x, y] = polar(DR * .78, i * 30); T(x, y + 8, ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'][i], 20, { 'font-family': 'Cormorant Garamond' }); }
@@ -221,10 +220,9 @@ function build(svg, b) {
     for (let k = 0; k < 3; k++) { const a = k * 120; const [x, y] = polar(tr * .85, a); L(`M0 ${ty} L${x} ${ty + y}`); }
     el('circle', { cx: 0, cy: ty, r: tr * .55, class: 'ln draw' }, dial);
     for (let i = 0; i < 15; i++) { const [x1, y1] = polar(tr * .3, i * 24), [x2, y2] = polar(tr * .38, i * 24 + 8); L(`M${x1} ${ty + y1} L${x2} ${ty + y2}`); }
-    T(0, ty + tr + 18, 'CAGE · 1 REV / 60 s', 9);
   }
   // brand plate
-  if (DR) T(0, -DR * .4, 'MECHWATCH', 13, { 'font-family': 'Cormorant Garamond', 'letter-spacing': 3 });
+  if (DR) T(0, -DR * (b.dial === 'field' ? .26 : .4), 'MECHWATCH', 13, { 'font-family': 'Cormorant Garamond', 'letter-spacing': 3 });
 
   // ── hands at 10:10
   if (b.hands !== 'none') {
@@ -262,28 +260,38 @@ function build(svg, b) {
   };
   const halfW = b.shape === 'rect' || b.shape === 'digital' ? b.D / 2 * S : r;
   dimH(cx - halfW, cx + halfW, cy + L2 + 60, (b.shape === 'round' || b.shape === 'octagon' ? 'Ø ' : '') + b.D.toFixed(1), cy + 10, cy + 10);
-  dimV(cy - L2, cy + L2, cx - halfW - 70, b.L2L.toFixed(1), cx - lugW / 2 - 10, cx - lugW / 2 - 10);
+  dimV(cy - L2, cy + L2, cx - (b.shape === 'rect' || b.shape === 'digital' ? halfW : r) - 84, b.L2L.toFixed(1), cx - lugW / 2 - 10, cx - lugW / 2 - 10);
   if (b.LW) { const y = cy - L2 - 28; el('path', { d: `M${cx - lugW / 2} ${y} H${cx + lugW / 2}`, class: 'dim draw', 'marker-start': 'url(#arr)', 'marker-end': 'url(#arr)' }, D); el('path', { d: `M${cx - lugW / 2} ${cy - L2} V${y - 6} M${cx + lugW / 2} ${cy - L2} V${y - 6}`, class: 'dim draw' }, D); el('text', { x: cx, y: y - 6, class: 'dimtxt fade', 'text-anchor': 'middle' }, D).textContent = `LUG ${b.LW}`; }
 
-  // ── callouts (front)
-  const call = (x, y, tx, ty, t) => {
-    el('path', { d: `M${x} ${y} L${tx} ${ty} H${tx + (tx > x ? 30 : -30)}`, class: 'dim draw' }, D);
-    el('circle', { cx: x, cy: y, r: 2.5, fill: '#9fc6ff', class: 'fade' }, D);
-    const words = t.split(' '), lines = ['']; for (const wd of words) { if ((lines[lines.length - 1] + ' ' + wd).trim().length > 20) lines.push(wd); else lines[lines.length - 1] = (lines[lines.length - 1] + ' ' + wd).trim(); }
-    lines.forEach((l, k) => { el('text', { x: tx + (tx > x ? 36 : -36), y: ty + 4 + k * 14, class: 'lbltxt fade', 'text-anchor': tx > x ? 'start' : 'end' }, D).textContent = l; });
+  // ── item balloons (front) — engineering-style callouts, keyed to the parts list
+  const BR = b.shape === 'rect' || b.shape === 'digital' ? halfW : r;
+  const DRr = DR || BR * .7;
+  const items = partsList(b);
+  const xL = cx - BR - 40, xR = cx + BR + 64;
+  const balloon = (n, bx, by, fx, fy) => {
+    const ang = Math.atan2(fy - by, fx - bx);
+    el('path', { d: `M${fx} ${fy} L${bx + 11 * Math.cos(ang)} ${by + 11 * Math.sin(ang)}`, class: 'dim draw' }, D);
+    el('circle', { cx: fx, cy: fy, r: 2.2, fill: '#9fc6ff', class: 'fade' }, D);
+    const g = el('g', { class: 'balloon fade' }, D);
+    el('circle', { cx: bx, cy: by, r: 11 }, g);
+    el('text', { x: bx, y: by + 4, 'text-anchor': 'middle' }, g).textContent = n;
   };
-  const C = b.specs;
-  const [bx, by] = polar(halfW * .92, -40);
-  call(cx + bx, cy + by, cx - halfW - 40, cy - L2 + 20, (C[2] || C[0])[1].toUpperCase());
-  call(cx + halfW + 10, cy, cx + halfW + 70, cy - 80, (C[3] || C[1])[1].toUpperCase());
-  const [hx, hy] = polar((DR || halfW * .6) * .5, 300);
-  call(cx + hx, cy + hy, cx + halfW + 70, cy + 120, (C[1] || C[0])[1].toUpperCase());
+  const pol = (rr, deg) => { const [x, y] = polar(rr, deg); return [cx + x, cy + y]; };
+  // left column (top → bottom): crystal, hands/display, dial, bezel
+  { const y = -.62 * BR; balloon(1, xL, cy + y, cx - .18 * BR, cy + y); }
+  { const [fx, fy] = b.hands === 'none' ? [cx - BR * .3, cy - BR * .12] : pol(DRr * .36, -60); balloon(2, xL, cy - .22 * BR, fx, fy); }
+  { const [fx, fy] = pol(DRr * .8, 250); balloon(3, xL, cy + .22 * BR, fx, fy); }
+  { const [fx, fy] = pol((BR + DRr) / 2 * (b.shape === 'rect' || b.shape === 'digital' ? .9 : 1), 215); balloon(4, xL, cy + .62 * BR, fx, fy); }
+  // right column: crown, case, lugs/bracelet
+  { const crownX = (b.shape === 'rect' ? b.D / 2 * S : r) + 2 * S; balloon(5, xR, cy - .3 * BR, b.crown === 'buttons' ? cx + BR + 8 : cx + crownX, b.crown === 'buttons' ? cy - (b.H || b.D) / 2 * S * .45 : cy - 1.4 * S); }
+  { const [fx, fy] = b.shape === 'round' ? pol(r - .3 * S, 104) : [cx + BR * .99, cy + .26 * BR]; balloon(6, xR, cy + .3 * BR, fx, fy); }
+  { const ly = cy + L2 - 3 * S; const fx = b.shape === 'octagon' ? cx + r * .7 : b.shape === 'rect' || b.shape === 'digital' ? cx + BR * .66 : cx + lugW / 2 + 1.2 * S; const fy = b.shape === 'octagon' ? cy + r * 1.1 : b.shape === 'rect' || b.shape === 'digital' ? cy + (b.H || b.D) / 2 * S + 30 : ly; balloon(7, xR, Math.max(cy + .62 * BR, fy), fx, fy); }
 
   // ── right column: side elevation + section
   const S2 = Math.min(7, 360 / b.L2L);
-  const sx = 1100, sy1 = 250, sy2 = 470;
-  el('text', { x: sx, y: 150, class: 'lbltxt fade', 'text-anchor': 'middle' }, root).textContent = 'SIDE ELEVATION — VIEW FROM 3 O\'CLOCK';
-  el('text', { x: sx, y: 380, class: 'lbltxt fade', 'text-anchor': 'middle' }, root).textContent = 'SECTION A–A';
+  const sx = 1110, sy1 = 238, sy2 = 425;
+  el('text', { x: sx, y: 140, class: 'lbltxt fade', 'text-anchor': 'middle' }, root).textContent = 'SIDE ELEVATION — VIEW FROM 3 O\'CLOCK';
+  el('text', { x: sx, y: 350, class: 'lbltxt fade', 'text-anchor': 'middle' }, root).textContent = 'SECTION A–A';
   const side = (g, section) => {
     const hw = b.D / 2 * S2, hl = b.L2L / 2 * S2, t = b.T * S2;
     const yTop = -t * .55, yBot = t * .45; // dial up
@@ -319,9 +327,9 @@ function build(svg, b) {
   // thickness dim
   dimV(sy1 + m1.yTop, sy1 + m1.yBot, sx + m1.hl + 50, b.T.toFixed(1), sx + m1.hw, sx + m1.hw);
   // section indicator on front view
-  el('path', { d: `M${cx} ${cy - L2 - 54} v-18 h14 M${cx} ${cy + L2 + 34} v18 h14`, class: 'ln draw' }, root);
+  el('path', { d: `M${cx} ${cy - L2 - 54} v-18 h14 M${cx} ${cy + L2 + 78} v16 h14`, class: 'ln draw' }, root);
   el('text', { x: cx + 20, y: cy - L2 - 66, class: 'lbltxt fade' }, root).textContent = 'A';
-  el('text', { x: cx + 20, y: cy + L2 + 56, class: 'lbltxt fade' }, root).textContent = 'A';
+  el('text', { x: cx + 20, y: cy + L2 + 98, class: 'lbltxt fade' }, root).textContent = 'A';
 
   // ── title block
   const tb = el('g', { transform: `translate(${W - 32 - 470} ${H - 32 - 150})` }, root);
@@ -330,7 +338,7 @@ function build(svg, b) {
   rows.slice(1).forEach(([y]) => el('path', { d: `M0 ${y} H470`, class: 'ln thin draw' }, tb));
   el('path', { d: 'M300 0 V150 M150 80 V150 M380 80 V150', class: 'ln thin draw' }, tb);
   const cell = (x, y, k, v) => { el('text', { x: x + 8, y: y + 13, class: 'tb fade' }, tb).textContent = k; el('text', { x: x + 8, y: y + 30, class: 'tbv fade' }, tb).textContent = v; };
-  cell(0, 0, 'TITLE', `${b.name.toUpperCase()} — GEN. ARRANGEMENT`.slice(0, 36));
+  cell(0, 0, 'TITLE · GENERAL ARRANGEMENT', b.name.toUpperCase());
   cell(300, 0, 'DRAWING NO.', b.ref);
   cell(0, 40, 'ARCHETYPE', b.arche.length > 38 ? b.arche.slice(0, 37) + '…' : b.arche);
   cell(300, 40, 'ESTABLISHED', b.era);
@@ -343,7 +351,36 @@ function build(svg, b) {
   // projection symbol
   const ps = el('g', { transform: `translate(${W - 32 - 470 - 70} ${H - 32 - 40})` }, root);
   el('circle', { r: 12, class: 'ln draw' }, ps); el('circle', { r: 5, class: 'ln draw' }, ps); el('path', { d: 'M-50 -12 L-22 -6 V6 L-50 12 Z', class: 'ln draw' }, ps);
-  // notes
-  const nt = el('g', { transform: `translate(830 ${H - 300})` }, root);
-  ['NOTES:', '1. BREAK ALL SHARP EDGES 0.1 × 45°.', '2. CASE FINISH: SATIN TOP, POLISHED FLANKS.', '3. CRYSTAL: SAPPHIRE, AR COATED (INNER).', '4. DO NOT SCALE DRAWING.'].forEach((s, i) => { el('text', { x: 0, y: i * 16, class: 'lbltxt fade', style: `--d:${1.4 + i * .1}s` }, nt).textContent = s; });
+  // parts list (bill of materials) above the title block
+  const pl = el('g', { transform: `translate(${W - 32 - 470} 512)` }, root);
+  el('rect', { width: 470, height: 20 + items.length * 20, class: 'ln draw', fill: 'rgba(8,35,80,.55)' }, pl);
+  el('path', { d: `M0 20 H470 M44 0 V${20 + items.length * 20} M330 0 V${20 + items.length * 20}`, class: 'ln thin draw' }, pl);
+  [['ITEM', 8], ['DESCRIPTION', 52], ['MATERIAL / FINISH', 338]].forEach(([t, x]) => { el('text', { x, y: 14, class: 'tb fade' }, pl).textContent = t; });
+  items.forEach(([name, desc, mat], k) => {
+    const y = 20 + k * 20;
+    if (k) el('path', { d: `M0 ${y} H470`, class: 'ln hair draw' }, pl);
+    el('text', { x: 22, y: y + 14, class: 'tbv fade', 'text-anchor': 'middle' }, pl).textContent = k + 1;
+    el('text', { x: 52, y: y + 14, class: 'lbltxt fade' }, pl).textContent = `${name} — ${desc}`.toUpperCase().slice(0, 46);
+    el('text', { x: 338, y: y + 14, class: 'lbltxt fade' }, pl).textContent = mat.toUpperCase().slice(0, 20);
+  });
+  el('text', { x: 0, y: -8, class: 'tb fade' }, pl).textContent = 'PARTS LIST';
+}
+
+
+function partsList(b) {
+  const metal = { diver: '904L steel', pilot: '316L steel', chrono: '316L steel', dress: '18k gold', gmt: '904L steel', field: 'Bead-blasted steel', octagon: '316L steel', tank: '18k gold', digital: 'Resin', tourbillon: 'Platinum' }[b.id] || '316L steel';
+  const bezel = { diver: 'Uni-dir. 120 clicks', gmt: 'Bi-dir. 24 h insert', tachy: 'Tachymeter scale', octagon: '8 visible screws', thin: 'Polished, thin', plain: 'Fixed, smooth', none: 'Integrated' }[b.bezel] || 'Fixed';
+  const crown = { guard: 'Screw-down, guarded', onion: 'Onion, oversized', pushers: 'Crown + 2 pushers', small: 'Push-pull', cabochon: 'Sapphire cabochon', buttons: '4 push buttons' }[b.crown] || 'Push-pull';
+  const hands = { mercedes: 'Mercedes / sword, lume', sword: 'Thermally blued sword', baton: 'Baton, luminous', dauphine: 'Faceted dauphine', breguet: 'Breguet, blued', none: 'TN-LCD 7-segment' }[b.hands] || 'Baton';
+  const dial = { diver: 'Lume plots, 3-6-9 bars', flieger: 'Triangle & dots at 12', chrono: '3 registers, tri-compax', dress: 'Applied indices, sub-sec', gmt: '24 h hand, date at 3', field: '1–12 + 13–24 numerals', tapisserie: 'Tapisserie guilloché', roman: 'Roman, chemin de fer', lcd: 'Polariser stack', tourbillon: 'Aperture at 6' }[b.dial] || 'Applied indices';
+  const lug = b.shape === 'octagon' ? ['Bracelet', 'Integrated, tapering', 'Brushed / polished'] : b.shape === 'rect' ? ['Brancards', `Integrated lugs, ${b.LW} mm`, metal] : b.shape === 'digital' ? ['Strap', `Resin, ${b.LW} mm`, 'Polyurethane'] : ['Lugs', `Drilled, ${b.LW} mm`, metal];
+  return [
+    ['Crystal', b.shape === 'digital' ? 'Flat, mineral' : b.id === 'dress' ? 'Box sapphire' : 'Sapphire, AR inner', b.shape === 'digital' ? 'Acrylic' : 'Sapphire'],
+    [b.hands === 'none' ? 'Display' : 'Hands', hands, b.hands === 'none' ? 'Liquid crystal' : b.hands === 'sword' || b.hands === 'breguet' ? 'Blued steel' : 'Rhodium / lume'],
+    ['Dial', dial, b.shape === 'digital' ? 'Glass / ITO' : 'Brass, lacquered'],
+    ['Bezel', bezel, b.bezel === 'diver' || b.bezel === 'gmt' ? 'Ceramic insert' : metal],
+    ['Crown', crown, b.crown === 'buttons' ? 'Stainless steel' : metal],
+    ['Case', `Ø ${b.D} × ${b.T} mm`, metal],
+    lug,
+  ];
 }

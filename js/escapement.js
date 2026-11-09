@@ -53,7 +53,7 @@ export function init() {
     return { fork, wheelA, bal, phase, n };
   }
 
-  const gold = '#d4b06a', steel = '#c7ccd4';
+  const gold = '#c9a35a', steel = '#c7ccd4';
   function drawWheel(a) {
     ctx.save(); ctx.translate(...E); ctx.rotate(-a);
     const gr = ctx.createRadialGradient(-40, -40, 10, 0, 0, Rw);
@@ -120,7 +120,7 @@ export function init() {
     ctx.restore();
   }
   function labels() {
-    ctx.font = '500 11px JetBrains Mono'; ctx.fillStyle = gold; ctx.textAlign = 'center';
+    ctx.font = '500 11px Cinzel, serif'; ctx.fillStyle = gold; ctx.textAlign = 'center';
     const L = (t, x, y, lx, ly) => { ctx.strokeStyle = 'rgba(212,176,106,.5)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(lx, ly + (ly < y ? 6 : -14)); ctx.stroke(); ctx.beginPath(); ctx.arc(x, y, 2.5, 0, TAU); ctx.fill(); ctx.fillText(t, lx, ly); };
     L('ESCAPE WHEEL · 15 TEETH', E[0] - 90, E[1] + 120, 150, 600);
     L('ENTRY PALLET', 380, 236, 370, 60);
@@ -136,9 +136,9 @@ export function init() {
     beats += dt * 8 * speed;
     const s = state(beats);
     ctx.clearRect(0, 0, 900, 640);
-    const bg = ctx.createRadialGradient(450, 320, 40, 450, 320, 520); bg.addColorStop(0, '#16181d'); bg.addColorStop(1, '#0a0b0e');
+    const bg = ctx.createRadialGradient(450, 320, 40, 450, 320, 520); bg.addColorStop(0, '#2c1c0f'); bg.addColorStop(1, '#100904');
     ctx.fillStyle = bg; ctx.fillRect(0, 0, 900, 640);
-    ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255,220,170,.045)'; ctx.lineWidth = 1;
     for (let x = 0; x < 900; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 640); ctx.stroke(); }
     for (let y = 0; y < 640; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(900, y); ctx.stroke(); }
     ctx.setLineDash([8, 4, 2, 4]); ctx.strokeStyle = 'rgba(212,176,106,.25)'; ctx.beginPath(); ctx.moveTo(20, 320); ctx.lineTo(880, 320); ctx.stroke(); ctx.setLineDash([]);
