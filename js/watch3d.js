@@ -891,7 +891,7 @@ export function buildWatch(sp) {
     const cap = new THREE.SphereGeometry(sph, 96, 12, 0, TAU, 0, th); cap.scale(1, dome, 1); cap.rotateX(Math.PI / 2); cap.translate(0, 0, zBz - sph * dome * Math.cos(th) + .2);
     crysG.add(new THREE.Mesh(cap, sapp));
     if (sp.cyclops && sp.date) { // the magnifying lens over the date
-      const da = (sp.dateAt ?? 3) / 12 * TAU, lens = new THREE.Mesh(new THREE.SphereGeometry(Rd * .16, 32, 12, 0, TAU, 0, Math.PI / 2), new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: .02, transparent: true, opacity: .16, depthWrite: false, clearcoat: 1, envMapIntensity: 2 }));
+      const da = (sp.dateAt ?? 3) / 12 * TAU, lens = new THREE.Mesh(new THREE.SphereGeometry(Rd * .16, 32, 12, 0, TAU, 0, Math.PI / 2), new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: .02, transparent: true, opacity: .05, depthWrite: false, envMapIntensity: .9 }));
       lens.rotation.x = Math.PI / 2; lens.scale.set(1.12, .22, .9); lens.position.set(Math.sin(da) * Rd * .665, Math.cos(da) * Rd * .665, zBz + .5 - (Rd * .665) ** 2 / 120 * dome); crysG.add(lens);
     }
   } else {
