@@ -8,7 +8,7 @@ A cinematic, interactive atlas of horology — from quartz to grand complication
 | | Chapter | What's in it |
 |---|---|---|
 | — | **Opening titles** | A winding loader (crown turns, power reserve fills to 42 h), letterboxed title card and lens flare |
-| — | **Overture** | A live 3D 18k gold pocket chronometer — grand feu enamel dial, Breguet numerals and gold Breguet hands — hanging dial-on from its chain like a slow pendulum; scrolling zooms in on the dial, and the Loupe shows its engine-turned back |
+| — | **Overture** | A live 3D 18k gold pocket chronometer — grand feu enamel chapter ring, gold Breguet hands, and an open centre onto a running movement (Côtes de Genève bridges, gilt train, lever escapement, screw balance breathing at 4 Hz) — hanging dial-on from its chain like a slow pendulum; scroll and its spring ring opens, the chain lifts away and the bow drops back |
 | I | **Prologue** | 500 years of milestones on a pinned, sideways-scrolling timeline |
 | II | **Anatomy** | Labelled exterior of a dive watch |
 | III | **Quartz** | Animated signal chain + live 15-stage binary divider (32,768 Hz → 1 Hz) |

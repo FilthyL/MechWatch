@@ -57,7 +57,6 @@ export function metal(key = 'steel', finish = 'polished') {
   matCache.set(k, m); return m;
 }
 const LUME = new THREE.MeshStandardMaterial({ color: 0xe7f6df, emissive: 0x8fe3a8, emissiveIntensity: .32, roughness: .6 });
-const BLUED = new THREE.MeshPhysicalMaterial({ color: 0x1a2a66, metalness: .9, roughness: .16, emissive: 0x02040f });
 const BLACKH = new THREE.MeshPhysicalMaterial({ color: 0x141416, metalness: .7, roughness: .18 });
 const REDH = new THREE.MeshPhysicalMaterial({ color: 0xc8193a, metalness: .3, roughness: .25 });
 const RUBY = new THREE.MeshPhysicalMaterial({ color: 0xd2123c, roughness: .05, clearcoat: 1, emissive: 0x3a0010, emissiveIntensity: .6 });
@@ -234,6 +233,10 @@ function dialTexture(sp, W = 1, H = 1) {
       if (T === 'journe') ring(12, .8, i => i || 12, .08, '"Jost", sans-serif');
       if (T === 'sandwich') { g.fillStyle = '#e8ddb8'; ring(12, .74, i => [12, '', '', 3, '', '', 6, '', '', 9, '', ''][i], .17, '"Jost", sans-serif'); g.fillStyle = ink; }
     }
+    if (sp.openDial) { // open centre, leaving the seconds sub-dial as an enamel island
+      g.save(); g.globalCompositeOperation = 'destination-out'; g.beginPath(); g.arc(0, 0, R * OPEN, 0, TAU); g.fill(); g.restore();
+      if (sp.subsec) { const eg = g.createRadialGradient(-R * .05, R * .44, R * .02, 0, R * .48, R * .21); eg.addColorStop(0, shade(base, .1)); eg.addColorStop(1, base); g.fillStyle = eg; g.beginPath(); g.arc(0, R * .48, R * .208, 0, TAU); g.fill(); }
+    }
     // sub-dials
     const sub = (x, y, r, labels) => {
       g.save(); g.translate(x * R, y * R);
@@ -260,9 +263,9 @@ function dialTexture(sp, W = 1, H = 1) {
     if (!['zeitwerk', 'lange1', 'fume', 'sandwich'].includes(T)) {
       g.fillStyle = ink; g.font = `400 ${R * .072}px "Libre Caslon Text", Georgia, serif`;
       const name = (sp.brand || 'MECHWATCH').toUpperCase(); const y = isRect ? -R * .5 : -R * (T === 'flieger' ? .42 : T === 'field' ? .3 : .44);
-      g.fillText(name.length > 18 ? name.split(' ').slice(0, 2).join(' ') : name, 0, y);
+      if (!sp.openDial) g.fillText(name.length > 18 ? name.split(' ').slice(0, 2).join(' ') : name, 0, y);
       g.globalAlpha = .7; g.font = `400 ${R * .035}px "Jost", sans-serif`;
-      g.fillText(sp.line || 'AUTOMATIC', 0, isRect ? R * .48 : (sp.subs || sp.subsec || T === 'tourbillon' || T === 'perpetual') ? -R * .32 : R * .32);
+      if (!sp.openDial) g.fillText(sp.line || 'AUTOMATIC', 0, isRect ? R * .48 : (sp.subs || sp.subsec || T === 'tourbillon' || T === 'perpetual') ? -R * .32 : R * .32);
       g.fillText('SWISS MADE', 0, isRect ? h / 2 - R * .06 : R * .9); g.globalAlpha = 1;
     }
     g.restore();
@@ -308,6 +311,164 @@ function engravedBack(text) {
     [...text].forEach((ch, i) => { const a = -Math.PI / 2 - .9 + i * (1.8 / text.length); g.save(); g.translate(c + R * Math.cos(a), c + R * Math.sin(a)); g.rotate(a + Math.PI / 2); g.fillText(ch, 0, 0); g.restore(); });
     g.font = '400 60px "Libre Caslon Display", serif'; g.fillText('MW', c, c + 20);
   }, { srgb: false });
+}
+
+/* ───────────────────────── open-worked movement ───────────────────────── */
+// An inverted calibre seen through the dial's open centre: rhodium bridges with Côtes de
+// Genève and polished bevels, a gilt going train, a Swiss lever escapement and a screw
+// balance on its hairspring, all running in step with the hands at 4 Hz.
+const OPEN = .64; // radius of the open centre, as a fraction of the dial
+function cotes() { // Côtes de Genève: rounded parallel stripes, as height and roughness
+  const t = canvasTex(256, 256, (g, w) => { for (let x = 0; x < w; x++) { const v = Math.cos(((x % 128) / 128 - .5) * Math.PI), c = Math.round(70 + 170 * v * v); g.fillStyle = `rgb(${c},${c},${c})`; g.fillRect(x, 0, 1, w); } }, { srgb: false, repeat: [1 / 4.6, 1 / 4.6] });
+  t.rotation = .5; return t;
+}
+function perlage() { // overlapping circular graining on the main plate
+  return canvasTex(256, 256, (g, w) => {
+    g.fillStyle = '#808080'; g.fillRect(0, 0, w, w);
+    for (let y = -64; y <= w + 64; y += 32) for (let x = -64; x <= w + 64; x += 32) {
+      const gr = g.createRadialGradient(x - 6, y - 6, 2, x, y, 27); gr.addColorStop(0, '#dadada'); gr.addColorStop(.7, '#8a8a8a'); gr.addColorStop(1, '#585858');
+      g.fillStyle = gr; g.beginPath(); g.arc(x, y, 27, 0, TAU); g.fill();
+    }
+  }, { srgb: false, repeat: [11, 11] });
+}
+/** gear outline: plain (`saw` for ratchet and escape teeth), with crossed-out spokes */
+function wheelShape(R, teeth, { spokes = 5, depth = .07, saw = false, rim = .13, hub = .2 } = {}) {
+  const s = new THREE.Shape(), Rb = R * (1 - depth), prof = saw ? [[Rb, 0], [R, .62], [R, .7], [Rb, .74]] : [[Rb, 0], [R, .22], [R, .46], [Rb, .68]];
+  if (!teeth) s.absarc(0, 0, R, 0, TAU, false);
+  for (let i = 0; i < teeth; i++) prof.forEach(([rr, f], k) => { const a = (i + f) / teeth * TAU, x = rr * Math.cos(a), y = rr * Math.sin(a); i || k ? s.lineTo(x, y) : s.moveTo(x, y); });
+  const ro = Rb - R * rim, ri = R * hub, hw = R * .07;
+  for (let k = 0; k < spokes; k++) {
+    const a1 = k / spokes * TAU, a2 = (k + 1) / spokes * TAU, h = new THREE.Path();
+    h.absarc(0, 0, ro, a1 + hw / ro, a2 - hw / ro, false); h.absarc(0, 0, ri, a2 - hw / ri, a1 + hw / ri, true); h.closePath(); s.holes.push(h);
+  }
+  return s;
+}
+/** a bar of width w along a polyline, with round ends */
+function ribbon(pts, w) {
+  const P = pts.map(p => new THREE.Vector2(...p)), n = P.length, hw = w / 2;
+  const N = P.map((_, i) => { const d = P[Math.min(n - 1, i + 1)].clone().sub(P[Math.max(0, i - 1)]).normalize(); return new THREE.Vector2(-d.y, d.x); });
+  const s = new THREE.Shape();
+  P.forEach((p, i) => { const q = p.clone().addScaledVector(N[i], hw); i ? s.lineTo(q.x, q.y) : s.moveTo(q.x, q.y); });
+  const aE = Math.atan2(N[n - 1].y, N[n - 1].x); s.absarc(P[n - 1].x, P[n - 1].y, hw, aE, aE - Math.PI, true);
+  for (let i = n - 1; i >= 0; i--) { const q = P[i].clone().addScaledVector(N[i], -hw); s.lineTo(q.x, q.y); }
+  const aS = Math.atan2(-N[0].y, -N[0].x); s.absarc(P[0].x, P[0].y, hw, aS, aS - Math.PI, true);
+  return s;
+}
+/** an arm of width w from p1 that ends in a disc of radius rc at p2 (a balance cock) */
+function keyhole(p1, p2, w, rc) {
+  const d = new THREE.Vector2(p2[0] - p1[0], p2[1] - p1[1]).normalize(), nx = -d.y, ny = d.x, hw = w / 2;
+  const phi = Math.atan2(-d.y, -d.x), al = Math.asin(Math.min(.99, hw / rc)), s = new THREE.Shape();
+  s.moveTo(p1[0] + nx * hw, p1[1] + ny * hw);
+  s.absarc(p2[0], p2[1], rc, phi - al, phi + al - TAU, true);
+  s.lineTo(p1[0] - nx * hw, p1[1] - ny * hw);
+  const aS = Math.atan2(-ny, -nx); s.absarc(p1[0], p1[1], hw, aS, aS - Math.PI, true);
+  return s;
+}
+/** a smooth closed outline through control points (the first one should sit hidden under the dial) */
+function blob(pts) { const s = new THREE.Shape(), v = pts.map(p => new THREE.Vector2(...p)); s.moveTo(v[0].x, v[0].y); s.splineThru([...v.slice(1), v[0]]); return s; }
+function slab(shape, h, z, bevel = .04, seg = 24) {
+  const g = new THREE.ExtrudeGeometry(shape, { depth: h, bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel * .8, bevelSegments: bevel > .06 ? 2 : 1, curveSegments: seg });
+  g.translate(0, 0, z + bevel); return g;
+}
+function engraving(lines) {
+  return canvasTex(640, 200, (g, w, h) => {
+    g.fillStyle = '#e2bd72'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = '400 96px "Libre Caslon Text", Georgia, serif'; g.fillText(lines[0], w / 2, h * .36);
+    g.font = '500 40px "Jost", sans-serif'; g.fillText(lines[1], w / 2, h * .82);
+  });
+}
+
+function openMovement(part, Rd, zD) {
+  const k = Rd * OPEN / 14.5, P = (x, y) => [x * k, y * k], at = (o, x, y, z) => { o.position.set(x * k, y * k, z); return o; };
+  const cs = cotes(), perl = perlage();
+  const rhod = new THREE.MeshPhysicalMaterial({ color: 0xbfc3c9, metalness: 1, roughness: .4, roughnessMap: cs, bumpMap: cs, bumpScale: .4 });
+  const bevel = new THREE.MeshPhysicalMaterial({ color: 0xe4e7eb, metalness: 1, roughness: .05 });
+  const plateM = new THREE.MeshPhysicalMaterial({ color: 0xaeb2b8, metalness: 1, roughness: .55, roughnessMap: perl, bumpMap: perl, bumpScale: .6 });
+  const gilt = metal('gold', 'semipolish'), gold = metal('gold', 'polished'), steel = metal('steel', 'polished'), dark = metal('black');
+  // levels, bottom to top: wheels that overlap in plan never share a level
+  const Z = { plate: zD - 3.65, barrel: zD - 3.6, esc: zD - 3.5, pallet: zD - 3.36, third: zD - 3.15, centre: zD - 2.8, balance: zD - 2.45, spring: zD - 1.95, bridge: zD - 1.85, top: zD - .85, ratchet: zD - .87 };
+  const C = [0, 0], BA = [-4.4, 4.1], CW = [-.7, 9.07], TH = [5.02, -2.9], FO = [5.84, -7.53], ES = [9.41, -6.23], PA = [8.94, -2.86], BL = [8.2, 2.4];
+  const wheel = (grp, c, R, teeth, z, h, mat, o = {}) => { const g = new THREE.Group(); at(g, c[0], c[1], 0); g.add(new THREE.Mesh(slab(wheelShape(R * k, teeth, o), h, z, .04, 12), mat)); grp.add(g); return g; };
+  const pinion = (grp, c, z, h, r = .75) => grp.add(at(new THREE.Mesh(slab(wheelShape(r * k, 10, { spokes: 0, depth: .3 }), h, z, 0, 8), steel), c[0], c[1], 0));
+  const cyl = (r, h, mat, seg = 24) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg), mat); m.rotation.x = Math.PI / 2; return m; };
+  const screw = (grp, c, z) => { const s = at(new THREE.Group(), c[0], c[1], z); const head = cyl(.5 * k, .26, steel); head.position.z = .13; s.add(head); const slot = new THREE.Mesh(new THREE.BoxGeometry(.85 * k, .12 * k, .1), dark); slot.position.z = .27; slot.rotation.z = Math.atan2(c[1], c[0]) + 1; s.add(slot); grp.add(s); };
+  const jewel = (grp, c, z) => {
+    const j = at(new THREE.Group(), c[0], c[1], z); const ch = cyl(.78 * k, .2, gold, 32); ch.position.z = .1; j.add(ch);
+    const ru = cyl(.42 * k, .14, RUBY, 24); ru.position.z = .25; j.add(ru);
+    [Math.PI * .25, Math.PI * 1.25].forEach(a => { const s = cyl(.26 * k, .18, steel, 16); s.position.set(Math.cos(a) * 1.08 * k, Math.sin(a) * 1.08 * k, .1); j.add(s); });
+    grp.add(j);
+  };
+
+  // main plate, frosted with perlage
+  const plate = part('plate', 'Main plate', 'The foundation of the calibre, finished with perlage — overlapping circles of graining applied one by one with a rotating peg.', [0, 0, -2], [...P(-5.6, -4.8), Z.plate], [0, 0, 1]);
+  const pl = new THREE.Mesh(new THREE.CircleGeometry(Rd + .1, 96), plateM); pl.position.z = Z.plate; plate.add(pl);
+
+  // going train
+  const train = part('train', 'Barrel & going train', 'The mainspring in its toothed barrel drives the gilt centre, third and fourth wheels on steel pinions. The centre wheel carries the minute hand and turns once an hour.', [0, 0, 0], [...P(2.6, -3.6), Z.centre + .3], [0, 0, 1]);
+  const barrel = wheel(train, BA, 5.2, 84, Z.barrel, .62, gilt, { spokes: 0, depth: .05 });
+  const centre = wheel(train, C, 4.6, 72, Z.centre, .18, gilt); pinion(train, C, Z.barrel + .05, .72);
+  const third = wheel(train, TH, 3.8, 64, Z.third, .18, gilt); pinion(train, TH, Z.third + .26, .4);
+  const fourth = wheel(train, FO, 3.2, 60, Z.centre, .18, gilt); pinion(train, FO, Z.third, .35);
+  const arbor = cyl(.55 * k, zD + .3 - Z.centre, steel); arbor.position.z = (Z.centre + zD + .3) / 2; train.add(arbor);
+
+  // escapement: escape wheel and pallet fork with ruby pallets
+  const escG = part('escapement', 'Escape wheel & pallet fork', 'The Swiss lever escapement. Each swing of the balance flicks the fork; its two ruby pallets let the steel escape wheel advance half a tooth per beat — the tick you hear.', [0, 0, .9], [...P(ES[0], ES[1] - 2.2), Z.esc + .3], [0, 0, 1]);
+  const esc = wheel(escG, ES, 2.5, 15, Z.esc, .18, steel, { spokes: 4, saw: true, depth: .22, rim: .1, hub: .24 }); pinion(escG, ES, Z.esc + .26, .7, .55);
+  const pal = at(new THREE.Group(), PA[0], PA[1], 0); escG.add(pal);
+  {
+    const v = (a, b) => new THREE.Vector2(b[0] - a[0], b[1] - a[1]), toB = v(PA, BL).normalize(), toE = v(PA, ES), aE = Math.atan2(-toE.y, -toE.x);
+    const tip = toB.clone().multiplyScalar(3.4), side = new THREE.Vector2(-toB.y, toB.x).multiplyScalar(.42);
+    const palPts = [aE - .62, aE + .62].map(a => [toE.x + 2.75 * Math.cos(a), toE.y + 2.75 * Math.sin(a)]);
+    const lever = [ribbon([[0, 0], [tip.x, tip.y]], .5), ribbon([palPts[0], [0, 0], palPts[1]], .44), ribbon([[tip.x + side.x, tip.y + side.y], [tip.x + side.x + toB.x * .7, tip.y + side.y + toB.y * .7]], .26), ribbon([[tip.x - side.x, tip.y - side.y], [tip.x - side.x + toB.x * .7, tip.y - side.y + toB.y * .7]], .26)];
+    lever.forEach(s => { const g = slab(s, .14, Z.pallet, .02, 12); g.scale(k, k, 1); pal.add(new THREE.Mesh(g, steel)); });
+    palPts.forEach(([x, y]) => { const d = new THREE.Vector2(toE.x - x, toE.y - y).normalize(), st = new THREE.Mesh(new THREE.BoxGeometry(.32 * k, .8 * k, .22), RUBY); st.position.set((x + d.x * .3) * k, (y + d.y * .3) * k, Z.pallet + .05); st.rotation.z = Math.atan2(d.y, d.x) - Math.PI / 2; pal.add(st); });
+  }
+
+  // balance and hairspring
+  const balG = part('balance', 'Balance & hairspring', 'The regulating organ: a gold screw balance breathing on a flat steel hairspring, 28,800 times an hour. The screws on its rim fine-tune its inertia.', [0, 0, 1.5], [...P(BL[0] - 3.5, BL[1] + 3.3), Z.balance + .45], [0, 0, 1]);
+  const bal = wheel(balG, BL, 4.8, 0, Z.balance, .34, gold, { spokes: 3, rim: .11, hub: .13 });
+  for (let i = 0; i < 18; i++) { const a = i / 18 * TAU, s = new THREE.Mesh(new THREE.CylinderGeometry(.2 * k, .2 * k, .55 * k, 12), gold); s.position.set(Math.cos(a) * 4.95 * k, Math.sin(a) * 4.95 * k, Z.balance + .21); s.rotation.z = a - Math.PI / 2; bal.add(s); }
+  const staff = cyl(.22 * k, Z.bridge + .3 - Z.pallet, steel, 12); staff.position.z = (Z.pallet + Z.bridge + .3) / 2; bal.add(staff);
+  const roller = cyl(.85 * k, .16, steel, 32); roller.position.z = Z.pallet + .07; bal.add(roller);
+  const ipin = new THREE.Mesh(new THREE.BoxGeometry(.2 * k, .34 * k, .3), RUBY); ipin.position.set(0, -.62 * k, Z.pallet + .07); bal.add(ipin);
+  const hs = at(new THREE.Group(), BL[0], BL[1], Z.spring); balG.add(hs);
+  { const pts = []; for (let i = 0; i <= 720; i++) { const f = i / 720, a = f * 13 * TAU, r = (.7 + 2.6 * f) * k; pts.push(new THREE.Vector3(r * Math.cos(a), r * Math.sin(a), 0)); }
+    hs.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 720, .045, 4), steel));
+    const stud = new THREE.Mesh(new THREE.BoxGeometry(.5 * k, .5 * k, .14), steel); stud.position.set(3.3 * k, 0, 0); hs.add(stud); }
+
+  // bridges, jewels and screws
+  const brG = part('bridges', 'Bridges & jewels', 'Rhodium-plated German silver, striped with Côtes de Genève and bevelled by hand (anglage). Each pivot runs in a ruby jewel set in a gold chaton held by two screws.', [0, 0, 2.2], [...P(-10, 9.6), Z.top], [0, 0, 1]);
+  const bridge = s => { const g = slab(s, .8, Z.bridge, .1, 32); g.scale(k, k, 1); brG.add(new THREE.Mesh(g, [rhod, bevel])); };
+  bridge(blob([[-17.2, 1], [-15.8, 7.4], [-11.4, 12.9], [-4.4, 14.6], [1.6, 12.6], [2.4, 8.6], [.6, 4.4], [-1.9, .3], [-5.97, -.22], [-7.4, -3.6], [-9, -7.4], [-10.6, -10.4], [-13.2, -11], [-16.4, -5.2]]));
+  bridge(keyhole([13.6, 10.6], BL, 3, 2.5));
+  bridge(ribbon([[10.2, -13.7], FO, TH], 3));
+  bridge(ribbon([[16.4, -5.8], ES], 2.4));
+  bridge(ribbon([[16.95, -1.6], PA], 2));
+  [TH, FO, ES, PA, BL].forEach(c => jewel(brG, c, Z.top - .1));
+  [[-12, 5.2], [-10.9, -7.6], [-2, 12.2], [11.44, 7.32], [8.24, -10.92], [12.2, -6.06], [12.55, -2.29]].forEach(c => screw(brG, c, Z.top - .1));
+  { const ix = new THREE.Vector2(BL[0] - 13.6, BL[1] - 10.6).normalize().rotateAround(new THREE.Vector2(), .55), g = slab(ribbon([BL, [BL[0] - ix.x * 3.8, BL[1] - ix.y * 3.8]], .34), .08, Z.top, 0); g.scale(k, k, 1); brG.add(new THREE.Mesh(g, steel)); }
+  const eng = new THREE.Mesh(new THREE.PlaneGeometry(7.4 * k, 2.3 * k), new THREE.MeshStandardMaterial({ map: engraving(['MECHWATCH', '21 RUBIS · 4 Hz']), transparent: true, metalness: .9, roughness: .3, depthWrite: false }));
+  at(eng, -11.1, -4.2, Z.top + .012).rotation.z = 1.16; brG.add(eng);
+
+  // ratchet and crown wheels on top of the barrel bridge
+  const rat = part('ratchet', 'Ratchet & crown wheels', 'Turning the crown spins the crown wheel, which winds the mainspring through the big ratchet wheel on the barrel arbor; a click stops it unwinding.', [0, 0, 3.2], [...P(BA[0] + 2.8, BA[1] + 2.8), Z.ratchet + .3], [0, 0, 1]);
+  const soleil = metal('steel', 'brushed');
+  wheel(rat, BA, 4, 48, Z.ratchet, .26, soleil, { spokes: 0, saw: true, depth: .06 });
+  wheel(rat, CW, 2.2, 30, Z.ratchet, .26, soleil, { spokes: 0, depth: .1 });
+  screw(rat, BA, Z.ratchet + .3); screw(rat, CW, Z.ratchet + .3);
+
+  const smooth = x => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  return now => {
+    const ms = now.getSeconds() * 1000 + now.getMilliseconds(), b = ms / 125, bi = Math.floor(b);
+    bal.rotation.z = 1.6 * Math.sin(Math.PI * b);
+    hs.rotation.z = bal.rotation.z * .22; hs.scale.set(1 + .028 * Math.sin(Math.PI * b), 1 + .028 * Math.sin(Math.PI * b), 1);
+    esc.rotation.z = (bi + smooth((b - bi) / .2)) / 30 * TAU;
+    pal.rotation.z = .09 * Math.tanh(6 * Math.sin(Math.PI * b));
+    fourth.rotation.z = -bi / 480 * TAU;
+    third.rotation.z = ((now.getMinutes() % 15) * 60 + ms / 1000) / 450 * TAU;
+    centre.rotation.z = -(now.getMinutes() + ms / 60000) / 60 * TAU;
+    barrel.rotation.z = ((now.getHours() % 8) * 60 + now.getMinutes()) / 480 * TAU;
+  };
 }
 
 /* ───────────────────────── geometry helpers ───────────────────────── */
@@ -518,6 +679,17 @@ export function buildWatch(sp) {
   else { const s = shapeKind === 'nautilus' ? squircle(Rd + .3, Rd + .3, 4.6) : shapeKind === 'santos' ? squircle(Rd + .3, Rd + .3, 7) : shapeKind === 'tonneau' ? squircle(Rd * .84, Rd * 1.12, 2.6, 128, .08) : roundRect(W - 5, H - 5.6, 1.4); dialGeo = normalizeUV(new THREE.ShapeGeometry(s, 64)); }
   const dialMesh = new THREE.Mesh(dialGeo, new THREE.MeshPhysicalMaterial({ map: dialTex, roughness: sp.dialType === 'enamel' ? .08 : .32, metalness: sp.dialType === 'enamel' || sp.dialType === 'lcd' ? 0 : .35, clearcoat: sp.dialType === 'enamel' ? 1 : .2 }));
   dialMesh.position.z = zDial; dialMesh.receiveShadow = true; dialG.add(dialMesh);
+  let movementTick = null;
+  if (sp.openDial && isRound) {
+    dialMesh.material.alphaTest = .5;
+    // polished gold beads finish the cut edges of the enamel
+    const Rt = Rd + .2, Ro = Rt * OPEN, S = .48 * Rt, rs = .208 * Rt, gold = metal('gold', 'polished');
+    const yx = sp.subsec ? (rs * rs - Ro * Ro - S * S) / (2 * S) : -Ro, xx = Math.sqrt(Math.max(0, Ro * Ro - yx * yx));
+    const a0 = Math.atan2(yx, xx), b0 = Math.atan2(yx + S, xx);
+    const bead = new THREE.Mesh(new THREE.TorusGeometry(Ro, .14, 10, 200, TAU - 2 * (a0 + Math.PI / 2)), gold); bead.rotation.z = a0; bead.position.z = zDial + .02; dialG.add(bead);
+    if (sp.subsec) { const sb = new THREE.Mesh(new THREE.TorusGeometry(rs, .1, 8, 120, TAU - 2 * (b0 + Math.PI / 2)), gold); sb.rotation.z = b0; sb.position.set(0, -S, zDial + .02); dialG.add(sb); }
+    movementTick = openMovement(part, Rt, zDial);
+  }
   // rehaut (inner flange)
   if (isRound) dialG.add(new THREE.Mesh(latheZ([[Rd + .2, zDial], [Rd + .2, zDial + .2], [Rd + .55, zBz - .4]], 128), new THREE.MeshStandardMaterial({ color: shade(cssHex(sp.dial), -.4), roughness: .5, metalness: .3, side: THREE.DoubleSide })));
   const idxMetal = sp.indexMetal ? metal(sp.indexMetal, 'polished') : (['gold', 'rose'].includes(sp.metal) ? polish : metal('white', 'polished'));
@@ -542,7 +714,8 @@ export function buildWatch(sp) {
   }
   /* ── hands ── */
   const handsG = part('hands', 'Hands', handsDesc(sp.hands, sp.handMetal), [0, 0, 6.5], [-Rd * .18, Rd * .22, zDial + 1.2], [0, 0, 1]);
-  const handMat = sp.handMetal === 'gold' ? metal('gold', 'polished') : sp.handMetal === 'blued' ? BLUED : darkDial ? (['gold', 'rose'].includes(sp.metal) ? polish : metal('white', 'polished')) : (['breguet', 'sword'].includes(sp.hands) || ['roman', 'enamel'].includes(sp.dialType) ? BLUED : ['gold', 'rose'].includes(sp.metal) ? polish : BLACKH);
+  const caseGold = ['gold', 'rose'].includes(sp.metal);
+  const handMat = sp.handMetal === 'gold' ? metal('gold', 'polished') : caseGold ? polish : darkDial ? metal('white', 'polished') : BLACKH;
   const lume = darkDial && !['dauphine', 'breguet'].includes(sp.hands);
   const hourStyle = sp.hands === 'mercedes' ? 'mercedes' : sp.hands, minStyle = sp.hands === 'mercedes' ? 'sword' : sp.hands;
   const hScale = isRect ? Math.min(W, H) / 2 * .85 : Rd;
@@ -642,6 +815,7 @@ export function buildWatch(sp) {
 
   /* ── strap or bracelet, wrapped around a wrist-shaped ellipse ── */
   const isPocket = sp.shape === 'pocket';
+  let bowHinge = null;
   let strapParts = [];
   const wrist = { a: Math.max(32, attach.y + 9), b: 22.5 };
   wrist.zc = -T * .5 - wrist.b + 1.2;
@@ -719,9 +893,10 @@ export function buildWatch(sp) {
     const crown = new THREE.Mesh(cg, polish); crown.position.set(0, yT + 6.5, crownZ); crownG.add(crown);
     const cap = new THREE.Mesh(new THREE.SphereGeometry(2.9, 32, 12, 0, TAU, 0, Math.PI / 2), polish); cap.scale.set(1, .4, 1); cap.position.set(0, yT + 8.6, crownZ); crownG.add(cap);
     const bow = part('lugs', 'Bow', 'The ring the chain hangs from, hinged on pivots either side of the pendant so the watch can turn.', [0, 18, 0], [0, yT + 17.2, crownZ], [0, 1, .3]);
-    const gap = 1.25, R = 7.4, yc = yT + 3.2 + R * Math.cos(gap / 2);
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(R, 1.15, 20, 96, TAU - gap), polish); ring.rotation.z = -Math.PI / 2 + gap / 2; ring.position.set(0, yc, crownZ); bow.add(ring);
-    for (const sx of [-1, 1]) { const k = new THREE.Mesh(new THREE.SphereGeometry(1.35, 24, 12), polish); k.position.set(sx * R * Math.sin(gap / 2), yc - R * Math.cos(gap / 2), crownZ); bow.add(k); }
+    const gap = 1.25, R = 7.4, lift = R * Math.cos(gap / 2);
+    bowHinge = new THREE.Group(); bowHinge.position.set(0, yT + 3.2, crownZ); bow.add(bowHinge);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(R, 1.15, 20, 96, TAU - gap), polish); ring.rotation.z = -Math.PI / 2 + gap / 2; ring.position.y = lift; bowHinge.add(ring);
+    for (const sx of [-1, 1]) { const k = new THREE.Mesh(new THREE.SphereGeometry(1.35, 24, 12), polish); k.position.x = sx * R * Math.sin(gap / 2); bowHinge.add(k); }
   }
 
   /* ── wrist cushion (display) ── */
@@ -749,12 +924,13 @@ export function buildWatch(sp) {
     if (GH) GH.rotation.z = -(now.getUTCHours() + now.getUTCMinutes() / 60) / 24 * TAU;
     if (rotor) rotor.rotation.z = Math.sin(t * .6) * 1.8 + Math.sin(t * 1.7) * .5;
     if (cage) { cage.rotation.z = -s / 60 * TAU; cageBal.rotation.z = Math.sin(t * TAU * 4) * 2.4; }
+    if (movementTick) movementTick(now);
     if (lcd && now.getSeconds() !== lastSec) { lastSec = now.getSeconds(); if (sp.dialType === 'lcd' || now.getSeconds() === 0) { const c = dialTex.userData.canvas; dialTex.userData.draw(c.getContext('2d'), c.width, c.height); dialTex.needsUpdate = true; } }
   }
   function setExplode(e) { parts.forEach(p => { p.group.position.copy(p.explode).multiplyScalar(e); }); }
-  function dispose() { root.traverse(o => { if (o.isMesh) { o.geometry.dispose(); const ms = Array.isArray(o.material) ? o.material : [o.material]; ms.forEach(m => { if (![LUME, BLUED, BLACKH, REDH, RUBY].includes(m) && ![...matCache.values()].includes(m)) { m.map && m.map.dispose(); m.dispose(); } }); } }); }
+  function dispose() { root.traverse(o => { if (o.isMesh) { o.geometry.dispose(); const ms = Array.isArray(o.material) ? o.material : [o.material]; ms.forEach(m => { if (![LUME, BLACKH, REDH, RUBY].includes(m) && ![...matCache.values()].includes(m)) { ['map', 'bumpMap', 'roughnessMap'].forEach(t => m[t] && m[t].dispose()); m.dispose(); } }); } }); }
   tick();
-  return { group: root, parts, tick, setExplode, dispose, wrist, strapParts, cushion };
+  return { group: root, parts, tick, setExplode, dispose, wrist, strapParts, cushion, bow: bowHinge };
 }
 
 /* ───────────────────────── descriptions ───────────────────────── */
@@ -772,8 +948,8 @@ function bezelTexture(kind, sp) {
   });
 }
 function bezelDesc(b, s) { return ({ diver: 'Unidirectional diving bezel, 120 clicks, ceramic insert with a luminous pip at 12 — it can only shorten your remaining dive time if knocked.', pepsi: 'Bidirectional 24-hour bezel in two tones (day/night) for reading a third time zone.', tachy: 'Tachymeter scale: time a known distance with the chronograph and read off the speed.', fluted: 'Fluted bezel — once functional for screwing the case shut, now pure light play.', clous: 'Clous de Paris hobnail guilloché — hundreds of tiny pyramids cut by hand.', maltese: 'Bezel cut in a half Maltese cross, emblem of its house.', tenth: 'Ceramic bezel graduated in 1/10 s for the high-beat chronograph.', slide: 'Circular slide rule for fuel, speed and unit conversions.', screws: 'Six visible H-screws clamp a "sandwich" of case materials.', thin: 'Slim polished bezel to let the dial breathe.', octagon: 'Octagonal bezel fixed by eight hexagonal screws.' }[s === 'octagon' ? 'octagon' : b] || 'Polished bezel ring holding the crystal and its gasket.'); }
-function dialDesc(sp) { return ({ diver: 'High-contrast dive dial with applied, luminous indices.', tapisserie: '"Tapisserie" guilloché — a grid of tiny pyramids, each catching light.', horizontal: 'Horizontally embossed dial, gradated from light to dark.', snow: 'Textured to evoke wind-blown snow.', birch: 'Vertically textured like birch bark.', enamel: 'Grand feu enamel: fired at 800 °C, layer by layer, with Breguet numerals.', flieger: 'Observation-watch dial: triangle and dots at 12, maximal legibility.', field: 'Arabic numerals with a 24-hour inner track.', roman: 'Roman numerals and a chemin de fer minute track.', perpetual: 'Day, month with leap-year cycle, and moon phase.', zeitwerk: 'Jumping digital hours and minutes — mechanically.', lange1: 'Off-centre dial, Outsize Date and small seconds, laid out on the golden ratio.', tourbillon: 'An aperture at 6 reveals the tourbillon cage turning once a minute.', fume: 'Fumé sunburst fading to black at the edge.', skeleton: 'Skeletonised: the movement itself becomes the dial.', lcd: 'Twisted-nematic liquid crystal display.', sandwich: 'Sandwich dial: cut-out numerals over a luminous lower plate.' }[sp.dialType] || 'Sunburst-brushed dial with applied indices.'); }
-function handsDesc(h, m) { if (h === 'breguet' && m === 'gold') return 'Breguet "pomme" hands in polished 18k gold.'; return ({ mercedes: 'Mercedes hour hand and sword minute hand, filled with lume.', sword: 'Sword hands, made for legibility.', dauphine: 'Faceted dauphine hands — two planes meeting in a sharp ridge.', breguet: 'Breguet "pomme" hands in thermally blued steel.', snowflake: 'Snowflake hour hand, a 1960s military signature.' }[h] || 'Baton hands, polished, with luminous inserts.'); }
+function dialDesc(sp) { if (sp.openDial) return 'A grand feu enamel chapter ring around an open centre: the movement itself is on show, running in time with the hands.'; return ({ diver: 'High-contrast dive dial with applied, luminous indices.', tapisserie: '"Tapisserie" guilloché — a grid of tiny pyramids, each catching light.', horizontal: 'Horizontally embossed dial, gradated from light to dark.', snow: 'Textured to evoke wind-blown snow.', birch: 'Vertically textured like birch bark.', enamel: 'Grand feu enamel: fired at 800 °C, layer by layer, with Breguet numerals.', flieger: 'Observation-watch dial: triangle and dots at 12, maximal legibility.', field: 'Arabic numerals with a 24-hour inner track.', roman: 'Roman numerals and a chemin de fer minute track.', perpetual: 'Day, month with leap-year cycle, and moon phase.', zeitwerk: 'Jumping digital hours and minutes — mechanically.', lange1: 'Off-centre dial, Outsize Date and small seconds, laid out on the golden ratio.', tourbillon: 'An aperture at 6 reveals the tourbillon cage turning once a minute.', fume: 'Fumé sunburst fading to black at the edge.', skeleton: 'Skeletonised: the movement itself becomes the dial.', lcd: 'Twisted-nematic liquid crystal display.', sandwich: 'Sandwich dial: cut-out numerals over a luminous lower plate.' }[sp.dialType] || 'Sunburst-brushed dial with applied indices.'); }
+function handsDesc(h, m) { if (h === 'breguet' && m === 'gold') return 'Breguet "pomme" hands in polished 18k gold.'; return ({ mercedes: 'Mercedes hour hand and sword minute hand, filled with lume.', sword: 'Sword hands, made for legibility.', dauphine: 'Faceted dauphine hands — two planes meeting in a sharp ridge.', breguet: 'Breguet "pomme" hands, each with a hollow moon near the tip.', snowflake: 'Snowflake hour hand, a 1960s military signature.' }[h] || 'Baton hands, polished, with luminous inserts.'); }
 function crownName(c) { return ({ guard: 'Screw-down crown & guards', onion: 'Onion crown', cabochon: 'Crown with sapphire cabochon', buttons: 'Push buttons', small: 'Crown' }[c] || 'Crown'); }
 function crownDesc(c) { return ({ guard: 'Screws down onto a triple gasket; the case shoulders guard it from knocks.', onion: 'Oversized and fluted so a pilot can wind it wearing gloves.', cabochon: 'A cut sapphire set into the crown — a jeweller\'s detail.', buttons: 'Light, mode, start/stop and reset.' }[c] || 'Winds the mainspring and sets the hands. Pull out to set.'); }
 function strapDesc(k) { return ({ alligator: 'Hand-stitched alligator, the scales graded from the belly.', calf: 'Calfskin with contrast stitching.', rubber: 'Vulcanised rubber, waterproof and supple.', nato: 'Woven nylon, threaded under the case so the watch can\'t fall if a bar fails.' }[k] || 'Leather strap.'); }
@@ -810,7 +986,7 @@ export const ARCHETYPE_SPECS = {
   digital: { name: 'Digital LCD archetype', brand: 'MechWatch', shape: 'digital', D: 35, H: 38, T: 8.5, LW: 18, metal: 'carbon', dial: '#9fab8f', dialType: 'lcd', hands: 'none', strap: 'rubber', strapColor: '#151515', crown: 'buttons', caseback: 'solid' },
   tourbillon: { name: 'Tourbillon archetype', brand: 'MechWatch', D: 41, T: 11.5, L2L: 49, LW: 21, metal: 'plat', dial: '#2a2c31', dialType: 'tourbillon', bezel: 'thin', hands: 'breguet', strap: 'alligator', strapColor: '#151012', line: 'TOURBILLON' },
 };
-export const POCKET = { name: 'MechWatch Pocket Chronometer', brand: 'MechWatch', shape: 'pocket', D: 50, T: 13.5, metal: 'gold', dial: '#f6f1e6', dialType: 'enamel', bezel: 'thin', hands: 'breguet', handMetal: 'gold', subsec: true, caseback: 'engine', line: 'CHRONOMÈTRE' };
+export const POCKET = { name: 'MechWatch Pocket Chronometer', brand: 'MechWatch', shape: 'pocket', D: 50, T: 13.5, metal: 'gold', dial: '#f6f1e6', dialType: 'enamel', bezel: 'thin', hands: 'breguet', handMetal: 'gold', subsec: true, openDial: true, caseback: 'engine', line: 'CHRONOMÈTRE' };
 export const SIGNATURE = { name: 'MechWatch Signature', brand: 'MechWatch', D: 40, T: 10.5, L2L: 47, LW: 20, metal: 'rose', dial: '#4a2a14', dialType: 'guilloche', bezel: 'thin', hands: 'dauphine', date: true, strap: 'alligator', strapColor: '#2a1509', crown: 'std', line: 'CHRONOMÈTRE · 28 800 A/h' };
 
 /* ───────────────────────── a reusable studio stage ───────────────────────── */

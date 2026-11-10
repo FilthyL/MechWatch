@@ -206,22 +206,21 @@ function choreograph() {
     });
   };
 
-  // hero: scrolling brings the camera in on the pocket watch's dial
-  const zoomTo = p => window.MW_HERO && window.MW_HERO.setProgress(p);
+  // hero: scrolling unhooks the pocket watch from its chain
+  const unchain = p => window.MW_HERO && window.MW_HERO.setProgress(p);
   mm.add('(min-width: 901px) and (prefers-reduced-motion: no-preference)', () => {
-    // the page holds while the lens closes in, then lets go
-    G.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '.hero', start: 'top top', end: '+=90%', pin: true, scrub: true, onUpdate: s => zoomTo(Math.min(1, s.progress / .8)) } })
-      .to('.hero-copy', { xPercent: -12, autoAlpha: 0, duration: .45 }, 0)
-      .to(['.scroll-cue', '.hero-caption'], { autoAlpha: 0, duration: .12 }, 0)
-      .to('.beam', { opacity: 0, duration: .6 }, 0)
+    // the page holds briefly while the spring ring opens and the chain lifts away
+    G.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '.hero', start: 'top top', end: '+=60%', pin: true, scrub: true, onUpdate: s => unchain(s.progress) } })
+      .to(['.scroll-cue', '.hero-caption'], { autoAlpha: 0, duration: .15 }, 0)
+      .to('.beam', { opacity: .35, duration: .8 }, 0)
       .to({}, { duration: 1 }, 0);
-    return () => zoomTo(0);
+    return () => unchain(0);
   });
   mm.add('(max-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
-    ST.create({ trigger: '.hero', start: 'top top', end: 'bottom top', onUpdate: s => zoomTo(s.progress) });
+    ST.create({ trigger: '.hero', start: 'top top', end: 'bottom top', onUpdate: s => unchain(Math.min(1, s.progress * 1.8)) });
     G.to('.hero-copy', { yPercent: -28, opacity: 0, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
     G.to('.beam', { opacity: 0, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: '80% top', scrub: true } });
-    return () => zoomTo(0);
+    return () => unchain(0);
   });
 
   // chapter title cards

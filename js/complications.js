@@ -139,10 +139,10 @@ export function init() {
   {
     const svg = shell(document.getElementById('perpSvg'), 'pp', '#f1ece2', { dial2: '#fffdf7', metal: 'gold' });
     svg.querySelectorAll('line').forEach(l => l.setAttribute('stroke', '#5a4a2a'));
-    const day = sub(svg, -44, 0, 25, 7, DAYS, { fill: '#e8e1d2', fs: 4.8, lr: 9, hand: '#1d3f9e' });
-    const month = sub(svg, 44, 0, 25, 12, MONTHS, { fill: '#e8e1d2', fs: 4, lr: 9, hand: '#1d3f9e' });
+    const day = sub(svg, -44, 0, 25, 7, DAYS, { fill: '#e8e1d2', fs: 4.8, lr: 9, hand: '#2a2118' });
+    const month = sub(svg, 44, 0, 25, 12, MONTHS, { fill: '#e8e1d2', fs: 4, lr: 9, hand: '#2a2118' });
     const dates = Array.from({ length: 31 }, (_, i) => (i + 1) % 5 === 0 || i === 0 ? String(i + 1) : '');
-    const date = sub(svg, 0, 44, 27, 31, dates, { fill: '#e8e1d2', fs: 4.6, lr: 9, hand: '#1d3f9e' });
+    const date = sub(svg, 0, 44, 27, 31, dates, { fill: '#e8e1d2', fs: 4.6, lr: 9, hand: '#2a2118' });
     // leap-year mini dial inside month
     const leapG = el('g', { transform: 'translate(44 0)' }, svg);
     el('circle', { r: 8, fill: '#f8f4ea', stroke: '#5a4a2a', 'stroke-width': .5 }, leapG);
