@@ -76,7 +76,7 @@ export function buildDressWatch(svg, { scale = 1, strap = true, id = 'hw' } = {}
   }
   for (let i = 5; i <= 60; i += 5) {
     const [x, y] = polar(167, i * 6);
-    el('text', { x, y: y + 3, 'font-size': 8.5, fill: '#e9d6a6', 'text-anchor': 'middle', 'font-family': 'JetBrains Mono', opacity: .8 }, dial).textContent = String(i).padStart(2, '0');
+    el('text', { x, y: y + 3, 'font-size': 8.5, fill: '#e9d6a6', 'text-anchor': 'middle', 'font-family': 'Jost', opacity: .8 }, dial).textContent = String(i).padStart(2, '0');
   }
   // applied indices
   for (let i = 0; i < 12; i++) {
@@ -92,16 +92,16 @@ export function buildDressWatch(svg, { scale = 1, strap = true, id = 'hw' } = {}
   // brand
   const tx = (t, y, s, fam, ls, col = '#e9d6a6', op = 1) => { const n = el('text', { x: 0, y, 'font-size': s, fill: col, 'text-anchor': 'middle', 'font-family': fam, 'letter-spacing': ls, opacity: op }, dial); n.textContent = t; return n; };
   el('path', { d: 'M0 -102 l6 7 l-6 7 l-6 -7z', fill: G }, dial);
-  tx('MECHWATCH', -64, 17, 'Cormorant Garamond', 5);
-  tx('GENÈVE', -50, 6.5, 'JetBrains Mono', 3, '#e9d6a6', .7);
-  tx('AUTOMATIC', 56, 8, 'JetBrains Mono', 3, '#e9d6a6', .85);
-  tx('CHRONOMETER · 28 800 A/h', 68, 6, 'JetBrains Mono', 1.6, '#e9d6a6', .6);
-  tx('SWISS MADE', 171, 5, 'JetBrains Mono', 2, '#e9d6a6', .55);
+  tx('MECHWATCH', -64, 17, 'Libre Caslon Display', 5);
+  tx('GENÈVE', -50, 6.5, 'Jost', 3, '#e9d6a6', .7);
+  tx('AUTOMATIC', 56, 8, 'Jost', 3, '#e9d6a6', .85);
+  tx('CHRONOMETER · 28 800 A/h', 68, 6, 'Jost', 1.6, '#e9d6a6', .6);
+  tx('SWISS MADE', 171, 5, 'Jost', 2, '#e9d6a6', .55);
   // small seconds-style power reserve arc (decorative live reserve)
   // date window
   el('rect', { x: 102, y: -12, width: 34, height: 24, rx: 2, fill: G }, dial);
   el('rect', { x: 105, y: -9.5, width: 28, height: 19, rx: 1, fill: '#f4f1ea' }, dial);
-  const date = tx(new Date().getDate(), 5.3, 14, 'Cormorant Garamond', 0, '#111');
+  const date = tx(new Date().getDate(), 5.3, 14, 'Libre Caslon Display', 0, '#111');
   date.setAttribute('x', 119); date.setAttribute('font-weight', 600);
   // hands
   const mk = (len, w, tail, fill) => {
@@ -232,7 +232,7 @@ const beatEl = $('#heroBeat'), sinceEl = $('#heroSince');
   el('circle', { cx, cy, r: 164, fill: 'url(#an-cer)' }, W);
   for (let i = 0; i < 60; i++) {
     const first = i < 15; const big = i % 5 === 0;
-    if (big && i) { const [x, y] = polar(152, i * 6); el('text', { x: cx + x, y: cy + y + 5, 'text-anchor': 'middle', 'font-size': 14, fill: '#e6e3dc', 'font-family': 'Inter', 'font-weight': 600, transform: `rotate(${i * 6} ${cx + x} ${cy + y})` }, W).textContent = i; }
+    if (big && i) { const [x, y] = polar(152, i * 6); el('text', { x: cx + x, y: cy + y + 5, 'text-anchor': 'middle', 'font-size': 14, fill: '#e6e3dc', 'font-family': 'Jost', 'font-weight': 600, transform: `rotate(${i * 6} ${cx + x} ${cy + y})` }, W).textContent = i; }
     else if (first || i === 0) { const [x1, y1] = polar(160, i * 6), [x2, y2] = polar(first ? 146 : 152, i * 6); if (i) el('line', { x1: cx + x1, y1: cy + y1, x2: cx + x2, y2: cy + y2, stroke: '#e6e3dc', 'stroke-width': 1.6 }, W); }
   }
   el('path', { d: `M${cx} ${cy - 142} l-11 -16 h22z`, fill: '#e6e3dc' }, W);
@@ -248,9 +248,9 @@ const beatEl = $('#heroBeat'), sinceEl = $('#heroSince');
     else el('circle', { cx: cx + x, cy: cy + y, r: 9, fill: '#c9f7d3', stroke: '#bbb', 'stroke-width': 1.5 }, W);
   }
   el('rect', { x: cx + 88, y: cy - 12, width: 32, height: 24, fill: '#fff', stroke: '#bbb', 'stroke-width': 2 }, W);
-  el('text', { x: cx + 104, y: cy + 7, 'text-anchor': 'middle', 'font-size': 17, 'font-family': 'Inter', 'font-weight': 600, fill: '#111' }, W).textContent = '24';
-  el('text', { x: cx, y: cy - 50, 'text-anchor': 'middle', 'font-size': 13, fill: '#eee', 'font-family': 'Cormorant Garamond', 'letter-spacing': 3 }, W).textContent = 'MECHWATCH';
-  el('text', { x: cx, y: cy + 50, 'text-anchor': 'middle', 'font-size': 7.5, fill: '#bbb', 'font-family': 'JetBrains Mono', 'letter-spacing': 1.5 }, W).textContent = '300m · 1000ft';
+  el('text', { x: cx + 104, y: cy + 7, 'text-anchor': 'middle', 'font-size': 17, 'font-family': 'Jost', 'font-weight': 600, fill: '#111' }, W).textContent = '24';
+  el('text', { x: cx, y: cy - 50, 'text-anchor': 'middle', 'font-size': 13, fill: '#eee', 'font-family': 'Libre Caslon Display', 'letter-spacing': 3 }, W).textContent = 'MECHWATCH';
+  el('text', { x: cx, y: cy + 50, 'text-anchor': 'middle', 'font-size': 7.5, fill: '#bbb', 'font-family': 'Jost', 'letter-spacing': 1.5 }, W).textContent = '300m · 1000ft';
   // hands at 10:09:36
   const hg = (deg, inner) => el('g', { transform: `rotate(${deg} ${cx} ${cy})`, filter: 'url(#an-shadow)' }, W).innerHTML = inner;
   hg(304.5, `<path d="M${cx - 5} ${cy + 18} L${cx - 5} ${cy - 40} L${cx + 5} ${cy - 40} L${cx + 5} ${cy + 18}Z" fill="#ddd"/><circle cx="${cx}" cy="${cy - 58}" r="18" fill="#c9f7d3" stroke="#ddd" stroke-width="3"/><path d="M${cx} ${cy - 76} l-6 0 l6 -10 l6 10z" fill="#ddd"/><path d="M${cx} ${cy - 58} l0 -18 M${cx} ${cy - 58} l-15 9 M${cx} ${cy - 58} l15 9" stroke="#ddd" stroke-width="3"/>`);

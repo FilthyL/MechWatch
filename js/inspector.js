@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/OrbitControls.js';
 import { buildWatch, createStage } from './watch3d.js';
 
-let ui = null, stage = null, controls = null, current = null, list = [], idx = 0, running = false, explode = 0, explodeT = 0, selected = null, labelsOn = true;
+let opts = {}, ui = null, stage = null, controls = null, current = null, list = [], idx = 0, running = false, explode = 0, explodeT = 0, selected = null, labelsOn = true;
 const views = { front: [0, 8, 158], three: [70, 26, 140], profile: [160, 10, -8], back: [-10, 14, -170], loupe: [0, 2, 58], top: [0, 165, 20] };
 let camTo = null, tgtTo = null;
 const fit = () => { const a = stage.camera.aspect || 1; return a < 1.15 ? Math.min(2.6, 1.2 / a) : 1; };
@@ -68,6 +68,7 @@ function load(i) {
   if (current) { stage.scene.remove(current.group); current.dispose(); }
   current = buildWatch(item.spec);
   current.group.rotation.x = -.08;
+  if (current.cushion) current.cushion.visible = false;
   stage.scene.add(current.group);
   if (stage.floor) stage.floor.position.y = -(current.wrist?.a ?? 30) - 3;
   ui.querySelector('.insp-brand').textContent = item.info.brand;
@@ -126,7 +127,8 @@ function loop() {
   }
 }
 
-export function openInspector(items, startIndex = 0, origin) {
+export function openInspector(items, startIndex = 0, origin, options = {}) {
+  opts = options;
   if (!ui) buildUI();
   list = items; ui.hidden = false; document.body.classList.add('insp-open');
   const ox = origin ? origin.x : innerWidth / 2, oy = origin ? origin.y : innerHeight / 2;
@@ -143,6 +145,7 @@ export function openInspector(items, startIndex = 0, origin) {
 }
 
 function close() {
+  if (opts.onClose) { const f = opts.onClose; opts = {}; f(idx); }
   ui.classList.remove('open');
   document.body.classList.remove('insp-open');
   setTimeout(() => { ui.hidden = true; running = false; if (current) { stage.scene.remove(current.group); current.dispose(); current = null; } }, 800);

@@ -176,7 +176,7 @@ function build(svg, b) {
   } else if (b.dial === 'flieger') {
     minuteTrack(DR, true);
     L(`M0 ${-DR * .78} l-15 -26 h30 Z`); el('circle', { cx: -24, cy: -DR * .86, r: 3, class: 'fillc fade' }, dial); el('circle', { cx: 24, cy: -DR * .86, r: 3, class: 'fillc fade' }, dial);
-    for (let i = 1; i < 12; i++) { const [x, y] = polar(DR * .72, i * 30); T(x, y + 10, i, 30, { 'font-family': 'Inter', 'font-weight': 300 }); }
+    for (let i = 1; i < 12; i++) { const [x, y] = polar(DR * .72, i * 30); T(x, y + 10, i, 30, { 'font-family': 'Jost', 'font-weight': 300 }); }
   } else if (b.dial === 'chrono') {
     minuteTrack(DR, true);
     for (let i = 0; i < 12; i++) { const [x1, y1] = polar(DR * .9, i * 30), [x2, y2] = polar(DR * .72, i * 30); if (i % 3) L(`M${x1} ${y1} L${x2} ${y2}`); }
@@ -192,7 +192,7 @@ function build(svg, b) {
     L(`M0 ${sy + 6} L0 ${sy - DR * .2}`);
   } else if (b.dial === 'field') {
     minuteTrack(DR, true);
-    for (let i = 0; i < 12; i++) { const [x, y] = polar(DR * .72, i * 30); T(x, y + 10, i || 12, 28, { 'font-family': 'Inter', 'font-weight': 500 }); const [x2, y2] = polar(DR * .56, i * 30); T(x2, y2 + 4, i + 12 === 12 ? 24 : i + 12, 10); }
+    for (let i = 0; i < 12; i++) { const [x, y] = polar(DR * .72, i * 30); T(x, y + 10, i || 12, 28, { 'font-family': 'Jost', 'font-weight': 500 }); const [x2, y2] = polar(DR * .56, i * 30); T(x2, y2 + 4, i + 12 === 12 ? 24 : i + 12, 10); }
   } else if (b.dial === 'tapisserie') {
     const g = el('g', { opacity: .6 }, dial);
     const n = 14, st = DR * 2 / n; let d = '';
@@ -205,7 +205,7 @@ function build(svg, b) {
     const w = b.D / 2 * S * .72, h = b.H / 2 * S * .76;
     el('rect', { x: -w, y: -h, width: w * 2, height: h * 2, class: 'ln thin draw' }, dial); el('rect', { x: -w + 8, y: -h + 8, width: w * 2 - 16, height: h * 2 - 16, class: 'ln hair' }, dial);
     for (let i = 0; i < 60; i++) { const a = i * 6 * Math.PI / 180; const dx = Math.sin(a), dy = -Math.cos(a); const k = Math.min(w / Math.abs(dx || 1e-6), h / Math.abs(dy || 1e-6)); L(`M${dx * k} ${dy * k} L${dx * (k - 8)} ${dy * (k - 8)}`); }
-    for (let i = 0; i < 12; i++) { const a = i * 30 * Math.PI / 180; const dx = Math.sin(a), dy = -Math.cos(a); const k = Math.min((w - 34) / Math.abs(dx || 1e-6), (h - 34) / Math.abs(dy || 1e-6)); T(dx * k, dy * k + 7, roman[i], 21, { 'font-family': 'Cormorant Garamond', transform: `rotate(${i * 30} ${dx * k} ${dy * k})` }); }
+    for (let i = 0; i < 12; i++) { const a = i * 30 * Math.PI / 180; const dx = Math.sin(a), dy = -Math.cos(a); const k = Math.min((w - 34) / Math.abs(dx || 1e-6), (h - 34) / Math.abs(dy || 1e-6)); T(dx * k, dy * k + 7, roman[i], 21, { 'font-family': 'Libre Caslon Display', transform: `rotate(${i * 30} ${dx * k} ${dy * k})` }); }
   } else if (b.dial === 'lcd') {
     const w = b.D / 2 * S * .7, h = b.H / 2 * S * .44;
     el('rect', { x: -w, y: -h, width: w * 2, height: h * 2, rx: 6, class: 'ln draw' }, dial);
@@ -216,7 +216,7 @@ function build(svg, b) {
     T(-w + 40, -h + 22, 'PM', 10); T(w - 50, -h + 22, 'MO 9', 10);
   } else if (b.dial === 'tourbillon') {
     minuteTrack(DR, false);
-    for (let i = 0; i < 12; i++) { if (i >= 5 && i <= 7) continue; const [x, y] = polar(DR * .78, i * 30); T(x, y + 8, ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'][i], 20, { 'font-family': 'Cormorant Garamond' }); }
+    for (let i = 0; i < 12; i++) { if (i >= 5 && i <= 7) continue; const [x, y] = polar(DR * .78, i * 30); T(x, y + 8, ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'][i], 20, { 'font-family': 'Libre Caslon Display' }); }
     const ty = DR * .46, tr = DR * .34;
     el('circle', { cx: 0, cy: ty, r: tr, class: 'ln draw' }, dial); el('circle', { cx: 0, cy: ty, r: tr - 6, class: 'ln hair' }, dial);
     for (let k = 0; k < 3; k++) { const a = k * 120; const [x, y] = polar(tr * .85, a); L(`M0 ${ty} L${x} ${ty + y}`); }
@@ -224,7 +224,7 @@ function build(svg, b) {
     for (let i = 0; i < 15; i++) { const [x1, y1] = polar(tr * .3, i * 24), [x2, y2] = polar(tr * .38, i * 24 + 8); L(`M${x1} ${ty + y1} L${x2} ${ty + y2}`); }
   }
   // brand plate
-  if (DR) T(0, -DR * (b.dial === 'field' ? .26 : .4), 'MECHWATCH', 13, { 'font-family': 'Cormorant Garamond', 'letter-spacing': 3 });
+  if (DR) T(0, -DR * (b.dial === 'field' ? .26 : .4), 'MECHWATCH', 13, { 'font-family': 'Libre Caslon Display', 'letter-spacing': 3 });
 
   // ── hands at 10:10
   if (b.hands !== 'none') {

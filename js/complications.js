@@ -26,25 +26,25 @@ function sub(svg, cx, cy, r, n, labels, opts = {}) {
   el('circle', { r, fill: opts.fill || 'rgba(0,0,0,.35)', stroke: '#d4b06a', 'stroke-opacity': .45, 'stroke-width': .7 }, g);
   for (let i = 0; i < 3; i++) el('circle', { r: r - 2 - i * (r / 5), fill: 'none', stroke: '#fff', 'stroke-opacity': .04 }, g);
   for (let i = 0; i < n; i++) { const [x1, y1] = polar(r - 1, i * 360 / n), [x2, y2] = polar(r - (labels && i % (opts.every || 1) === 0 ? 5 : 3), i * 360 / n); el('line', { x1, y1, x2, y2, stroke: '#e8e4da', 'stroke-width': .6, 'stroke-opacity': .7 }, g); }
-  if (labels) labels.forEach((t, i) => { if (t === '') return; const [x, y] = polar(r - (opts.lr || 10), i * 360 / labels.length); const n2 = el('text', { x, y: y + 2.4, 'text-anchor': 'middle', 'font-size': opts.fs || 6, fill: '#e8e4da', 'font-family': 'JetBrains Mono' }, g); n2.textContent = t; });
+  if (labels) labels.forEach((t, i) => { if (t === '') return; const [x, y] = polar(r - (opts.lr || 10), i * 360 / labels.length); const n2 = el('text', { x, y: y + 2.4, 'text-anchor': 'middle', 'font-size': opts.fs || 6, fill: '#e8e4da', 'font-family': 'Jost' }, g); n2.textContent = t; });
   const hand = el('path', { d: `M-.9 4 L0 ${-(r - 3)} L.9 4 Z`, fill: opts.hand || '#d4b06a' }, g);
   el('circle', { r: 1.8, fill: opts.hand || '#d4b06a' }, g);
   return a => hand.setAttribute('transform', `rotate(${a})`);
 }
-const txt = (svg, x, y, t, size = 7, fill = '#e8e4da', fam = 'JetBrains Mono', extra = {}) => { const n = el('text', { x, y, 'text-anchor': 'middle', 'font-size': size, fill, 'font-family': fam, ...extra }, svg); n.textContent = t; return n; };
+const txt = (svg, x, y, t, size = 7, fill = '#e8e4da', fam = 'Jost', extra = {}) => { const n = el('text', { x, y, 'text-anchor': 'middle', 'font-size': size, fill, 'font-family': fam, ...extra }, svg); n.textContent = t; return n; };
 
 export function init() {
   /* ── Chronograph ── */
   {
     const svg = shell(document.getElementById('chronoSvg'), 'ch', '#e9e6df', { dial2: '#ffffff' });
     // tachymeter on rehaut
-    [500, 300, 200, 150, 120, 100, 90, 80, 70, 60].forEach(v => { const a = 3600 / v * 6; const [x, y] = polar(86, a); txt(svg, x, y + 2, v, 5, '#333', 'JetBrains Mono', { transform: `rotate(${a} ${x} ${y})` }); });
+    [500, 300, 200, 150, 120, 100, 90, 80, 70, 60].forEach(v => { const a = 3600 / v * 6; const [x, y] = polar(86, a); txt(svg, x, y + 2, v, 5, '#333', 'Jost', { transform: `rotate(${a} ${x} ${y})` }); });
     el('circle', { r: 82, fill: 'none', stroke: '#222', 'stroke-opacity': .3 }, svg);
     for (let i = 0; i < 240; i++) { const [x1, y1] = polar(81, i * 1.5), [x2, y2] = polar(i % 4 ? 79 : 76, i * 1.5); el('line', { x1, y1, x2, y2, stroke: '#111', 'stroke-width': .4 }, svg); }
     for (let i = 0; i < 12; i++) { if (i === 3 || i === 9 || i === 6) continue; const g = el('g', { transform: `rotate(${i * 30})` }, svg); el('rect', { x: -2, y: -74, width: 4, height: 14, fill: '#1c1e22' }, g); }
     const min30 = sub(svg, 40, 0, 22, 30, ['30', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '15'].concat(Array(14).fill('')), { fill: '#1c1e22', hand: '#c2183b', every: 5 });
     const runS = sub(svg, -40, 0, 22, 60, ['60', '15', '30', '45'], { fill: '#1c1e22', every: 15, hand: '#e8e4da' });
-    txt(svg, 0, -40, 'MECHWATCH', 8, '#111', 'Cormorant Garamond', { 'letter-spacing': 2 });
+    txt(svg, 0, -40, 'MECHWATCH', 8, '#111', 'Libre Caslon Display', { 'letter-spacing': 2 });
     txt(svg, 0, -31, 'CHRONOGRAPH', 4.5, '#444');
     const readout = txt(svg, 0, 44, '00:00.000', 8.5, '#111');
     const setT = hands(svg, 'ch', { color: '#1a1c20', sec: false });
@@ -90,7 +90,7 @@ export function init() {
     const ageTxt = txt(svg, 0, 54, '', 7.5, '#f3dca6');
     const illTxt = txt(svg, 0, 66, '', 6, '#9fb6e0');
     const nextTxt = txt(svg, 0, 78, '', 5.2, '#8e9099');
-    txt(svg, 0, -70, 'PHASES DE LUNE', 5.5, '#e2bd6a', 'JetBrains Mono', { 'letter-spacing': 1.5 });
+    txt(svg, 0, -70, 'PHASES DE LUNE', 5.5, '#e2bd6a', 'Jost', { 'letter-spacing': 1.5 });
     const ageEl = document.getElementById('moonAge');
     const SYN = 29.530588853, ref = Date.UTC(2000, 0, 6, 18, 14) ;
     whenVisible(svg, () => {
@@ -114,12 +114,12 @@ export function init() {
     el('path', { d: 'M-112 0 A112 112 0 0 1 112 0 L92 0 A92 92 0 0 0 -92 0 Z', fill: '#1c3f8f' }, svg);
     el('path', { d: 'M-112 0 A112 112 0 0 0 112 0 L92 0 A92 92 0 0 1 -92 0 Z', fill: '#a61a2e' }, svg);
     // top half = night? Convention: day (red) 6→18. Rotate so 12 at bottom? keep 24 at top = midnight in blue.
-    for (let i = 0; i < 24; i++) { const [x, y] = polar(102, i * 15); if (i % 2 === 0) txt(svg, x, y + 3, i === 0 ? '▼' : i, i === 0 ? 7 : 8, '#f3f0e8', 'Inter', { transform: `rotate(${i * 15} ${x} ${y})`, 'font-weight': 600 }); else el('circle', { cx: x, cy: y, r: 1.4, fill: '#f3f0e8' }, svg); }
+    for (let i = 0; i < 24; i++) { const [x, y] = polar(102, i * 15); if (i % 2 === 0) txt(svg, x, y + 3, i === 0 ? '▼' : i, i === 0 ? 7 : 8, '#f3f0e8', 'Jost', { transform: `rotate(${i * 15} ${x} ${y})`, 'font-weight': 600 }); else el('circle', { cx: x, cy: y, r: 1.4, fill: '#f3f0e8' }, svg); }
     el('circle', { r: 91, fill: '#0e0f12' }, svg);
     for (let i = 0; i < 60; i++) { const [x1, y1] = polar(89, i * 6), [x2, y2] = polar(i % 5 ? 85 : 81, i * 6); el('line', { x1, y1, x2, y2, stroke: '#ddd', 'stroke-width': i % 5 ? .5 : 1.4 }, svg); }
     for (let i = 0; i < 12; i++) { const [x, y] = polar(70, i * 30); if (i === 0) el('path', { d: 'M0 -62 l-7 -14 h14z', fill: '#d9fbe4' }, svg); else if (i === 3) { el('rect', { x: 56, y: -7, width: 18, height: 14, fill: '#fff' }, svg); } else if (i % 3 === 0) el('rect', { x: x - 3, y: y - 8, width: 6, height: 16, fill: '#d9fbe4', transform: `rotate(${i * 30} ${x} ${y})` }, svg); else el('circle', { cx: x, cy: y, r: 4.6, fill: '#d9fbe4' }, svg); }
-    const dateT = txt(svg, 65, 4, new Date().getDate(), 10, '#111', 'Inter', { 'font-weight': 600 });
-    txt(svg, 0, -30, 'MECHWATCH', 8, '#eee', 'Cormorant Garamond', { 'letter-spacing': 2 });
+    const dateT = txt(svg, 65, 4, new Date().getDate(), 10, '#111', 'Jost', { 'font-weight': 600 });
+    txt(svg, 0, -30, 'MECHWATCH', 8, '#eee', 'Libre Caslon Display', { 'letter-spacing': 2 });
     txt(svg, 0, 34, 'GMT · 24H', 5.5, '#c2183b');
     const gmtH = el('g', {}, svg);
     el('path', { d: 'M-.8 0 L-.8 -76 L.8 -76 L.8 0Z', fill: '#c2183b' }, gmtH); el('path', { d: 'M0 -90 l-6 14 h12z', fill: '#c2183b' }, gmtH);
@@ -148,8 +148,8 @@ export function init() {
     el('circle', { r: 8, fill: '#f8f4ea', stroke: '#5a4a2a', 'stroke-width': .5 }, leapG);
     ['L', '1', '2', '3'].forEach((t, i) => { const [x, y] = polar(5, i * 90); txt(leapG, x, y + 1.6, t, 3.6, '#5a4a2a'); });
     const leapHand = el('path', { d: 'M-.5 1 L0 -7 L.5 1Z', fill: '#c2183b' }, leapG);
-    txt(svg, 0, -46, 'PERPETUAL CALENDAR', 5, '#5a4a2a', 'JetBrains Mono', { 'letter-spacing': 1.2 });
-    txt(svg, 0, -58, 'MECHWATCH', 8, '#2d2414', 'Cormorant Garamond', { 'letter-spacing': 2 });
+    txt(svg, 0, -46, 'PERPETUAL CALENDAR', 5, '#5a4a2a', 'Jost', { 'letter-spacing': 1.2 });
+    txt(svg, 0, -58, 'MECHWATCH', 8, '#2d2414', 'Libre Caslon Display', { 'letter-spacing': 2 });
     for (let i = 0; i < 12; i++) { if (i % 3 === 0) continue; const g = el('g', { transform: `rotate(${i * 30})` }, svg); el('rect', { x: -1.5, y: -90, width: 3, height: 10, fill: '#a77b33' }, g); }
     const setT = hands(svg, 'pp', { color: '#1d3f9e', secColor: '#1d3f9e', len: .95 });
     const leapLabel = document.getElementById('perpLeap');
@@ -165,7 +165,7 @@ export function init() {
   /* ── Tourbillon ── */
   {
     const svg = shell(document.getElementById('tourbSvg'), 'tb', '#121417', { dial2: '#2c3038' });
-    for (let i = 0; i < 12; i++) { if (i >= 5 && i <= 7) continue; const [x, y] = polar(80, i * 30); txt(svg, x, y + 4, ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'][i], 10, '#e9e4d8', 'Cormorant Garamond'); }
+    for (let i = 0; i < 12; i++) { if (i >= 5 && i <= 7) continue; const [x, y] = polar(80, i * 30); txt(svg, x, y + 4, ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'][i], 10, '#e9e4d8', 'Libre Caslon Display'); }
     const cy = 42;
     el('circle', { cx: 0, cy, r: 38, fill: '#06070a', stroke: '#d4b06a', 'stroke-width': 1.6 }, svg);
     // fixed fourth wheel teeth
@@ -188,7 +188,7 @@ export function init() {
     el('path', { d: sp, stroke: '#9fb6e0', 'stroke-width': .35, fill: 'none' }, cage);
     el('circle', { r: 2.4, fill: '#c2183b' }, cage);
     el('path', { d: `M-38 ${cy} A38 38 0 0 1 38 ${cy}`, fill: 'none', stroke: '#fff', 'stroke-opacity': .1, 'stroke-width': 6 }, svg);
-    txt(svg, 0, -36, 'MECHWATCH', 8, '#e9e4d8', 'Cormorant Garamond', { 'letter-spacing': 2 });
+    txt(svg, 0, -36, 'MECHWATCH', 8, '#e9e4d8', 'Libre Caslon Display', { 'letter-spacing': 2 });
     txt(svg, 0, -27, 'TOURBILLON', 4.5, '#d4b06a');
     const setT = hands(svg, 'tb', { sec: false });
     whenVisible(svg, () => {
@@ -209,7 +209,7 @@ export function init() {
     el('path', { d: arc(54, -60, 60), fill: 'none', stroke: '#e8e4da', 'stroke-opacity': .15, 'stroke-width': 10 }, svg);
     const fill = el('path', { d: arc(54, -60, 60), fill: 'none', stroke: 'url(#pr-gold)', 'stroke-width': 10, 'stroke-linecap': 'butt' }, svg);
     for (let hh = 0; hh <= MAX; hh += 6) { const a = -60 + hh / MAX * 120; const [x1, y1] = polar(62, a), [x2, y2] = polar(66, a); el('line', { x1, y1: y1 - 24, x2, y2: y2 - 24, stroke: '#e8e4da', 'stroke-width': .8 }, svg); const [x, y] = polar(73, a); txt(svg, x, y - 22, hh, 5.5); }
-    txt(svg, 0, -6, 'RÉSERVE DE MARCHE', 5, '#d4b06a', 'JetBrains Mono', { 'letter-spacing': 1 });
+    txt(svg, 0, -6, 'RÉSERVE DE MARCHE', 5, '#d4b06a', 'Jost', { 'letter-spacing': 1 });
     const prHand = el('path', { d: 'M-1 0 L0 -50 L1 0Z', fill: '#d4b06a' }, svg);
     el('circle', { cx: 0, cy: -24, r: 3, fill: '#d4b06a' }, svg);
     // small seconds that stops when empty
@@ -234,8 +234,8 @@ export function init() {
     const svg = shell(document.getElementById('repSvg'), 'rp', '#f3efe6', { dial2: '#ffffff', metal: 'gold' });
     svg.querySelectorAll('line').forEach(l => l.setAttribute('stroke', '#2d2414'));
     const gong = el('circle', { r: 108, fill: 'none', stroke: '#f3dca6', 'stroke-width': 2, opacity: 0 }, svg);
-    for (let i = 0; i < 12; i++) { const [x, y] = polar(78, i * 30); txt(svg, x, y + 5, ['XII', 'I', 'II', 'III', 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'][i], 12, '#1a1408', 'Cormorant Garamond'); }
-    txt(svg, 0, -38, 'MECHWATCH', 8, '#1a1408', 'Cormorant Garamond', { 'letter-spacing': 2 });
+    for (let i = 0; i < 12; i++) { const [x, y] = polar(78, i * 30); txt(svg, x, y + 5, ['XII', 'I', 'II', 'III', 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'][i], 12, '#1a1408', 'Libre Caslon Display'); }
+    txt(svg, 0, -38, 'MECHWATCH', 8, '#1a1408', 'Libre Caslon Display', { 'letter-spacing': 2 });
     txt(svg, 0, -29, 'RÉPÉTITION MINUTES', 4.5, '#7a5a22');
     const hamL = el('path', { d: 'M-70 60 l14 -10 l3 4 l-14 10 z', fill: '#4a5262' }, svg);
     const hamR = el('path', { d: 'M70 60 l-14 -10 l-3 4 l14 10 z', fill: '#4a5262' }, svg);

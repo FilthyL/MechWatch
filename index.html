@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23140d07' stroke='%23c9a35a' stroke-width='4'/%3E%3Cpath d='M32 14v18l11 7' stroke='%23c9a35a' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="vendor/gsap/gsap.min.js"></script>
 <script src="vendor/gsap/ScrollTrigger.min.js"></script>
@@ -408,7 +408,7 @@
     <span class="roman" aria-hidden="true">X</span>
     <p class="chapter-no">Chapter X · Haute Horlogerie</p>
     <h2 class="display">The<br><em>Vault</em></h2>
-    <p class="chapter-intro">The houses and references that define high watchmaking, each under its own glass — with calibres, case specifications and indicative retail prices. Hover a cloche to lift it.</p>
+    <p class="chapter-intro">A wall of glass winders, each keeping a great watch wound — two turns, a pause, two turns back. Walk along it, then open a door: the winder steps aside and the watch is yours to turn over in three dimensions.</p>
     <div class="complexity"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
   </div>
   <div class="trinity" id="trinity"></div>
@@ -421,8 +421,21 @@
       <button data-s="year">Year</button>
     </div>
   </div>
+  <div class="gallery" id="gallery">
+    <canvas id="galleryCanvas" aria-label="A wall of glass watch winders. Drag sideways or use the arrows; click the centre winder to take the watch out."></canvas>
+    <div class="gal-top"><p class="gal-hint">Drag along the wall · click the lit winder to take the watch out</p><span class="gal-count num" id="galCount">— / —</span></div>
+    <button class="gal-nav gal-prev" id="galPrev" aria-label="Previous winder"><span></span></button>
+    <button class="gal-nav gal-next" id="galNext" aria-label="Next winder"><span></span></button>
+    <div class="gal-plaque" id="galPlaque">
+      <p class="tag" id="galBrand">—</p>
+      <h3 class="display" id="galModel">—</h3>
+      <p class="gal-ref" id="galRef"></p>
+      <dl class="gal-specs" id="galSpecs"></dl>
+      <div class="gal-foot"><b class="gal-price" id="galPrice"></b><button class="btn btn-brass" id="galInspect"><span>Take it out of the winder</span></button></div>
+    </div>
+  </div>
   <p class="small atlas-count" id="atlasCount"></p>
-  <div class="atlas-grid" id="atlasGrid"></div>
+  <ol class="catalogue" id="atlasGrid"></ol>
   <div class="auctions frame">
     <h3 class="tag">Hammer prices — the record book</h3>
     <div id="auctions"></div>

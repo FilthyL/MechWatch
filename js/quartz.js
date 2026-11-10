@@ -11,7 +11,7 @@ export function init() {
     <filter id="q-glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   </defs>`;
   const g = el('g', {}, svg);
-  const label = (x, y, t, sub) => { const n = el('text', { x, y, 'text-anchor': 'middle', fill: '#d4b06a', 'font-family': 'JetBrains Mono', 'font-size': 11, 'letter-spacing': 2 }, g); n.textContent = t; if (sub) { const s = el('text', { x, y: y + 16, 'text-anchor': 'middle', fill: '#8e9099', 'font-family': 'Inter', 'font-size': 11 }, g); s.textContent = sub; } };
+  const label = (x, y, t, sub) => { const n = el('text', { x, y, 'text-anchor': 'middle', fill: '#d4b06a', 'font-family': 'Jost', 'font-size': 11, 'letter-spacing': 2 }, g); n.textContent = t; if (sub) { const s = el('text', { x, y: y + 16, 'text-anchor': 'middle', fill: '#8e9099', 'font-family': 'Jost', 'font-size': 11 }, g); s.textContent = sub; } };
   // traces
   const trace = (d) => el('path', { d, stroke: '#3b3424', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }, g);
   const pulse = (d) => el('path', { d, stroke: '#f3dca6', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', 'stroke-dasharray': '14 400', filter: 'url(#q-glow)' }, g);
@@ -21,15 +21,15 @@ export function init() {
   // battery
   el('circle', { cx: 70, cy: 210, r: 46, fill: 'url(#q-bat)', stroke: '#4c535d' }, g);
   el('circle', { cx: 70, cy: 210, r: 36, fill: 'none', stroke: '#5c636d', 'stroke-width': .8 }, g);
-  el('text', { x: 70, y: 206, 'text-anchor': 'middle', 'font-family': 'JetBrains Mono', 'font-size': 10, fill: '#333' }, g).textContent = 'SR626SW';
-  el('text', { x: 70, y: 222, 'text-anchor': 'middle', 'font-family': 'JetBrains Mono', 'font-size': 14, fill: '#222', 'font-weight': 600 }, g).textContent = '1.55V +';
+  el('text', { x: 70, y: 206, 'text-anchor': 'middle', 'font-family': 'Jost', 'font-size': 10, fill: '#333' }, g).textContent = 'SR626SW';
+  el('text', { x: 70, y: 222, 'text-anchor': 'middle', 'font-family': 'Jost', 'font-size': 14, fill: '#222', 'font-weight': 600 }, g).textContent = '1.55V +';
   label(70, 300, 'BATTERY', 'silver-oxide cell');
 
   // IC
   el('rect', { x: 200, y: 150, width: 130, height: 120, rx: 6, fill: 'url(#q-chip)', stroke: '#3a3f48' }, g);
   for (let i = 0; i < 7; i++) { el('rect', { x: 210 + i * 16, y: 142, width: 6, height: 10, fill: '#c9a46a' }, g); el('rect', { x: 210 + i * 16, y: 268, width: 6, height: 10, fill: '#c9a46a' }, g); }
-  el('text', { x: 265, y: 205, 'text-anchor': 'middle', 'font-family': 'JetBrains Mono', 'font-size': 11, fill: '#c9a46a' }, g).textContent = 'CMOS IC';
-  el('text', { x: 265, y: 222, 'text-anchor': 'middle', 'font-family': 'JetBrains Mono', 'font-size': 9, fill: '#7d7a72' }, g).textContent = 'oscillator · ÷2¹⁵';
+  el('text', { x: 265, y: 205, 'text-anchor': 'middle', 'font-family': 'Jost', 'font-size': 11, fill: '#c9a46a' }, g).textContent = 'CMOS IC';
+  el('text', { x: 265, y: 222, 'text-anchor': 'middle', 'font-family': 'Jost', 'font-size': 9, fill: '#7d7a72' }, g).textContent = 'oscillator · ÷2¹⁵';
   const icLed = el('circle', { cx: 312, cy: 168, r: 4, fill: '#d02a4c' }, g);
   label(265, 300, 'INTEGRATED CIRCUIT', 'drives fork, divides, pulses motor');
 
@@ -43,7 +43,7 @@ export function init() {
   el('rect', { x: 461, y: 130, width: 10, height: 90, fill: '#c9a46a', opacity: .7 }, fork);
   el('rect', { x: 479, y: 130, width: 10, height: 90, fill: '#c9a46a', opacity: .7 }, fork);
   label(475, 330, 'QUARTZ TUNING FORK', '32,768 Hz · piezoelectric');
-  const hzText = el('text', { x: 475, y: 60, 'text-anchor': 'middle', 'font-family': 'JetBrains Mono', 'font-size': 12, fill: '#f3dca6' }, g);
+  const hzText = el('text', { x: 475, y: 60, 'text-anchor': 'middle', 'font-family': 'Jost', 'font-size': 12, fill: '#f3dca6' }, g);
 
   // stepping motor
   el('rect', { x: 600, y: 170, width: 90, height: 80, rx: 4, fill: '#1b1d22', stroke: '#3a3f48' }, g);
@@ -52,8 +52,8 @@ export function init() {
   const rotor = el('g', { transform: 'translate(745 210)' }, g);
   el('circle', { r: 14, fill: '#1c2230', stroke: '#9aa1ab' }, rotor);
   el('path', { d: 'M0 -14 A14 14 0 0 1 0 14 Z', fill: '#c2183b' }, rotor);
-  el('text', { x: 6, y: 4, 'font-size': 9, fill: '#fff', 'font-family': 'JetBrains Mono' }, rotor).textContent = 'N';
-  el('text', { x: -12, y: 4, 'font-size': 9, fill: '#fff', 'font-family': 'JetBrains Mono' }, rotor).textContent = 'S';
+  el('text', { x: 6, y: 4, 'font-size': 9, fill: '#fff', 'font-family': 'Jost' }, rotor).textContent = 'N';
+  el('text', { x: -12, y: 4, 'font-size': 9, fill: '#fff', 'font-family': 'Jost' }, rotor).textContent = 'S';
   label(680, 300, 'LAVET STEPPING MOTOR', 'coil + magnetised rotor');
 
   // gear & hand

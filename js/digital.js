@@ -54,8 +54,8 @@ export function init() {
     for (let i = 0; i < 12; i++) { const gg = el('g', { transform: `rotate(${i * 30})` }, g); el('rect', { x: i ? -2.2 : -4.6, y: -86, width: i ? 4.4 : 9.2, height: 16, fill: 'url(#sd-steel)', stroke: '#555', 'stroke-width': .4 }, gg); }
     const pr = el('path', { d: 'M-1 0 L0 -26 L1 0Z', fill: '#2b4fa8' }, g); el('circle', { cx: -44, cy: 0, r: 2, fill: '#2b4fa8' }, g);
     for (let i = 0; i <= 6; i++) { const [x1, y1] = polar(28, -120 + i * 40), [x2, y2] = polar(32, -120 + i * 40); el('line', { x1: x1 - 44, y1, x2: x2 - 44, y2, stroke: '#333', 'stroke-width': .6 }, g); }
-    const t = (y, txt, sz, f = '#333', fam = 'Cinzel') => { const n = el('text', { x: 0, y, 'text-anchor': 'middle', 'font-size': sz, fill: f, 'font-family': fam }, g); n.textContent = txt; };
-    t(-40, 'MECHWATCH', 8); t(36, 'SPRING DRIVE', 5, '#2b4fa8'); t(46, 'GLIDE · ±1 s / DAY', 4, '#777', 'JetBrains Mono');
+    const t = (y, txt, sz, f = '#333', fam = 'Libre Caslon Text') => { const n = el('text', { x: 0, y, 'text-anchor': 'middle', 'font-size': sz, fill: f, 'font-family': fam }, g); n.textContent = txt; };
+    t(-40, 'MECHWATCH', 8); t(36, 'SPRING DRIVE', 5, '#2b4fa8'); t(46, 'GLIDE · ±1 s / DAY', 4, '#777', 'Jost');
     const H = el('path', { d: 'M-3 10 L-2.2 -48 L0 -56 L2.2 -48 L3 10Z', fill: 'url(#sd-steel)', stroke: '#444', 'stroke-width': .4 }, g);
     const M = el('path', { d: 'M-2.4 12 L-1.6 -82 L0 -90 L1.6 -82 L2.4 12Z', fill: 'url(#sd-steel)', stroke: '#444', 'stroke-width': .4 }, g);
     const S = el('path', { d: 'M-.6 22 L-.6 -96 L.6 -96 L.6 22Z', fill: '#2b4fa8' }, g); el('circle', { r: 3.4, fill: '#2b4fa8' }, g);
@@ -90,18 +90,18 @@ export function init() {
       ctx.strokeStyle = c; ctx.shadowColor = c; ctx.shadowBlur = 12; ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * v); ctx.stroke(); ctx.shadowBlur = 0;
     });
     ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-    ctx.font = '300 44px Inter'; ctx.fillText(`${p2(d.getHours())}:${p2(d.getMinutes())}`, cx, cy + 14);
-    ctx.font = '500 13px JetBrains Mono'; ctx.fillStyle = '#ff9f0a'; ctx.fillText(d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' }).toUpperCase(), cx, cy - 26);
+    ctx.font = '300 44px Jost'; ctx.fillText(`${p2(d.getHours())}:${p2(d.getMinutes())}`, cx, cy + 14);
+    ctx.font = '500 13px Jost'; ctx.fillStyle = '#ff9f0a'; ctx.fillText(d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' }).toUpperCase(), cx, cy - 26);
     // seconds ticks
     for (let i = 0; i < 60; i++) { const a = i / 60 * Math.PI * 2 - Math.PI / 2; const on = i <= d.getSeconds(); ctx.strokeStyle = on ? 'rgba(255,255,255,.85)' : 'rgba(255,255,255,.15)'; ctx.lineWidth = i % 5 ? 1.2 : 2.2; ctx.beginPath(); ctx.moveTo(cx + 114 * Math.cos(a), cy + 114 * Math.sin(a)); ctx.lineTo(cx + 122 * Math.cos(a), cy + 122 * Math.sin(a)); ctx.stroke(); }
     // heart rate
     hrT += dt; if (hrT > 2) { hrT = 0; hr = Math.round(62 + Math.random() * 14); }
     const beat = Math.pow(Math.max(0, Math.sin(t * Math.PI * 2 * hr / 60)), 12);
-    ctx.fillStyle = '#ff375f'; ctx.font = `${16 + beat * 4}px Inter`; ctx.fillText('♥', 120, 360);
-    ctx.fillStyle = '#fff'; ctx.font = '500 20px Inter'; ctx.textAlign = 'left'; ctx.fillText(hr, 136, 362);
-    ctx.fillStyle = '#8e9099'; ctx.font = '400 10px JetBrains Mono'; ctx.fillText('BPM', 136, 376);
-    ctx.textAlign = 'right'; ctx.fillStyle = '#fff'; ctx.font = '500 20px Inter'; ctx.fillText((8000 + Math.floor((d.getHours() * 60 + d.getMinutes()) * 4.7)).toLocaleString('en-US'), 285, 362);
-    ctx.fillStyle = '#8e9099'; ctx.font = '400 10px JetBrains Mono'; ctx.fillText('STEPS', 285, 376);
+    ctx.fillStyle = '#ff375f'; ctx.font = `${16 + beat * 4}px Jost`; ctx.fillText('♥', 120, 360);
+    ctx.fillStyle = '#fff'; ctx.font = '500 20px Jost'; ctx.textAlign = 'left'; ctx.fillText(hr, 136, 362);
+    ctx.fillStyle = '#8e9099'; ctx.font = '400 10px Jost'; ctx.fillText('BPM', 136, 376);
+    ctx.textAlign = 'right'; ctx.fillStyle = '#fff'; ctx.font = '500 20px Jost'; ctx.fillText((8000 + Math.floor((d.getHours() * 60 + d.getMinutes()) * 4.7)).toLocaleString('en-US'), 285, 362);
+    ctx.fillStyle = '#8e9099'; ctx.font = '400 10px Jost'; ctx.fillText('STEPS', 285, 376);
     // ECG trace
     ctx.strokeStyle = '#ff375f'; ctx.lineWidth = 1.5; ctx.beginPath();
     for (let x = 0; x < 200; x++) { const ph = ((x / 200) * 3 - t * hr / 60) % 1; const p = ph < 0 ? ph + 1 : ph; const y = p > .45 && p < .5 ? -20 * Math.sin((p - .45) / .05 * Math.PI) : p > .5 && p < .55 ? 8 * Math.sin((p - .5) / .05 * Math.PI) : 0; x ? ctx.lineTo(100 + x, 320 + y) : ctx.moveTo(100 + x, 320 + y); }
@@ -123,8 +123,8 @@ export function init() {
     if (i === 1) for (let k = 0; k < 3; k++) el('path', { d: `M${x + 8} ${y + sk + 30 + k * 40} L${x + 34} ${y + sk - 4 + k * 40}`, stroke: '#3a7bd5', 'stroke-width': 3 }, svg);
     if (i === 2) for (let k = 0; k < 9; k++) { const yy = y + 60 + k * 15; el('line', { x1: x + 8, y1: yy + 12, x2: x + 34, y2: yy - 6, stroke: '#2a5a48', 'stroke-width': 2, 'stroke-linecap': 'round', transform: `rotate(${k * 10} ${x + 21} ${yy + 3})` }, svg); }
     if (i === 0 || i === 4) for (let k = 0; k < 8; k++) { const xx = x + 6 + k * 4; el('line', i === 0 ? { x1: xx, y1: y + sk - k * 6.8 + 20, x2: xx, y2: y + Hh + sk - k * 6.8 - 20, stroke: '#3a7bd5', opacity: .5 } : { x1: x + 4, y1: y + sk + 20 + k * 18, x2: x + 38, y2: y + sk + k * 18, stroke: '#3a7bd5', opacity: .5 }, svg); }
-    const t = el('text', { x: x + 20, y: 300 + (i % 2) * 18, 'text-anchor': 'middle', fill: '#e8e4da', 'font-family': 'JetBrains Mono', 'font-size': 11 }, svg); t.textContent = n;
-    const t2 = el('text', { x: x + 20, y: 40 - (i % 2) * 16, 'text-anchor': 'middle', fill: '#8e9099', 'font-family': 'Inter', 'font-size': 10.5 }, svg); t2.textContent = d;
+    const t = el('text', { x: x + 20, y: 300 + (i % 2) * 18, 'text-anchor': 'middle', fill: '#e8e4da', 'font-family': 'Jost', 'font-size': 11 }, svg); t.textContent = n;
+    const t2 = el('text', { x: x + 20, y: 40 - (i % 2) * 16, 'text-anchor': 'middle', fill: '#8e9099', 'font-family': 'Jost', 'font-size': 10.5 }, svg); t2.textContent = d;
   });
-  el('text', { x: 18, y: 192, fill: '#f3dca6', 'font-family': 'JetBrains Mono', 'font-size': 10 }, svg).textContent = 'LIGHT →';
+  el('text', { x: 18, y: 192, fill: '#f3dca6', 'font-family': 'Jost', 'font-size': 10 }, svg).textContent = 'LIGHT →';
 }

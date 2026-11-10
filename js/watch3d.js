@@ -153,7 +153,7 @@ function dialTexture(sp, W = 1, H = 1) {
       g.fillStyle = on; g.fillRect(w * .48, y0 + dh * .28, w * .022, w * .022); g.fillRect(w * .48, y0 + dh * .62, w * .022, w * .022);
       [2, 3].forEach(i => seg(g, t[i], w * .53 + (i - 2) * dw * 1.12, y0, dw, dh, on, off));
       [0, 1].forEach(i => seg(g, s[i], w * .78 + i * dw * .62, y0 + dh * .4, dw * .55, dh * .6, on, off));
-      g.font = `600 ${h * .07}px "JetBrains Mono", monospace`; g.fillStyle = on;
+      g.font = `600 ${h * .07}px "Jost", sans-serif`; g.fillStyle = on;
       g.fillText(d.getHours() >= 12 ? 'PM' : 'AM', w * .08, h * .22); g.fillText(['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'][d.getDay()] + ' ' + d.getDate(), w * .62, h * .22);
       return;
     }
@@ -177,17 +177,17 @@ function dialTexture(sp, W = 1, H = 1) {
     if (isRect) { // chemin de fer for rectangular dials
       const hw = w / 2 * .86, hh = h / 2 * .9; g.strokeStyle = ink; g.lineWidth = 3; g.strokeRect(-hw, -hh, hw * 2, hh * 2); g.strokeRect(-hw + 18, -hh + 18, hw * 2 - 36, hh * 2 - 36);
       for (let i = 0; i < 60; i++) { const a = i / 60 * TAU, dx = Math.sin(a), dy = -Math.cos(a), k = Math.min(hw / Math.abs(dx || 1e-6), hh / Math.abs(dy || 1e-6)); g.beginPath(); g.moveTo(dx * k, dy * k); g.lineTo(dx * (k - 18), dy * (k - 18)); g.lineWidth = 2; g.stroke(); }
-      if (T === 'roman') { g.font = `400 ${R * .2}px "Bodoni Moda", "Cormorant Garamond", serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = ink;
+      if (T === 'roman') { g.font = `400 ${R * .2}px "Libre Caslon Display", Georgia, serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = ink;
         ['XII', 'I', 'II', 'III', 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'].forEach((n, i) => { const a = i / 12 * TAU, dx = Math.sin(a), dy = -Math.cos(a), k = Math.min((hw - R * .2) / Math.abs(dx || 1e-6), (hh - R * .2) / Math.abs(dy || 1e-6)); g.save(); g.translate(dx * k, dy * k); g.rotate(a); g.scale(.62, 1.15); g.fillText(n, 0, 0); g.restore(); }); }
     }
     g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = ink;
-    const ring = (n, r, f, sz, font = '"Bodoni Moda", "Cormorant Garamond", serif', skip = []) => { g.font = `400 ${R * sz}px ${font}`; for (let i = 0; i < n; i++) { if (skip.includes(i)) continue; const a = i / n * TAU; g.fillText(f(i), r * R * Math.sin(a), -r * R * Math.cos(a)); } };
+    const ring = (n, r, f, sz, font = '"Libre Caslon Display", Georgia, serif', skip = []) => { g.font = `400 ${R * sz}px ${font}`; for (let i = 0; i < n; i++) { if (skip.includes(i)) continue; const a = i / n * TAU; g.fillText(f(i), r * R * Math.sin(a), -r * R * Math.cos(a)); } };
     if (!isRect) {
-      if (T === 'flieger') { ring(12, .76, i => i, .15, '"Inter", "JetBrains Mono", sans-serif', [0]); g.beginPath(); g.moveTo(0, -R * .7); g.lineTo(-R * .07, -R * .86); g.lineTo(R * .07, -R * .86); g.closePath(); g.fill(); [-1, 1].forEach(s => { g.beginPath(); g.arc(s * R * .11, -R * .86, R * .018, 0, TAU); g.fill(); }); }
-      if (T === 'field') { ring(12, .76, i => i || 12, .14, '"Inter", sans-serif'); ring(12, .56, i => i + 12, .06, '"JetBrains Mono", monospace'); }
-      if (T === 'roman' || T === 'tourbillon' || T === 'enamel') { const n = T === 'enamel' ? ['12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'] : ['XII', 'I', 'II', 'III', 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI']; g.font = `${T === 'enamel' ? 'italic ' : ''}400 ${R * .13}px "Bodoni Moda", "Cormorant Garamond", serif`; n.forEach((t, i) => { if (T === 'tourbillon' && i >= 5 && i <= 7) return; const a = i / 12 * TAU; g.save(); g.translate(.78 * R * Math.sin(a), -.78 * R * Math.cos(a)); if (T !== 'enamel') g.rotate(a); g.fillText(t, 0, 0); g.restore(); }); }
-      if (T === 'journe') ring(12, .8, i => i || 12, .08, '"Inter", sans-serif');
-      if (T === 'sandwich') { g.fillStyle = '#e8ddb8'; ring(12, .74, i => [12, '', '', 3, '', '', 6, '', '', 9, '', ''][i], .17, '"Inter", sans-serif'); g.fillStyle = ink; }
+      if (T === 'flieger') { ring(12, .76, i => i, .15, '"Jost", "Jost", sans-serif', [0]); g.beginPath(); g.moveTo(0, -R * .7); g.lineTo(-R * .07, -R * .86); g.lineTo(R * .07, -R * .86); g.closePath(); g.fill(); [-1, 1].forEach(s => { g.beginPath(); g.arc(s * R * .11, -R * .86, R * .018, 0, TAU); g.fill(); }); }
+      if (T === 'field') { ring(12, .76, i => i || 12, .14, '"Jost", sans-serif'); ring(12, .56, i => i + 12, .06, '"Jost", sans-serif'); }
+      if (T === 'roman' || T === 'tourbillon' || T === 'enamel') { const n = T === 'enamel' ? ['12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'] : ['XII', 'I', 'II', 'III', 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI']; g.font = `${T === 'enamel' ? 'italic ' : ''}400 ${R * .13}px "Libre Caslon Display", Georgia, serif`; n.forEach((t, i) => { if (T === 'tourbillon' && i >= 5 && i <= 7) return; const a = i / 12 * TAU; g.save(); g.translate(.78 * R * Math.sin(a), -.78 * R * Math.cos(a)); if (T !== 'enamel') g.rotate(a); g.fillText(t, 0, 0); g.restore(); }); }
+      if (T === 'journe') ring(12, .8, i => i || 12, .08, '"Jost", sans-serif');
+      if (T === 'sandwich') { g.fillStyle = '#e8ddb8'; ring(12, .74, i => [12, '', '', 3, '', '', 6, '', '', 9, '', ''][i], .17, '"Jost", sans-serif'); g.fillStyle = ink; }
     }
     // sub-dials
     const sub = (x, y, r, labels) => {
@@ -198,7 +198,7 @@ function dialTexture(sp, W = 1, H = 1) {
       const sInk = panda ? '#eee' : ink;
       g.strokeStyle = sInk; g.lineWidth = 2.5; g.beginPath(); g.arc(0, 0, r * R, 0, TAU); g.stroke();
       for (let i = 0; i < 60; i++) { const a = i / 60 * TAU, r1 = r * R * .97, r2 = r * R * (i % 5 ? .9 : .82); g.lineWidth = i % 5 ? 1.5 : 3; g.beginPath(); g.moveTo(r1 * Math.sin(a), -r1 * Math.cos(a)); g.lineTo(r2 * Math.sin(a), -r2 * Math.cos(a)); g.stroke(); }
-      if (labels) { g.fillStyle = sInk; g.font = `500 ${R * .045}px "JetBrains Mono", monospace`; labels.forEach((t, i) => { const a = i / labels.length * TAU; g.fillText(t, r * R * .62 * Math.sin(a), -r * R * .62 * Math.cos(a)); }); }
+      if (labels) { g.fillStyle = sInk; g.font = `500 ${R * .045}px "Jost", sans-serif`; labels.forEach((t, i) => { const a = i / labels.length * TAU; g.fillText(t, r * R * .62 * Math.sin(a), -r * R * .62 * Math.cos(a)); }); }
       g.restore();
     };
     if (sp.subs === 3) { sub(-.42, 0, .21, ['60', '15', '30', '45']); sub(.42, 0, .21, ['30', '10', '20']); sub(0, .42, .21, ['12', '3', '6', '9']); }
@@ -206,17 +206,17 @@ function dialTexture(sp, W = 1, H = 1) {
     if (sp.subsec && !isRect) sub(0, .48, .2, ['60', '15', '30', '45']);
     if (isRect && sp.subsec) sub(0, .42, .26, ['60', '15', '30', '45']);
     if (T === 'perpetual') { sub(-.42, 0, .2, ['MON', 'WED', 'FRI', 'SUN']); sub(.42, 0, .2, ['JAN', 'APR', 'JUL', 'OCT']); g.save(); g.translate(0, .42 * R); g.fillStyle = '#0d1a3a'; g.beginPath(); g.arc(0, 0, .2 * R, Math.PI, 0); g.fill(); g.fillStyle = '#f2cd7e'; g.beginPath(); g.arc(R * .05, -R * .07, R * .06, 0, TAU); g.fill(); g.restore(); }
-    if (T === 'lange1') { g.strokeStyle = ink; g.lineWidth = 3; g.beginPath(); g.arc(-R * .16, -R * .06, R * .5, 0, TAU); g.stroke(); sub(.32, .44, .17); g.fillStyle = '#fff'; g.fillRect(R * .2, -R * .66, R * .2, R * .24); g.fillRect(R * .42, -R * .66, R * .2, R * .24); g.fillStyle = '#111'; g.font = `500 ${R * .18}px "Inter", sans-serif`; g.fillText(String(new Date().getDate()).padStart(2, '0')[0], R * .3, -R * .54); g.fillText(String(new Date().getDate()).padStart(2, '0')[1], R * .52, -R * .54); }
-    if (T === 'zeitwerk') { g.fillStyle = '#f6f4ef'; g.fillRect(-R * .62, -R * .16, R * .52, R * .36); g.fillRect(R * .1, -R * .16, R * .52, R * .36); g.fillStyle = '#111'; g.font = `300 ${R * .3}px "Inter", sans-serif`; const d = new Date(); g.fillText(String(d.getHours()).padStart(2, '0'), -R * .36, R * .03); g.fillText(String(d.getMinutes()).padStart(2, '0'), R * .36, R * .03); g.strokeStyle = '#c9a35a'; g.lineWidth = R * .03; g.beginPath(); g.arc(0, R * .9, R * .82, -Math.PI * .78, -Math.PI * .22); g.stroke(); sub(0, -.58, .14); }
+    if (T === 'lange1') { g.strokeStyle = ink; g.lineWidth = 3; g.beginPath(); g.arc(-R * .16, -R * .06, R * .5, 0, TAU); g.stroke(); sub(.32, .44, .17); g.fillStyle = '#fff'; g.fillRect(R * .2, -R * .66, R * .2, R * .24); g.fillRect(R * .42, -R * .66, R * .2, R * .24); g.fillStyle = '#111'; g.font = `500 ${R * .18}px "Jost", sans-serif`; g.fillText(String(new Date().getDate()).padStart(2, '0')[0], R * .3, -R * .54); g.fillText(String(new Date().getDate()).padStart(2, '0')[1], R * .52, -R * .54); }
+    if (T === 'zeitwerk') { g.fillStyle = '#f6f4ef'; g.fillRect(-R * .62, -R * .16, R * .52, R * .36); g.fillRect(R * .1, -R * .16, R * .52, R * .36); g.fillStyle = '#111'; g.font = `300 ${R * .3}px "Jost", sans-serif`; const d = new Date(); g.fillText(String(d.getHours()).padStart(2, '0'), -R * .36, R * .03); g.fillText(String(d.getMinutes()).padStart(2, '0'), R * .36, R * .03); g.strokeStyle = '#c9a35a'; g.lineWidth = R * .03; g.beginPath(); g.arc(0, R * .9, R * .82, -Math.PI * .78, -Math.PI * .22); g.stroke(); sub(0, -.58, .14); }
     if (T === 'tourbillon') { g.fillStyle = '#050506'; g.beginPath(); g.arc(0, .44 * R, .3 * R, 0, TAU); g.fill(); }
-    if (sp.power) { g.strokeStyle = ink; g.lineWidth = 5; g.beginPath(); g.arc(-R * .18, -R * .2, R * .3, -Math.PI * .95, -Math.PI * .55); g.stroke(); g.font = `500 ${R * .035}px "JetBrains Mono"`; g.fillText('POWER RESERVE', -R * .32, -R * .36); }
-    if (sp.date && !(sp.subs && sp.subs >= 2) && !isRect) { g.fillStyle = '#fbfaf6'; g.fillRect(R * .58, -R * .07, R * .17, R * .14); g.strokeStyle = shade(base, -.4); g.lineWidth = 6; g.strokeRect(R * .58, -R * .07, R * .17, R * .14); g.fillStyle = '#111'; g.font = `600 ${R * .1}px "Inter", sans-serif`; g.fillText(new Date().getDate(), R * .665, R * .005); }
+    if (sp.power) { g.strokeStyle = ink; g.lineWidth = 5; g.beginPath(); g.arc(-R * .18, -R * .2, R * .3, -Math.PI * .95, -Math.PI * .55); g.stroke(); g.font = `500 ${R * .035}px "Jost"`; g.fillText('POWER RESERVE', -R * .32, -R * .36); }
+    if (sp.date && !(sp.subs && sp.subs >= 2) && !isRect) { g.fillStyle = '#fbfaf6'; g.fillRect(R * .58, -R * .07, R * .17, R * .14); g.strokeStyle = shade(base, -.4); g.lineWidth = 6; g.strokeRect(R * .58, -R * .07, R * .17, R * .14); g.fillStyle = '#111'; g.font = `600 ${R * .1}px "Jost", sans-serif`; g.fillText(new Date().getDate(), R * .665, R * .005); }
     // signature
     if (!['zeitwerk', 'lange1', 'fume', 'sandwich'].includes(T)) {
-      g.fillStyle = ink; g.font = `400 ${R * .072}px "Cinzel", "Cormorant Garamond", serif`;
+      g.fillStyle = ink; g.font = `400 ${R * .072}px "Libre Caslon Text", Georgia, serif`;
       const name = (sp.brand || 'MECHWATCH').toUpperCase(); const y = isRect ? -R * .5 : -R * (T === 'flieger' ? .42 : T === 'field' ? .3 : .44);
       g.fillText(name.length > 18 ? name.split(' ').slice(0, 2).join(' ') : name, 0, y);
-      g.globalAlpha = .7; g.font = `400 ${R * .035}px "JetBrains Mono", monospace`;
+      g.globalAlpha = .7; g.font = `400 ${R * .035}px "Jost", sans-serif`;
       g.fillText(sp.line || 'AUTOMATIC', 0, isRect ? R * .48 : (sp.subs || sp.subsec || T === 'tourbillon' || T === 'perpetual') ? -R * .32 : R * .32);
       g.fillText('SWISS MADE', 0, isRect ? h / 2 - R * .06 : R * .9); g.globalAlpha = 1;
     }
@@ -235,17 +235,17 @@ function movementTexture() {
     g.strokeStyle = '#e8b47a'; g.lineWidth = 12; g.beginPath(); g.arc(w * .26, w * .7, w * .11, 0, TAU); g.stroke();
     [[.5, .5], [.3, .32], [.66, .4], [.42, .72], [.7, .72], [.26, .7]].forEach(([x, y]) => { g.fillStyle = '#d4af6a'; g.beginPath(); g.arc(x * w, y * w, 20, 0, TAU); g.fill(); g.fillStyle = '#c2183b'; g.beginPath(); g.arc(x * w, y * w, 11, 0, TAU); g.fill(); });
     [[.2, .44], [.8, .38], [.55, .88], [.78, .62]].forEach(([x, y]) => { g.fillStyle = '#2246a8'; g.beginPath(); g.arc(x * w, y * w, 16, 0, TAU); g.fill(); g.strokeStyle = '#0b1640'; g.lineWidth = 4; g.beginPath(); g.moveTo(x * w - 12, y * w); g.lineTo(x * w + 12, y * w); g.stroke(); });
-    g.fillStyle = '#b8913f'; g.font = '600 34px "Cinzel", serif'; g.textAlign = 'center'; g.fillText('MECHWATCH · 25 JEWELS', c, w * .2);
+    g.fillStyle = '#b8913f'; g.font = '600 34px "Libre Caslon Text", serif'; g.textAlign = 'center'; g.fillText('MECHWATCH · 25 JEWELS', c, w * .2);
   });
 }
 function engravedBack(text) {
   return canvasTex(1024, 1024, (g, w) => {
     const c = w / 2; g.fillStyle = '#808080'; g.fillRect(0, 0, w, w);
     for (let r = 10; r < c; r += 3) { g.strokeStyle = `rgba(${r % 6 ? 255 : 0},${r % 6 ? 255 : 0},${r % 6 ? 255 : 0},.12)`; g.beginPath(); g.arc(c, c, r, 0, TAU); g.stroke(); }
-    g.fillStyle = '#2c2c2c'; g.font = '500 44px "Cinzel", serif'; g.textAlign = 'center';
+    g.fillStyle = '#2c2c2c'; g.font = '500 44px "Libre Caslon Text", serif'; g.textAlign = 'center';
     const R = c * .72;
     [...text].forEach((ch, i) => { const a = -Math.PI / 2 - .9 + i * (1.8 / text.length); g.save(); g.translate(c + R * Math.cos(a), c + R * Math.sin(a)); g.rotate(a + Math.PI / 2); g.fillText(ch, 0, 0); g.restore(); });
-    g.font = '400 60px "Bodoni Moda", serif'; g.fillText('MW', c, c + 20);
+    g.font = '400 60px "Libre Caslon Display", serif'; g.fillText('MW', c, c + 20);
   }, { srgb: false });
 }
 
@@ -516,7 +516,7 @@ export function buildWatch(sp) {
 
   /* ── crystal ── */
   const crysG = part('crystal', 'Crystal', isRect && shapeKind === 'digital' ? 'Mineral glass over the liquid-crystal display.' : 'Synthetic sapphire (9 on the Mohs scale), domed, with an anti-reflective coating that glints blue-violet at an angle.', [0, 0, 14], [Rd * .45, Rd * .4, zBz + .9], [.2, .2, 1]);
-  const sapp = sapphire();
+  const sapp = sp.cheapGlass ? new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0, roughness: .02, transparent: true, opacity: .16, depthWrite: false, envMapIntensity: 2.2, iridescence: .5, iridescenceIOR: 1.6, iridescenceThicknessRange: [180, 420] }) : sapphire();
   if (isRound || ['octagon', 'cushion'].includes(shapeKind)) {
     const R0 = isRound ? Rd + .5 : Rd + .4, sph = 60, th = Math.asin(R0 / sph);
     const cap = new THREE.SphereGeometry(sph, 96, 12, 0, TAU, 0, th); cap.scale(1, .2, 1); cap.rotateX(Math.PI / 2); cap.translate(0, 0, zBz - sph * .2 * Math.cos(th) + .2);
@@ -555,6 +555,7 @@ export function buildWatch(sp) {
 
   /* ── caseback ── */
   const exhib = sp.caseback !== 'solid';
+  if (sp.cheapGlass) sp._cheap = true;
   const backG = part('caseback', exhib ? 'Exhibition caseback' : 'Screw-down caseback', exhib ? 'A sapphire window onto the movement: perlage, Côtes de Genève, blued screws and a gold-segment rotor that spins as you move.' : 'Solid steel, screwed down against a gasket and engraved — for water resistance.', [0, 0, -11], [r * .3, -r * .3, zB - T * .1], [0, 0, -1]);
   const bOuter = isRound ? r * .9 : Math.min(W, H) * .42;
   const backRing = new THREE.Mesh(latheZ([[bOuter * (exhib ? .72 : .86), zB - T * .07], [bOuter, zB - T * .05], [bOuter + .5, zB + .2], [bOuter + .5, zB + .6]], 160), exhib ? polish : brush);
@@ -567,7 +568,7 @@ export function buildWatch(sp) {
     const rs = new THREE.Shape(); rs.absarc(0, 0, bOuter * .7, .05, Math.PI - .05, false); rs.absarc(0, 0, bOuter * .14, Math.PI - .05, .05 + TAU, true);
     const rg = ext(rs, .5, .12, 64); rg.translate(0, 0, -.25); const rm = new THREE.Mesh(rg, metal('gold', 'polished')); rotor.add(rm);
     const hub = new THREE.Mesh(new THREE.CylinderGeometry(bOuter * .15, bOuter * .15, .9, 32), metal('white', 'polished')); hub.rotation.x = Math.PI / 2; rotor.add(hub);
-    const win = new THREE.Mesh(new THREE.CircleGeometry(bOuter * .74, 96), sapphire()); win.rotation.y = Math.PI; win.position.z = zB - T * .065; backG.add(win);
+    const win = new THREE.Mesh(new THREE.CircleGeometry(bOuter * .74, 96), sp.cheapGlass ? sapp : sapphire()); win.rotation.y = Math.PI; win.position.z = zB - T * .065; backG.add(win);
   }
   for (let i = 0; i < 6; i++) { const a = i / 6 * TAU; const n = new THREE.Mesh(new THREE.BoxGeometry(2.2, .9, .6), metal('black')); n.position.set(Math.cos(a) * bOuter * .96, Math.sin(a) * bOuter * .96, zB - T * .05); n.rotation.z = a; backG.add(n); }
 
@@ -583,7 +584,7 @@ export function buildWatch(sp) {
     for (let k = 0; k <= 10; k++) { const al = a0 + (endAng - a0) * k / 10; pts.push(new THREE.Vector3(0, sgn * wrist.a * Math.sin(al), wrist.zc + wrist.b * Math.cos(al))); }
     return pts;
   };
-  if (!isPocket) {
+  if (!isPocket && !sp.headOnly) {
     const bracelet = sp.bracelet;
     if (bracelet) {
       const bm = metal(sp.metal, 'brushed'), pm = metal(sp.metal, 'polished');
@@ -633,7 +634,7 @@ export function buildWatch(sp) {
     }
     const bars = part('springbars', 'Spring bars', 'Spring-loaded pins that pass through the strap and click into holes inside the lugs.', [0, 0, 0], [attach.w * .3, attach.y, attach.z], [0, 1, 0]);
     for (const sy of [1, -1]) { const b = new THREE.Mesh(new THREE.CylinderGeometry(.85, .85, attach.w + 1.2, 16), metal('steel', 'polished')); b.rotation.z = Math.PI / 2; b.position.set(0, sy * attach.y, attach.z); bars.add(b); }
-  } else {
+  } else if (isPocket) {
     const bow = part('lugs', 'Bow & pendant', 'A pocket watch hangs from a bow on its pendant, with the crown at 12.', [0, 10, 0], [0, r + 8, crownZ], [0, 1, .3]);
     const t = new THREE.Mesh(new THREE.TorusGeometry(7, 1.1, 16, 48), polish); t.position.set(0, r + 9, crownZ); bow.add(t);
     crownG.rotation.z = Math.PI / 2;
@@ -641,8 +642,9 @@ export function buildWatch(sp) {
 
   /* ── wrist cushion (display) ── */
   const cushion = new THREE.Group(); cushion.name = 'cushion';
-  if (!isPocket) {
-    const prof = [[0, -31], [.8, -31], [.97, -30.2], [1, -28.8], [1, 28.8], [.97, 30.2], [.8, 31], [0, 31]].map(([x, y]) => new THREE.Vector2(x, y));
+  if (!isPocket && !sp.headOnly) {
+    const L = sp.cushionLength || 62, hl = L / 2;
+    const prof = [[0, -hl], [.8, -hl], [.97, -hl + .8], [1, -hl + 2.2], [1, hl - 2.2], [.97, hl - .8], [.8, hl], [0, hl]].map(([x, y]) => new THREE.Vector2(x, y));
     const cg = new THREE.LatheGeometry(prof, 96); cg.rotateZ(-Math.PI / 2); cg.scale(1, wrist.a - (sp.bracelet ? 2.2 : 3.2), wrist.b - (sp.bracelet ? 2.2 : 3.2)); cg.translate(0, 0, wrist.zc);
     const cm = new THREE.Mesh(cg, new THREE.MeshPhysicalMaterial({ color: 0x24130b, roughness: 1, sheen: .8, sheenColor: new THREE.Color(0x6a4228), sheenRoughness: .6, bumpMap: canvasTex(256, 256, (g, w) => { g.fillStyle = '#808080'; g.fillRect(0, 0, w, w); for (let i = 0; i < 6000; i++) { g.fillStyle = Math.random() > .5 ? '#9a9a9a' : '#666'; g.fillRect(Math.random() * w, Math.random() * w, 1.5, 1.5); } }, { srgb: false, repeat: [6, 6] }), bumpScale: .6 }));
     cm.receiveShadow = true; cm.castShadow = true; cushion.add(cm);
@@ -679,10 +681,10 @@ function bezelTexture(kind, sp) {
     g.fillStyle = colA; g.beginPath(); g.arc(0, 0, c, Math.PI, TAU); g.fill(); g.fillStyle = colB; g.beginPath(); g.arc(0, 0, c, 0, Math.PI); g.fill();
     const ink = kind === 'tachy' && lum(sp.dial) > .5 ? '#111' : '#f1ece0'; g.fillStyle = ink; g.strokeStyle = ink; g.textAlign = 'center'; g.textBaseline = 'middle';
     const R = c * .885;
-    if (kind === 'tachy') { g.font = `600 ${c * .07}px "Inter", sans-serif`; [500, 300, 200, 150, 120, 100, 90, 80, 70, 60].forEach(v => { const a = 3600 / v * 6 * Math.PI / 180; g.save(); g.rotate(a); g.fillText(v, 0, -R); g.restore(); }); g.font = `500 ${c * .045}px "Inter"`; g.save(); g.rotate(Math.PI); g.fillText('TACHYMETRE', 0, -R); g.restore(); }
-    else if (kind === 'pepsi' || kind === 'gmt') { g.font = `600 ${c * .09}px "Inter", sans-serif`; for (let i = 0; i < 24; i++) { g.save(); g.rotate(i / 24 * TAU); if (i % 2 === 0 && i) g.fillText(i, 0, -R); else if (!i) { g.beginPath(); g.moveTo(0, -R + c * .05); g.lineTo(-c * .05, -R - c * .04); g.lineTo(c * .05, -R - c * .04); g.fill(); } else g.fillRect(-c * .008, -R - c * .03, c * .016, c * .06); g.restore(); } }
+    if (kind === 'tachy') { g.font = `600 ${c * .07}px "Jost", sans-serif`; [500, 300, 200, 150, 120, 100, 90, 80, 70, 60].forEach(v => { const a = 3600 / v * 6 * Math.PI / 180; g.save(); g.rotate(a); g.fillText(v, 0, -R); g.restore(); }); g.font = `500 ${c * .045}px "Jost"`; g.save(); g.rotate(Math.PI); g.fillText('TACHYMETRE', 0, -R); g.restore(); }
+    else if (kind === 'pepsi' || kind === 'gmt') { g.font = `600 ${c * .09}px "Jost", sans-serif`; for (let i = 0; i < 24; i++) { g.save(); g.rotate(i / 24 * TAU); if (i % 2 === 0 && i) g.fillText(i, 0, -R); else if (!i) { g.beginPath(); g.moveTo(0, -R + c * .05); g.lineTo(-c * .05, -R - c * .04); g.lineTo(c * .05, -R - c * .04); g.fill(); } else g.fillRect(-c * .008, -R - c * .03, c * .016, c * .06); g.restore(); } }
     else if (kind === 'tenth') { for (let i = 0; i < 100; i++) { g.save(); g.rotate(i / 100 * TAU); g.fillRect(-c * .004, -c * .96, c * .008, i % 10 ? c * .05 : c * .1); g.restore(); } }
-    else { g.font = `600 ${c * .1}px "Inter", sans-serif`; for (let i = 0; i < 60; i++) { g.save(); g.rotate(i / 60 * TAU); if (i % 10 === 0 && i) g.fillText(i, 0, -R); else if (i === 0) { } else if (i < 15 || i % 5 === 0) g.fillRect(-c * .007, -R - c * .04, c * .014, i % 5 ? c * .06 : c * .08); g.restore(); } }
+    else { g.font = `600 ${c * .1}px "Jost", sans-serif`; for (let i = 0; i < 60; i++) { g.save(); g.rotate(i / 60 * TAU); if (i % 10 === 0 && i) g.fillText(i, 0, -R); else if (i === 0) { } else if (i < 15 || i % 5 === 0) g.fillRect(-c * .007, -R - c * .04, c * .014, i % 5 ? c * .06 : c * .08); g.restore(); } }
   });
 }
 function bezelDesc(b, s) { return ({ diver: 'Unidirectional diving bezel, 120 clicks, ceramic insert with a luminous pip at 12 — it can only shorten your remaining dive time if knocked.', pepsi: 'Bidirectional 24-hour bezel in two tones (day/night) for reading a third time zone.', tachy: 'Tachymeter scale: time a known distance with the chronograph and read off the speed.', fluted: 'Fluted bezel — once functional for screwing the case shut, now pure light play.', clous: 'Clous de Paris hobnail guilloché — hundreds of tiny pyramids cut by hand.', maltese: 'Bezel cut in a half Maltese cross, emblem of its house.', tenth: 'Ceramic bezel graduated in 1/10 s for the high-beat chronograph.', slide: 'Circular slide rule for fuel, speed and unit conversions.', screws: 'Six visible H-screws clamp a "sandwich" of case materials.', thin: 'Slim polished bezel to let the dial breathe.', octagon: 'Octagonal bezel fixed by eight hexagonal screws.' }[s === 'octagon' ? 'octagon' : b] || 'Polished bezel ring holding the crystal and its gasket.'); }

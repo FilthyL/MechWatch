@@ -81,8 +81,8 @@ function bezelRings() {
     const isBin = roman.classList.contains('roman-bin'), col = isBin ? 'rgba(179,32,63,.5)' : 'rgba(201,163,90,.5)';
     let s = `<svg viewBox="-200 -200 400 400"><circle r="196" fill="none" stroke="${col}" stroke-width=".8"/><circle r="186" fill="none" stroke="${col}" stroke-width=".5"/><circle r="150" fill="none" stroke="${col}" stroke-width=".8"/><circle r="146" fill="none" stroke="${col}" stroke-width=".3" stroke-dasharray="1 3"/><g class="rot">`;
     for (let i = 0; i < 60; i++) { const [x1, y1] = P(186, i * 6), [x2, y2] = P(i % 5 ? 178 : i < 15 ? 160 : 170, i * 6); if (i) s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="${i % 5 ? .6 : 1.4}"/>`; }
-    for (let i = 10; i < 60; i += 10) { const [x, y] = P(166, i * 6); s += `<text x="${x}" y="${y + 6}" text-anchor="middle" font-family="Bodoni Moda, serif" font-size="18" fill="${col}" transform="rotate(${i * 6} ${x} ${y})">${i}</text>`; }
-    s += `<path d="M0 -150 l-12 -22 h24z" fill="${col}"/></g><text y="44" text-anchor="middle" font-family="Bodoni Moda, serif" font-size="128" font-style="italic" fill="none" stroke="${col}" stroke-width=".9">${roman.textContent}</text></svg>`;
+    for (let i = 10; i < 60; i += 10) { const [x, y] = P(166, i * 6); s += `<text x="${x}" y="${y + 6}" text-anchor="middle" font-family="Libre Caslon Display, serif" font-size="18" fill="${col}" transform="rotate(${i * 6} ${x} ${y})">${i}</text>`; }
+    s += `<path d="M0 -150 l-12 -22 h24z" fill="${col}"/></g><text y="44" text-anchor="middle" font-family="Libre Caslon Display, serif" font-size="128" font-style="italic" fill="none" stroke="${col}" stroke-width=".9">${roman.textContent}</text></svg>`;
     ring.innerHTML = s; head.appendChild(ring); head.classList.add('has-ring');
   });
 }
@@ -152,7 +152,7 @@ function intro(onDone) {
   if (wsvg) {
     let g = `<defs><linearGradient id="iw-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0c4"/><stop offset=".35" stop-color="#c79a4a"/><stop offset=".6" stop-color="#f5dc9a"/><stop offset="1" stop-color="#7a5520"/></linearGradient></defs>`;
     g += `<circle r="118" fill="none" stroke="rgba(201,163,90,.25)"/><circle r="104" fill="none" stroke="rgba(201,163,90,.15)" stroke-dasharray="1 4"/>`;
-    for (let i = 0; i <= 42; i += 6) { const a = -120 + i / 42 * 240, [x1, y1] = P(96, a), [x2, y2] = P(86, a), [tx, ty] = P(74, a); g += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#c9a35a" stroke-width="1.2"/><text x="${tx}" y="${ty + 4}" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8a6a32">${i}</text>`; }
+    for (let i = 0; i <= 42; i += 6) { const a = -120 + i / 42 * 240, [x1, y1] = P(96, a), [x2, y2] = P(86, a), [tx, ty] = P(74, a); g += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#c9a35a" stroke-width="1.2"/><text x="${tx}" y="${ty + 4}" text-anchor="middle" font-family="Jost" font-size="10" fill="#8a6a32">${i}</text>`; }
     g += `<path id="iwArc" d="M${P(108, -120).join(' ')} A108 108 0 1 1 ${P(108, 120).join(' ')}" fill="none" stroke="url(#iw-g)" stroke-width="5" stroke-linecap="round" pathLength="1" stroke-dasharray="0 1"/>`;
     g += `<g id="iwHand"><path d="M-2 10 L0 -84 L2 10Z" fill="url(#iw-g)"/></g><circle r="5" fill="url(#iw-g)"/>`;
     g += `<g id="iwCrown" transform="translate(0 -128)"><rect x="-9" y="-10" width="18" height="12" rx="3" fill="url(#iw-g)"/><g id="iwKnurl">${Array.from({ length: 7 }, (_, k) => `<line x1="${-8 + k * 2.6}" y1="-9" x2="${-8 + k * 2.6}" y2="1" stroke="#5a3f17" stroke-width=".8"/>`).join('')}</g></g>`;

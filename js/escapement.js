@@ -120,7 +120,7 @@ export function init() {
     ctx.restore();
   }
   function labels() {
-    ctx.font = '500 11px Cinzel, serif'; ctx.fillStyle = gold; ctx.textAlign = 'center';
+    ctx.font = '500 11px Libre Caslon Text, serif'; ctx.fillStyle = gold; ctx.textAlign = 'center';
     const L = (t, x, y, lx, ly) => { ctx.strokeStyle = 'rgba(212,176,106,.5)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(lx, ly + (ly < y ? 6 : -14)); ctx.stroke(); ctx.beginPath(); ctx.arc(x, y, 2.5, 0, TAU); ctx.fill(); ctx.fillText(t, lx, ly); };
     L('ESCAPE WHEEL · 15 TEETH', E[0] - 90, E[1] + 120, 150, 600);
     L('ENTRY PALLET', 380, 236, 370, 60);
@@ -146,7 +146,7 @@ export function init() {
     drawWheel(s.wheelA);
     drawFork(s.fork);
     labels();
-    ctx.font = '400 12px JetBrains Mono'; ctx.fillStyle = '#8e9099'; ctx.textAlign = 'left';
+    ctx.font = '400 12px Jost'; ctx.fillStyle = '#8e9099'; ctx.textAlign = 'left';
     ctx.fillText(`BEAT ${Math.floor(beats).toString().padStart(5, '0')}   ·   ${['LOCK', 'UNLOCK', 'IMPULSE', 'DROP', 'DRAW'][s.phase]}`, 24, 34);
     if (s.phase !== lastPhase) { phases.forEach((p, i) => p.classList.toggle('on', i === s.phase)); if (s.phase === 3) tick(s.n % 2); lastPhase = s.phase; }
   });
@@ -160,7 +160,7 @@ export function init() {
   const secH = el('g', {}, svg);
   el('line', { x1: 0, y1: 18, x2: 0, y2: -90, stroke: '#d4b06a', 'stroke-width': 1.6, 'stroke-linecap': 'round' }, secH);
   el('circle', { r: 4, fill: '#d4b06a' }, svg);
-  const lbl = el('text', { y: 40, 'text-anchor': 'middle', fill: '#8e9099', 'font-family': 'JetBrains Mono', 'font-size': 8.5, 'letter-spacing': 1 }, svg);
+  const lbl = el('text', { y: 40, 'text-anchor': 'middle', fill: '#8e9099', 'font-family': 'Jost', 'font-size': 8.5, 'letter-spacing': 1 }, svg);
   let vph = 28800;
   const info = document.getElementById('beatInfo');
   const examples = { 18000: 'Vintage & many hand-wound calibres — Lange Datograph, Omega 321, Unitas 6497. Lower wear, longer service intervals.', 21600: 'The 1960s–70s standard; Patek 240, Omega 3861, JLC Reverso. A smooth compromise between accuracy and wear.', 25200: 'Omega\'s Co-Axial choice (8500/8900): the co-axial escapement works best slightly slower than 4 Hz.', 28800: 'The modern default: ETA 2824, Rolex 3235, Valjoux 7750. 4 Hz resists shocks and position errors well.', 36000: 'High-beat 5 Hz: Zenith El Primero (1/10 s timing), Grand Seiko Hi-Beat 9S85/9SA5. Better stability, more wear and energy.' };

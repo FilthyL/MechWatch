@@ -49,14 +49,14 @@ const rotorTex = () => canvasTex(1024, (g, s) => {
   g.fillStyle = '#c9ced5'; g.fillRect(0, 0, s, s);
   for (let r = 4; r < c; r += 3) { const l = 170 + 70 * Math.sin(r / 9); g.strokeStyle = `rgb(${l},${l + 3},${l + 7})`; g.lineWidth = 3.2; g.beginPath(); g.arc(c, c, r, 0, TAU); g.stroke(); }
   // engraved gilt text along the arc
-  g.fillStyle = '#b8913f'; g.font = '600 38px "Cormorant Garamond", Georgia, serif';
+  g.fillStyle = '#b8913f'; g.font = '600 38px "Libre Caslon Display", Georgia, serif';
   const txt = 'MECHWATCH  ·  AUTOMATIC  ·  25 JEWELS  ·  SWISS';
   const R = c * .62, span = Math.PI * .86, start = -Math.PI / 2 - span / 2;
   for (let i = 0; i < txt.length; i++) {
     const a = start + span * (i / (txt.length - 1));
     g.save(); g.translate(c + R * Math.cos(a), c + R * Math.sin(a)); g.rotate(a + Math.PI / 2); g.fillText(txt[i], -10, 0); g.restore();
   }
-  g.font = '400 22px "JetBrains Mono", monospace'; g.fillStyle = '#7d6531'; g.textAlign = 'center';
+  g.font = '400 22px "Jost", sans-serif'; g.fillStyle = '#7d6531'; g.textAlign = 'center';
   g.fillText('CAL. MW-28 · 28 800 A/h', c, c - R * .55);
 }, { repeat: [1 / 25.4, 1 / 25.4], offset: [.5, .5], wrap: false });
 const dialTex = () => canvasTex(1024, (g, s) => {
@@ -75,9 +75,9 @@ const dialTex = () => canvasTex(1024, (g, s) => {
   }
   g.restore();
   g.fillStyle = '#efe0b5'; g.textAlign = 'center';
-  g.font = '500 54px "Cormorant Garamond", Georgia, serif'; g.fillText('M E C H W A T C H', c, c - 175);
-  g.font = '400 20px "JetBrains Mono", monospace'; g.fillText('A U T O M A T I C', c, c + 170);
-  g.globalAlpha = .7; g.font = '400 15px "JetBrains Mono", monospace'; g.fillText('CHRONOMETER  ·  28 800 A/h', c, c + 200);
+  g.font = '500 54px "Libre Caslon Display", Georgia, serif'; g.fillText('M E C H W A T C H', c, c - 175);
+  g.font = '400 20px "Jost", sans-serif'; g.fillText('A U T O M A T I C', c, c + 170);
+  g.globalAlpha = .7; g.font = '400 15px "Jost", sans-serif'; g.fillText('CHRONOMETER  ·  28 800 A/h', c, c + 200);
   g.fillText('SWISS MADE', c, s - 30);
 }, { wrap: false });
 
