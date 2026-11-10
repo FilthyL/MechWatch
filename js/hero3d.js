@@ -22,7 +22,7 @@ function chain(top, length, linkR = 1.45) {
   return inst;
 }
 
-const INFO = { brand: 'MechWatch', model: 'Pocket <em>Chronometer</em>', ref: 'Ref. MW-1801 · 18k yellow gold · hand-wound', specs: [['Case', '50 mm · 18k gold, bombé'], ['Dial', 'Grand feu enamel, Breguet numerals'], ['Hands', 'Breguet, thermally blued'], ['Seconds', 'Small seconds at 6'], ['Back', 'Engine-turned barleycorn'], ['Crystal', 'High-domed sapphire']] };
+const INFO = { brand: 'MechWatch', model: 'Pocket <em>Chronometer</em>', ref: 'Ref. MW-1801 · 18k yellow gold · hand-wound', specs: [['Case', '50 mm · 18k gold, bombé'], ['Dial', 'Grand feu enamel, Breguet numerals'], ['Hands', 'Breguet, polished 18k gold'], ['Seconds', 'Small seconds at 6'], ['Back', 'Engine-turned barleycorn'], ['Crystal', 'High-domed sapphire']] };
 
 export function initHero() {
   const hero = document.querySelector('.hero'), layer = document.getElementById('heroGL'), wrap = document.getElementById('heroWatchWrap');

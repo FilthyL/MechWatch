@@ -57,7 +57,7 @@ export function metal(key = 'steel', finish = 'polished') {
   matCache.set(k, m); return m;
 }
 const LUME = new THREE.MeshStandardMaterial({ color: 0xe7f6df, emissive: 0x8fe3a8, emissiveIntensity: .32, roughness: .6 });
-const BLUED = new THREE.MeshPhysicalMaterial({ color: 0x2246b0, metalness: .9, roughness: .14, emissive: 0x050c33 });
+const BLUED = new THREE.MeshPhysicalMaterial({ color: 0x1a2a66, metalness: .9, roughness: .16, emissive: 0x02040f });
 const BLACKH = new THREE.MeshPhysicalMaterial({ color: 0x141416, metalness: .7, roughness: .18 });
 const REDH = new THREE.MeshPhysicalMaterial({ color: 0xc8193a, metalness: .3, roughness: .25 });
 const RUBY = new THREE.MeshPhysicalMaterial({ color: 0xd2123c, roughness: .05, clearcoat: 1, emissive: 0x3a0010, emissiveIntensity: .6 });
@@ -541,8 +541,8 @@ export function buildWatch(sp) {
     }
   }
   /* ── hands ── */
-  const handsG = part('hands', 'Hands', handsDesc(sp.hands), [0, 0, 6.5], [-Rd * .18, Rd * .22, zDial + 1.2], [0, 0, 1]);
-  const handMat = sp.handMetal === 'blued' ? BLUED : darkDial ? (['gold', 'rose'].includes(sp.metal) ? polish : metal('white', 'polished')) : (['breguet', 'sword'].includes(sp.hands) || ['roman', 'enamel'].includes(sp.dialType) ? BLUED : ['gold', 'rose'].includes(sp.metal) ? polish : BLACKH);
+  const handsG = part('hands', 'Hands', handsDesc(sp.hands, sp.handMetal), [0, 0, 6.5], [-Rd * .18, Rd * .22, zDial + 1.2], [0, 0, 1]);
+  const handMat = sp.handMetal === 'gold' ? metal('gold', 'polished') : sp.handMetal === 'blued' ? BLUED : darkDial ? (['gold', 'rose'].includes(sp.metal) ? polish : metal('white', 'polished')) : (['breguet', 'sword'].includes(sp.hands) || ['roman', 'enamel'].includes(sp.dialType) ? BLUED : ['gold', 'rose'].includes(sp.metal) ? polish : BLACKH);
   const lume = darkDial && !['dauphine', 'breguet'].includes(sp.hands);
   const hourStyle = sp.hands === 'mercedes' ? 'mercedes' : sp.hands, minStyle = sp.hands === 'mercedes' ? 'sword' : sp.hands;
   const hScale = isRect ? Math.min(W, H) / 2 * .85 : Rd;
@@ -553,7 +553,7 @@ export function buildWatch(sp) {
     handsG.add(HH, MH);
     if (!sp.subsec && sp.dialType !== 'tourbillon' && sp.dialType !== 'lange1') {
       SH = new THREE.Group(); SH.position.z = zDial + 1.35;
-      const sMat = sp.subs ? REDH : sp.dialType === 'snowflakehand' || sp.bezel === 'diver' ? handMat : handMat;
+      const sMat = sp.subs ? REDH : handMat;
       const bar = new THREE.Mesh(new THREE.BoxGeometry(.2, hScale * 1.12, .12), sMat); bar.position.y = hScale * .38; SH.add(bar);
       const cw = new THREE.Mesh(new THREE.CylinderGeometry(hScale * .05, hScale * .05, .14, 24), sMat); cw.rotation.x = Math.PI / 2; cw.position.y = -hScale * .12; SH.add(cw);
       if (sp.bezel === 'diver' || sp.dialType === 'diver') { const lol = new THREE.Mesh(new THREE.CylinderGeometry(hScale * .045, hScale * .045, .2, 24), LUME); lol.rotation.x = Math.PI / 2; lol.position.y = hScale * .62; SH.add(lol); }
@@ -773,7 +773,7 @@ function bezelTexture(kind, sp) {
 }
 function bezelDesc(b, s) { return ({ diver: 'Unidirectional diving bezel, 120 clicks, ceramic insert with a luminous pip at 12 — it can only shorten your remaining dive time if knocked.', pepsi: 'Bidirectional 24-hour bezel in two tones (day/night) for reading a third time zone.', tachy: 'Tachymeter scale: time a known distance with the chronograph and read off the speed.', fluted: 'Fluted bezel — once functional for screwing the case shut, now pure light play.', clous: 'Clous de Paris hobnail guilloché — hundreds of tiny pyramids cut by hand.', maltese: 'Bezel cut in a half Maltese cross, emblem of its house.', tenth: 'Ceramic bezel graduated in 1/10 s for the high-beat chronograph.', slide: 'Circular slide rule for fuel, speed and unit conversions.', screws: 'Six visible H-screws clamp a "sandwich" of case materials.', thin: 'Slim polished bezel to let the dial breathe.', octagon: 'Octagonal bezel fixed by eight hexagonal screws.' }[s === 'octagon' ? 'octagon' : b] || 'Polished bezel ring holding the crystal and its gasket.'); }
 function dialDesc(sp) { return ({ diver: 'High-contrast dive dial with applied, luminous indices.', tapisserie: '"Tapisserie" guilloché — a grid of tiny pyramids, each catching light.', horizontal: 'Horizontally embossed dial, gradated from light to dark.', snow: 'Textured to evoke wind-blown snow.', birch: 'Vertically textured like birch bark.', enamel: 'Grand feu enamel: fired at 800 °C, layer by layer, with Breguet numerals.', flieger: 'Observation-watch dial: triangle and dots at 12, maximal legibility.', field: 'Arabic numerals with a 24-hour inner track.', roman: 'Roman numerals and a chemin de fer minute track.', perpetual: 'Day, month with leap-year cycle, and moon phase.', zeitwerk: 'Jumping digital hours and minutes — mechanically.', lange1: 'Off-centre dial, Outsize Date and small seconds, laid out on the golden ratio.', tourbillon: 'An aperture at 6 reveals the tourbillon cage turning once a minute.', fume: 'Fumé sunburst fading to black at the edge.', skeleton: 'Skeletonised: the movement itself becomes the dial.', lcd: 'Twisted-nematic liquid crystal display.', sandwich: 'Sandwich dial: cut-out numerals over a luminous lower plate.' }[sp.dialType] || 'Sunburst-brushed dial with applied indices.'); }
-function handsDesc(h) { return ({ mercedes: 'Mercedes hour hand and sword minute hand, filled with lume.', sword: 'Sword hands, made for legibility.', dauphine: 'Faceted dauphine hands — two planes meeting in a sharp ridge.', breguet: 'Breguet "pomme" hands in thermally blued steel.', snowflake: 'Snowflake hour hand, a 1960s military signature.' }[h] || 'Baton hands, polished, with luminous inserts.'); }
+function handsDesc(h, m) { if (h === 'breguet' && m === 'gold') return 'Breguet "pomme" hands in polished 18k gold.'; return ({ mercedes: 'Mercedes hour hand and sword minute hand, filled with lume.', sword: 'Sword hands, made for legibility.', dauphine: 'Faceted dauphine hands — two planes meeting in a sharp ridge.', breguet: 'Breguet "pomme" hands in thermally blued steel.', snowflake: 'Snowflake hour hand, a 1960s military signature.' }[h] || 'Baton hands, polished, with luminous inserts.'); }
 function crownName(c) { return ({ guard: 'Screw-down crown & guards', onion: 'Onion crown', cabochon: 'Crown with sapphire cabochon', buttons: 'Push buttons', small: 'Crown' }[c] || 'Crown'); }
 function crownDesc(c) { return ({ guard: 'Screws down onto a triple gasket; the case shoulders guard it from knocks.', onion: 'Oversized and fluted so a pilot can wind it wearing gloves.', cabochon: 'A cut sapphire set into the crown — a jeweller\'s detail.', buttons: 'Light, mode, start/stop and reset.' }[c] || 'Winds the mainspring and sets the hands. Pull out to set.'); }
 function strapDesc(k) { return ({ alligator: 'Hand-stitched alligator, the scales graded from the belly.', calf: 'Calfskin with contrast stitching.', rubber: 'Vulcanised rubber, waterproof and supple.', nato: 'Woven nylon, threaded under the case so the watch can\'t fall if a bar fails.' }[k] || 'Leather strap.'); }
@@ -810,7 +810,7 @@ export const ARCHETYPE_SPECS = {
   digital: { name: 'Digital LCD archetype', brand: 'MechWatch', shape: 'digital', D: 35, H: 38, T: 8.5, LW: 18, metal: 'carbon', dial: '#9fab8f', dialType: 'lcd', hands: 'none', strap: 'rubber', strapColor: '#151515', crown: 'buttons', caseback: 'solid' },
   tourbillon: { name: 'Tourbillon archetype', brand: 'MechWatch', D: 41, T: 11.5, L2L: 49, LW: 21, metal: 'plat', dial: '#2a2c31', dialType: 'tourbillon', bezel: 'thin', hands: 'breguet', strap: 'alligator', strapColor: '#151012', line: 'TOURBILLON' },
 };
-export const POCKET = { name: 'MechWatch Pocket Chronometer', brand: 'MechWatch', shape: 'pocket', D: 50, T: 13.5, metal: 'gold', dial: '#f6f1e6', dialType: 'enamel', bezel: 'thin', hands: 'breguet', subsec: true, caseback: 'engine', line: 'CHRONOMÈTRE' };
+export const POCKET = { name: 'MechWatch Pocket Chronometer', brand: 'MechWatch', shape: 'pocket', D: 50, T: 13.5, metal: 'gold', dial: '#f6f1e6', dialType: 'enamel', bezel: 'thin', hands: 'breguet', handMetal: 'gold', subsec: true, caseback: 'engine', line: 'CHRONOMÈTRE' };
 export const SIGNATURE = { name: 'MechWatch Signature', brand: 'MechWatch', D: 40, T: 10.5, L2L: 47, LW: 20, metal: 'rose', dial: '#4a2a14', dialType: 'guilloche', bezel: 'thin', hands: 'dauphine', date: true, strap: 'alligator', strapColor: '#2a1509', crown: 'std', line: 'CHRONOMÈTRE · 28 800 A/h' };
 
 /* ───────────────────────── a reusable studio stage ───────────────────────── */
