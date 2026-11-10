@@ -78,6 +78,9 @@ export const PARTS3D_INFO = {
   rotor: { n: 'Rotor (oscillating weight)', d: 'A half-moon weight on a ball bearing. Gravity and wrist motion spin it; reversing wheels convert both directions to winding.', s: { Bearing: 'Ceramic balls', Material: '22k gold segment', Winding: 'Bidirectional' } },
   case: { n: 'Case middle', d: 'The armoured housing with lugs and crown tube. Brushed tops, polished flanks and chamfers.', s: { Material: '316L steel', Diameter: '40 mm', WR: '100 m' } },
   caseback: { n: 'Exhibition caseback', d: 'Screw-down back with a sapphire window to admire the movement.', s: { Window: 'Sapphire', Thread: '6 notches' } },
+  strap12: { n: 'Strap — 12 o\'clock side', d: 'Hand-stitched alligator, scales graded from the belly. This half carries the buckle; it is fixed to the lugs by a spring bar.', s: { Material: 'Alligator', Width: '20 → 16 mm', Lining: 'Calfskin' } },
+  strap6: { n: 'Strap — 6 o\'clock side', d: 'The long half with adjustment holes; its tapered tail tucks into the keepers.', s: { Holes: '7', Thickness: '3.6 → 2.4 mm' } },
+  buckle: { n: 'Pin buckle', d: 'Solid steel, polished, matched to the case. The tongue passes through a hole in the 6 o\'clock half.', s: { Material: '316L steel', Width: '16 mm' } },
   screws: { n: 'Blued screws', d: 'Heated to ≈ 290 °C until the steel oxidises to a deep cornflower blue — decorative and corrosion-resistant. Slots are polished, heads bevelled.', s: { Process: 'Thermal bluing', Temp: '≈ 290 °C' } },
 };
 

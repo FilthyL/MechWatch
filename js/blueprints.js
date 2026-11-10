@@ -19,6 +19,7 @@ export function init() {
     svg.innerHTML = '';
     build(svg, b);
     notes.innerHTML = `
+      <div class="bp-3d"><button class="btn btn-brass" id="bp3d"><span>Inspect this archetype in 3D</span></button><p class="small muted">Built from the same dimensions as the drawing — orbit it, take it apart, flip it to the caseback.</p></div>
       <div><p class="tag mono">Drawing ${b.ref}</p><h4>${b.name}</h4><p>${b.text}</p></div>
       <div><p class="tag mono">Defining dimensions</p><ul>
         <li><span>Case diameter / width</span><span>${b.D.toFixed(1)} mm</span></li>
@@ -29,6 +30,7 @@ export function init() {
         <li><span>Archetype established</span><span>${b.era}</span></li></ul></div>
       <div><p class="tag mono">Genre markers</p><ul>${b.specs.map(([k, v]) => `<li><span>${k}</span><span>${v}</span></li>`).join('')}</ul>
       <p style="margin-top:10px;font-size:.78rem;opacity:.75">Reference lineage: ${b.arche}</p></div>`;
+    notes.querySelector('#bp3d').onclick = e => Promise.all([import('./inspector.js'), import('./watch3d.js')]).then(([I, W]) => I.openInspector(BLUEPRINTS.map(x => ({ spec: W.ARCHETYPE_SPECS[x.id], info: { brand: 'Archetype · ' + x.era, model: x.name.replace(/(\S+)$/, '<em>$1</em>'), ref: x.arche, specs: x.specs } })), i, { x: e.clientX, y: e.clientY }));
     // stroke-draw animation
     let k = 0;
     svg.querySelectorAll('.draw').forEach(p => {

@@ -288,6 +288,9 @@ const beatEl = $('#heroBeat'), sinceEl = $('#heroSince');
     });
   }
   groups.bezel.dispatchEvent(new Event('mouseenter'));
+  const b3 = document.createElement('button'); b3.className = 'btn btn-brass anat-3d'; b3.innerHTML = '<span>Inspect this diver in 3D</span>';
+  card.after(b3);
+  b3.onclick = e => Promise.all([import('./inspector.js'), import('./watch3d.js')]).then(([I, W]) => I.openInspector([{ spec: W.ARCHETYPE_SPECS.diver, info: { brand: 'Anatomy', model: 'The dive <em>watch</em>', ref: 'Every exterior part, in three dimensions', specs: [['Case', '40 mm · 904L steel'], ['Bezel', 'Unidirectional, 120 clicks'], ['Crown', 'Screw-down, guarded'], ['Bracelet', 'Three-link, folding clasp'], ['Water resistance', '300 m']] } }], 0, { x: e.clientX, y: e.clientY }));
 })();
 
 /* ═════════════ GLOSSARY ═════════════ */
@@ -303,6 +306,7 @@ const lazy = (sel, loader) => {
   const io = new IntersectionObserver(es => { if (es[0].isIntersecting && !done) { done = true; io.disconnect(); loader().catch(err => console.error(sel, err)); } }, { rootMargin: '1200px' });
   io.observe(node);
 };
+import('./hero3d.js').then(m => m.initHero()).catch(e => console.warn('hero3d', e));
 lazy('#quartz', () => import('./quartz.js').then(m => m.init()));
 lazy('#movement', () => import('./movement3d.js').then(m => m.init()));
 lazy('#escapement', () => import('./escapement.js').then(m => m.init()));

@@ -216,7 +216,7 @@ export function init() {
     const sum = list.filter(x => x.w.price).reduce((s, x) => s + x.w.price, 0);
     count.textContent = `${list.length} reference${list.length === 1 ? '' : 's'} · combined indicative retail ${usd(sum)}${list.some(x => !x.w.price) ? ' + price-on-request pieces' : ''}`;
     grid.innerHTML = list.map(({ w, i }) => `<article class="watch-card">
-      <div class="vitrine">${svgs[i]}<span class="cat">${w.cat[0]} · ${w.y}</span></div>
+      <div class="vitrine">${svgs[i]}<span class="cat">${w.cat[0]} · ${w.y}</span><span class="inspect-chip"><i></i>Inspect in 3D</span></div>
       <div class="wc-body">
         <span class="wc-brand">${w.b}</span>
         <h4 class="wc-model">${w.m}</h4>
@@ -229,6 +229,7 @@ export function init() {
         <p class="wc-note">${w.note}</p>
         <div class="wc-price"><b>${w.price ? '≈ ' + usd(w.price) : 'On request'}</b><span>${w.price ? 'Indicative retail' : 'Unique / bespoke'}</span></div>
       </div></article>`).join('') || `<p class="muted">No references match.</p>`;
+    grid.querySelectorAll('.watch-card').forEach((card, k) => card.addEventListener('click', e => openVault(list.map(x => x.w), k, e)));
     if (firstRender) { firstRender = false; window.mwReveal?.(grid.children); }
     window.mwRefresh?.();
   }
@@ -245,4 +246,12 @@ export function init() {
   // houses
   window.mwReveal?.(document.querySelectorAll('.tri'));
   document.getElementById('houseGrid').innerHTML = [...HOUSES].sort((a, b) => a.y - b.y).map(h => `<div class="house"><span class="m">${h.y} · ${h.c}</span><h5>${h.n}</h5><p>${h.p}</p></div>`).join('');
+}
+
+export function vaultInfo(w) {
+  return { brand: w.b, model: w.m.replace(/(\S+)$/, '<em>$1</em>'), ref: `Ref. ${w.ref} · ${w.mat} · Cal. ${w.cal}`,
+    specs: [['Diameter', w.dia + ' mm'], ['Thickness', w.t + ' mm'], ['Calibre', w.cal], ['Power reserve', w.pr], ['Frequency', w.vph ? (w.vph / 7200).toFixed(1).replace('.0', '') + ' Hz · ' + w.vph.toLocaleString('en-US') + ' vph' : 'Spring Drive'], ['Case', w.mat], ['Introduced', w.y], ['Indicative retail', w.price ? '≈ ' + usd(w.price) : 'On request']] };
+}
+function openVault(ws, k, e) {
+  Promise.all([import('./inspector.js'), import('./watch3d.js')]).then(([I, W]) => I.openInspector(ws.map(w => ({ spec: W.specFromVault(w), info: vaultInfo(w) })), k, { x: e.clientX, y: e.clientY }));
 }

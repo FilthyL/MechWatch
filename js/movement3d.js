@@ -4,7 +4,7 @@
 // ═══════════════════════════════════════════════════════════════
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/OrbitControls.js';
-import { RoomEnvironment } from 'three/addons/RoomEnvironment.js';
+import { studioEnvironment, bandGeometry, strapTexture } from './watch3d.js';
 import { PARTS3D_INFO } from './data.js';
 
 const TAU = Math.PI * 2;
@@ -156,7 +156,7 @@ export function init() {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+  scene.environment = studioEnvironment(renderer, { fill: .55 }); void pmrem;
   const camera = new THREE.PerspectiveCamera(30, 1, .5, 800);
   camera.position.set(78, 30, 132);
   const controls = new OrbitControls(camera, canvas);
@@ -179,10 +179,10 @@ export function init() {
     plate: new THREE.MeshStandardMaterial({ color: 0xffffff, map: perlage(), metalness: 1, roughness: .36 }),
     steel: new THREE.MeshStandardMaterial({ color: 0xeef0f4, metalness: 1, roughness: .14 }),
     brushed: new THREE.MeshStandardMaterial({ color: 0xd8dce2, metalness: 1, roughness: .38 }),
-    caseSteel: new THREE.MeshStandardMaterial({ color: 0xe9ecf0, metalness: 1, roughness: .17 }),
+    caseSteel: new THREE.MeshPhysicalMaterial({ color: 0xe9ecf0, metalness: 1, roughness: .2, anisotropy: .5 }),
     blue: new THREE.MeshStandardMaterial({ color: 0x2246a8, metalness: .85, roughness: .22, emissive: 0x050d30 }),
     ruby: new THREE.MeshPhysicalMaterial({ color: 0xd2123c, metalness: .05, roughness: .06, clearcoat: 1, clearcoatRoughness: .05, emissive: 0x3a0010, emissiveIntensity: .8 }),
-    sapph: new THREE.MeshPhysicalMaterial({ color: 0xe6f2ff, metalness: 0, roughness: 0, transparent: true, opacity: .18, depthWrite: false, envMapIntensity: 2.5, side: THREE.DoubleSide }),
+    sapph: new THREE.MeshPhysicalMaterial({ color: 0xe6f2ff, metalness: 0, roughness: 0, transparent: true, opacity: .2, depthWrite: false, envMapIntensity: 2.8, side: THREE.DoubleSide, iridescence: .7, iridescenceIOR: 1.6, iridescenceThicknessRange: [200, 420] }),
     rubber: new THREE.MeshStandardMaterial({ color: 0x141414, roughness: .7, metalness: 0 }),
     lume: new THREE.MeshStandardMaterial({ color: 0xe3fbe9, emissive: 0x7fe3aa, emissiveIntensity: .25, roughness: .6 }),
     spring: new THREE.MeshStandardMaterial({ color: 0x9fb6e0, metalness: 1, roughness: .2 }),
@@ -467,6 +467,27 @@ export function init() {
     const win = new THREE.Mesh(new THREE.CylinderGeometry(12.6, 12.6, .9, 96), M.sapph); add(g, win, 0, 0, 0);
   }
 
+  /* ── strap & buckle — they leave the lugs and fall away like a real strap ── */
+  {
+    const leather = new THREE.MeshPhysicalMaterial({ map: strapTexture('alligator', '#3a1c0c'), roughness: .52, clearcoat: .18, clearcoatRoughness: .5, envMapIntensity: .45 });
+    const mk = (id, sgn) => {
+      const g = part(id, 21.9, .9, 0, 0, [0, -6, sgn * 34]); parts[id].zOut = sgn;
+      const pts = [[0, -21.6], [-.4, -27], [-2.2, -33], [-6.5, -38.5], [-13, -41.5], [-21, -42], [-28, -40.5]].map(([y, z]) => new THREE.Vector3(0, y, sgn * -z));
+      const geo = bandGeometry(pts, { w0: 20, w1: 16, t0: 3.6, t1: 2.4, center: new THREE.Vector3(0, -22, sgn * 22), seg: 90 });
+      add(g, new THREE.Mesh(geo, leather));
+      return { g, pts };
+    };
+    mk('strap12', -1); const s6 = mk('strap6', 1);
+    const bk = part('buckle', 21.9, .9, 0, 0, [9.6, -30, -40.5]); parts.buckle.zOut = -1.55;
+    const end = new THREE.Vector3(0, -28, -40.5);
+    const frame = new THREE.Group(); frame.position.copy(end).add(new THREE.Vector3(0, -3, 0)); bk.add(frame);
+    for (const x of [-9.4, 9.4]) { const b = new THREE.Mesh(new THREE.BoxGeometry(1.4, 7, 1.4), M.caseSteel); b.position.set(x, 0, 0); frame.add(b); }
+    const fr = cyl(.8, 20.2, M.caseSteel, 20); fr.rotation.z = Math.PI / 2; fr.position.set(0, -3.5, 0); frame.add(fr);
+    const bar = cyl(.6, 19, M.steel, 16); bar.rotation.z = Math.PI / 2; bar.position.set(0, 3.2, 0); frame.add(bar);
+    const tongue = new THREE.Mesh(new THREE.BoxGeometry(.9, 7.4, .7), M.caseSteel); tongue.position.set(0, -.2, .5); frame.add(tongue);
+    void s6;
+  }
+
   /* ───── per-part material clones (for isolation fades) ───── */
   const meshesOf = {};
   for (const id of order) {
@@ -564,6 +585,7 @@ export function init() {
       const p = parts[id];
       p.g.position.y = p.y0 + (CENTER - p.layer) * GAP * explode;
       if (id === 'stem') p.g.position.x = explode * 6;
+      if (p.zOut) p.g.position.z = p.zOut * explode * 9;
     }
   }
   function animate(dt) {
