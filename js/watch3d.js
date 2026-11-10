@@ -22,17 +22,17 @@ const cssHex = c => '#' + hex(c).getHexString();
 export function studioEnvironment(renderer, { fill = .22 } = {}) {
   const s = new THREE.Scene();
   s.background = new THREE.Color(0x0a0705).multiplyScalar(1);
-  const dome = new THREE.Mesh(new THREE.SphereGeometry(40, 32, 16), new THREE.MeshBasicMaterial({ color: new THREE.Color(0x2a1a10).multiplyScalar(fill * 3), side: THREE.BackSide }));
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(40, 32, 16), new THREE.MeshBasicMaterial({ color: new THREE.Color(0x161514).multiplyScalar(fill * 3), side: THREE.BackSide }));
   s.add(dome);
   const box = (w, h, pos, intensity, color = 0xffffff) => {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(intensity), side: THREE.DoubleSide }));
     m.position.set(...pos); m.lookAt(0, 0, 0); s.add(m);
   };
-  box(14, 10, [0, 16, 4], 3.2);                 // overhead softbox
+  box(14, 10, [0, 16, 4], 3.4);                 // overhead softbox (daylight)
   box(2.2, 16, [-15, 3, 6], 5.5);               // left strip
-  box(2.2, 16, [15, 4, -4], 4.0, 0xffd3a0);     // warm right strip
-  box(18, 3, [0, -4, 16], 1.1, 0xffe8cc);       // low front fill
-  box(10, 2.4, [0, 8, -16], 3.0, 0xffb469);     // amber rim
+  box(2.2, 16, [15, 4, -4], 4.0, 0xfff4e8);     // right strip, a breath warmer than the left
+  box(18, 3, [0, -4, 16], 1.3, 0xffffff);       // low front fill
+  box(10, 2.4, [0, 8, -16], 1.6, 0xffcf96);     // a thin amber rim — the only warm note
   box(3, 3, [9, 12, 10], 6.0);                  // hot kicker for sparkle
   const pm = new THREE.PMREMGenerator(renderer);
   const tex = pm.fromScene(s, .02).texture; pm.dispose();
@@ -50,7 +50,7 @@ export function metal(key = 'steel', finish = 'polished') {
   let m;
   if (key === 'ceramic' || key === 'black') m = new THREE.MeshPhysicalMaterial({ color: METAL[key], metalness: 0, roughness: finish === 'polished' ? .08 : .35, clearcoat: 1, clearcoatRoughness: .05 });
   else if (key === 'carbon') m = new THREE.MeshPhysicalMaterial({ color: METAL.carbon, metalness: .35, roughness: .42, clearcoat: .8, clearcoatRoughness: .2 });
-  else m = new THREE.MeshPhysicalMaterial({ color: METAL[key] ?? METAL.steel, metalness: 1, roughness: finish === 'polished' ? .07 : finish === 'blasted' ? .5 : .26, anisotropy: finish === 'brushed' ? .55 : 0 });
+  else m = new THREE.MeshPhysicalMaterial({ color: METAL[key] ?? METAL.steel, metalness: 1, roughness: finish === 'polished' ? .07 : finish === 'blasted' ? .5 : finish === 'satin' ? .5 : finish === 'semipolish' ? .17 : .26, anisotropy: finish === 'brushed' || finish === 'satin' ? .6 : 0 });
   m.side = THREE.DoubleSide;
   matCache.set(k, m); return m;
 }
@@ -73,39 +73,83 @@ function canvasTex(w, h, draw, { srgb = true, repeat } = {}) {
   t.userData.canvas = c; t.userData.draw = draw;
   return t;
 }
-export function strapTexture(type, color) {
-  return canvasTex(512, 1024, (g, w, h) => {
-    g.fillStyle = color; g.fillRect(0, 0, w, h);
-    if (type === 'alligator') {
-      let y = 0;
-      while (y < h) {
-        const rh = 22 + Math.random() * 18; let x = 4; const cols = [.08, .11, .14, .17, .17, .14, .11, .08];
-        cols.forEach(cw => {
-          const ww = cw * (w - 8);
-          const gr = g.createLinearGradient(x, y, x, y + rh);
-          gr.addColorStop(0, shade(color, .1)); gr.addColorStop(.6, color); gr.addColorStop(1, shade(color, -.28));
-          g.fillStyle = gr; g.beginPath(); g.roundRect(x + 1.5, y + 1.5, ww - 3, rh - 3, 6); g.fill();
-          g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = 2; g.stroke();
-          x += ww;
-        });
+/* Leather, rubber and fabric with real relief: a colour map plus a height map drawn from the same pattern. */
+export function strapMaterial(type = 'alligator', color = '#3a1d0e') {
+  const W = 512, H = 1024, col = document.createElement('canvas'), hgt = document.createElement('canvas');
+  col.width = hgt.width = W; col.height = hgt.height = H;
+  const g = col.getContext('2d'), h = hgt.getContext('2d');
+  const base = new THREE.Color(color), lift = k => '#' + base.clone().offsetHSL(0, 0, k).getHexString();
+  g.fillStyle = color; g.fillRect(0, 0, W, H); h.fillStyle = '#808080'; h.fillRect(0, 0, W, H);
+  if (type === 'alligator') {
+    h.fillStyle = '#1a1a1a'; h.fillRect(0, 0, W, H); // grooves
+    const cols = [.065, .095, .125, .155, .155, .125, .095, .065], margin = (1 - cols.reduce((a, b) => a + b, 0)) / 2 * W;
+    let x = margin;
+    cols.forEach((cw, ci) => {
+      const ww = cw * W; let y = -Math.random() * 40;
+      while (y < H) {
+        const centre = ci > 1 && ci < 6, rh = ww * (centre ? .95 + Math.random() * .35 : .7 + Math.random() * .3);
+        const gap = 2.4, r = Math.min(ww, rh) * .28;
+        g.fillStyle = lift((Math.random() - .5) * .035); g.beginPath(); g.roundRect(x + gap, y + gap, ww - gap * 2, rh - gap * 2, r); g.fill();
+        const rg = h.createRadialGradient(x + ww * .45, y + rh * .4, 1, x + ww / 2, y + rh / 2, Math.max(ww, rh) * .62);
+        rg.addColorStop(0, '#f2f2f2'); rg.addColorStop(.7, '#a8a8a8'); rg.addColorStop(1, '#5a5a5a');
+        h.fillStyle = rg; h.beginPath(); h.roundRect(x + gap, y + gap, ww - gap * 2, rh - gap * 2, r); h.fill();
         y += rh;
       }
-    } else if (type === 'rubber') {
-      for (let y = 0; y < h; y += 14) { g.fillStyle = 'rgba(255,255,255,.035)'; g.fillRect(0, y, w, 3); g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, y + 3, w, 2); }
-    } else if (type === 'nato') {
-      const stripes = [color, shade(color, -.25), color];
-      for (let x = 0; x < w; x += 4) { g.fillStyle = 'rgba(0,0,0,' + (x % 8 ? .12 : 0) + ')'; g.fillRect(x, 0, 2, h); }
-      g.fillStyle = 'rgba(0,0,0,.2)'; for (let y = 0; y < h; y += 4) g.fillRect(0, y, w, 1);
-      void stripes;
-    } else {
-      for (let i = 0; i < 9000; i++) { g.fillStyle = `rgba(${Math.random() > .5 ? '255,255,255' : '0,0,0'},.05)`; g.fillRect(Math.random() * w, Math.random() * h, 2, 2); }
-    }
-    if (type !== 'rubber') { // stitching
-      g.strokeStyle = type === 'nato' ? 'rgba(0,0,0,.3)' : 'rgba(236,220,190,.75)'; g.lineWidth = 5; g.setLineDash([16, 12]);
-      [22, w - 22].forEach(x => { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); });
-    }
-  }, { repeat: [1, 1] });
+      x += ww;
+    });
+    g.globalAlpha = .55; g.fillStyle = lift(-.08); for (let i = 0; i < 3; i++) g.fillRect(0, 0, 0, 0); g.globalAlpha = 1;
+  } else if (type === 'rubber') {
+    for (let i = 0; i < 14000; i++) { h.fillStyle = Math.random() > .5 ? '#888' : '#787878'; h.fillRect(Math.random() * W, Math.random() * H, 2, 2); }
+    for (let y = 0; y < H; y += 64) { h.fillStyle = '#5c5c5c'; h.fillRect(W * .12, y, W * .76, 6); }
+  } else if (type === 'nato') {
+    for (let y = 0; y < H; y += 6) { h.fillStyle = y % 12 ? '#9a9a9a' : '#6a6a6a'; h.fillRect(0, y, W, 3); }
+    for (let x = 0; x < W; x += 6) { h.fillStyle = 'rgba(0,0,0,.18)'; h.fillRect(x, 0, 2, H); }
+    g.fillStyle = lift(-.06); g.fillRect(W * .3, 0, W * .08, H); g.fillRect(W * .62, 0, W * .08, H);
+  } else { // calf
+    for (let i = 0; i < 26000; i++) { const v = 110 + Math.random() * 40 | 0; h.fillStyle = `rgb(${v},${v},${v})`; h.fillRect(Math.random() * W, Math.random() * H, 2.2, 2.2); }
+  }
+  if (type !== 'rubber' && type !== 'nato') {
+    // painted edges and a tone-on-tone saddle stitch
+    const edge = '#' + base.clone().offsetHSL(0, -.1, -.12).getHexString();
+    g.fillStyle = edge; g.fillRect(0, 0, W * .028, H); g.fillRect(W * .972, 0, W * .028, H);
+    const thread = '#' + base.clone().offsetHSL(0, -.05, base.getHSL({}).l < .15 ? .12 : .18).getHexString();
+    g.strokeStyle = thread; g.lineWidth = 6; g.lineCap = 'round'; g.setLineDash([13, 11]);
+    h.strokeStyle = '#d8d8d8'; h.lineWidth = 6; h.lineCap = 'round'; h.setLineDash([13, 11]);
+    [W * .06, W * .94].forEach(xx => { [g, h].forEach(c => { c.beginPath(); c.moveTo(xx, 0); c.lineTo(xx, H); c.stroke(); }); });
+  }
+  const map = new THREE.CanvasTexture(col); map.colorSpace = THREE.SRGBColorSpace; map.wrapS = map.wrapT = THREE.RepeatWrapping; map.anisotropy = 8;
+  const bump = new THREE.CanvasTexture(hgt); bump.wrapS = bump.wrapT = THREE.RepeatWrapping; bump.anisotropy = 8;
+  const P = { alligator: { roughness: .36, clearcoat: .45, clearcoatRoughness: .3, bumpScale: 3.2 }, calf: { roughness: .58, clearcoat: .1, clearcoatRoughness: .6, bumpScale: 1.1 }, rubber: { roughness: .7, clearcoat: 0, bumpScale: .9 }, nato: { roughness: .9, clearcoat: 0, bumpScale: 2.2, sheen: .5, sheenColor: base.clone(), sheenRoughness: .8 } }[type] || {};
+  return new THREE.MeshPhysicalMaterial({ map, bumpMap: bump, envMapIntensity: .85, ...P });
 }
+export const strapTexture = (type, color) => strapMaterial(type, color).map;
+/* A bracelet as one continuous band whose links are carved into colour, roughness and relief maps:
+   satin outer links, polished centres, crisp grooves between — no faceted "tiles". */
+export function braceletMaterial(type = 'oyster', key = 'steel') {
+  const W = 512, H = 1024, mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
+  const cC = mk(), cR = mk(), cB = mk(), g = cC.getContext('2d'), r = cR.getContext('2d'), b = cB.getContext('2d');
+  g.fillStyle = '#2a2a2a'; g.fillRect(0, 0, W, H); r.fillStyle = '#ffffff'; r.fillRect(0, 0, W, H); b.fillStyle = '#202020'; b.fillRect(0, 0, W, H);
+  // [u0, u1, links per tile, phase, polished]
+  const cols = type === 'jubilee' ? [[0, .24, 8, 0, 0], [.255, .4, 8, .5, 1], [.43, .57, 8, 0, 1], [.6, .745, 8, .5, 1], [.76, 1, 8, 0, 0]]
+    : type === 'integrated' ? [[0, .385, 7, 0, 0], [.405, .595, 7, .5, 1], [.615, 1, 7, 0, 0]]
+    : [[0, .315, 6, 0, 0], [.335, .665, 6, 0, 1], [.685, 1, 6, 0, 0]];
+  cols.forEach(([u0, u1, n, ph, pol]) => {
+    const x0 = u0 * W, x1 = u1 * W, p = H / n;
+    for (let k = -1; k <= n; k++) {
+      const y0 = (k + ph) * p + 3, y1 = (k + ph + 1) * p - 3;
+      const gr = g.createLinearGradient(x0, 0, x1, 0);
+      if (pol) { gr.addColorStop(0, '#d8d8d8'); gr.addColorStop(.5, '#ffffff'); gr.addColorStop(1, '#d8d8d8'); } else { gr.addColorStop(0, '#cfcfcf'); gr.addColorStop(.5, '#f0f0f0'); gr.addColorStop(1, '#cfcfcf'); }
+      g.fillStyle = gr; g.beginPath(); g.roundRect(x0 + 2, y0, x1 - x0 - 4, y1 - y0, 6); g.fill();
+      if (!pol) for (let x = x0 + 4; x < x1 - 4; x += 2) { g.fillStyle = `rgba(0,0,0,${Math.random() * .05})`; g.fillRect(x, y0, 1, y1 - y0); }
+      const v = pol ? 30 : 140; r.fillStyle = `rgb(${v},${v},${v})`; r.beginPath(); r.roundRect(x0 + 2, y0, x1 - x0 - 4, y1 - y0, 6); r.fill();
+      const bg = b.createLinearGradient(0, y0, 0, y1); bg.addColorStop(0, '#9a9a9a'); bg.addColorStop(.12, '#e8e8e8'); bg.addColorStop(.88, '#e8e8e8'); bg.addColorStop(1, '#9a9a9a');
+      b.fillStyle = bg; b.beginPath(); b.roundRect(x0 + 2, y0, x1 - x0 - 4, y1 - y0, 6); b.fill();
+    }
+  });
+  const tex = (c, srgb) => { const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; return t; };
+  return new THREE.MeshPhysicalMaterial({ color: METAL[key] ?? METAL.steel, metalness: 1, roughness: 1, map: tex(cC, true), roughnessMap: tex(cR), bumpMap: tex(cB), bumpScale: 2.2, anisotropy: .35, envMapIntensity: 1.1 });
+}
+
 
 /* seven-segment for LCD dials */
 const SEGS = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg', ' ': '' };
@@ -280,9 +324,13 @@ const M4 = new THREE.Matrix4();
 export function bandGeometry(pts, { w0 = 20, w1 = 16, t0 = 3.6, t1 = 2.2, center = new THREE.Vector3(0, 0, -30), seg = 140, axis = new THREE.Vector3(1, 0, 0) } = {}) {
   const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
   const P = curve.getSpacedPoints(seg), L = curve.getLength();
-  const prof = []; const cr = .35, cs = 5;
-  const corner = (cx, cy, a0) => { for (let i = 0; i <= cs; i++) { const a = a0 + i / cs * Math.PI / 2; prof.push([cx + cr * Math.cos(a), cy + cr * Math.sin(a)]); } };
-  corner(.5 - cr, .5 - cr, 0); corner(-.5 + cr, .5 - cr, Math.PI / 2); corner(-.5 + cr, -.5 + cr, Math.PI); corner(.5 - cr, -.5 + cr, Math.PI * 1.5);
+  // padded profile: flat underside, rounded edges, a gentle dome on top (edges ~60% of centre thickness)
+  const prof = [];
+  const top = x => -.5 + (.6 + .4 * Math.sqrt(Math.max(0, Math.cos(Math.PI * x))));
+  prof.push([-.46, -.5], [.46, -.5]);
+  for (let i = 1; i <= 3; i++) { const a = -Math.PI / 2 + i / 3 * Math.PI / 2; prof.push([.46 + .04 * Math.cos(a), -.46 + .04 * Math.sin(a)]); }
+  for (let i = 0; i <= 18; i++) { const x = .5 - i / 18; prof.push([x, top(Math.max(-.499, Math.min(.499, x)))]); }
+  for (let i = 0; i <= 3; i++) { const a = Math.PI + i / 3 * Math.PI / 2; prof.push([-.46 + .04 * Math.cos(a), -.46 + .04 * Math.sin(a)]); }
   const pos = [], uv = [], idx = [], np = prof.length;
   P.forEach((p, i) => {
     const t = i / seg, T = curve.getTangentAt(Math.min(.999, t)).normalize();
@@ -410,8 +458,8 @@ export function buildWatch(sp) {
     if (bezelInsert) {
       bezelG.add(new THREE.Mesh(latheZ([[Rd, zT], [rr, zT], [rr + .05, zT + 1.2], [rr - .5, zBz], [Rd + .3, zBz - .3]], 320, (R, phi, y) => R > rr - .3 ? R - .16 * (.5 - .5 * Math.cos(120 * phi)) : R), polish));
       const ins = new THREE.Mesh(new THREE.RingGeometry(Rd + .4, rr - .9, 160, 1), new THREE.MeshPhysicalMaterial({ map: bezelTexture(sp.bezel, sp), roughness: sp.bezel === 'tachy' ? .3 : .1, metalness: sp.bezel === 'tachy' ? .6 : 0, clearcoat: 1 }));
-      ins.position.z = zBz - .25; bezelG.add(ins);
-      if (sp.bezel === 'diver' || sp.bezel === 'pepsi') { const pip = new THREE.Mesh(new THREE.CylinderGeometry(.75, .75, .3, 24), LUME); pip.rotation.x = Math.PI / 2; pip.position.set(0, (Rd + rr) / 2, zBz - .05); bezelG.add(pip); }
+      ins.position.z = zBz + .06; bezelG.add(ins);
+      if (sp.bezel === 'diver' || sp.bezel === 'pepsi') { const pip = new THREE.Mesh(new THREE.CylinderGeometry(.75, .75, .3, 24), LUME); pip.rotation.x = Math.PI / 2; pip.position.set(0, (Rd + rr) / 2, zBz + .2); bezelG.add(pip); }
     } else if (sp.bezel === 'fluted') {
       bezelG.add(new THREE.Mesh(latheZ([[Rd, zT], [rr, zT], [rr, zT + .6], [rr - .4, zBz], [Rd + .4, zBz + .2]], 480, (R, phi) => { const t = clamp((R - Rd) / (rr - Rd), 0, 1); return R - .55 * t * (.5 - .5 * Math.cos(64 * phi)); }), polish));
     } else if (sp.bezel === 'maltese') {
@@ -587,34 +635,29 @@ export function buildWatch(sp) {
   if (!isPocket && !sp.headOnly) {
     const bracelet = sp.bracelet;
     if (bracelet) {
-      const bm = metal(sp.metal, 'brushed'), pm = metal(sp.metal, 'polished');
+      const bm = metal(sp.metal, 'satin'), pm = metal(sp.metal, 'semipolish');
       const top = part('bracelet12', 'Bracelet — 12 o\'clock side', braceletDesc(bracelet), [0, 13, -5], [attach.w * .3, attach.y + 9, attach.z - 6], [0, .7, .5]);
       const bot = part('bracelet6', 'Bracelet — 6 o\'clock side', 'Solid links joined by pins or screws; removable links size it to the wrist.', [0, -13, -5], [-attach.w * .3, -attach.y - 9, attach.z - 6], [0, -.7, .5]);
+      const bmat = braceletMaterial(bracelet, sp.metal);
       [[top, 1], [bot, -1]].forEach(([grp, sgn]) => {
-        const pts = wristPts(sgn, Math.PI * .86); const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal'); const L = curve.getLength();
-        const pitch = bracelet === 'jubilee' ? 5.6 : bracelet === 'integrated' ? 6.2 : 7.2, n = Math.floor(L / pitch);
-        const pieces = bracelet === 'jubilee' ? [[-.37, .25, bm, 1], [.37, .25, bm, 1], [-.12, .13, pm, .5], [.12, .13, pm, .5], [0, .1, pm, .5, .5]] : bracelet === 'integrated' ? [[-.3, .38, bm, 1], [.3, .38, bm, 1], [0, .17, pm, .55, .5]] : [[-.33, .3, bm, 1], [.33, .3, bm, 1], [0, .34, pm, 1]];
-        pieces.forEach(([xo, wf, mat, lf, off = 0]) => {
-          const inst = new THREE.InstancedMesh(new RoundedBoxGeometry(1, 1, 1, 3, .22), mat, n); inst.castShadow = true;
-          for (let i = 0; i < n; i++) {
-            const t = clamp((i + .5 + off * .5) / n, 0, 1), f = frameAt(curve, Math.min(.999, t), C);
-            const wNow = attach.w + (attach.w * (bracelet === 'integrated' ? .62 : .82) - attach.w) * t;
-            const basis = new THREE.Matrix4().makeBasis(f.X, f.N, f.T);
-            const m = basis.clone().scale(new THREE.Vector3(wNow * wf - .2, 2.3 - t * .4, pitch * lf * .975));
-            m.setPosition(f.p.clone().addScaledVector(f.X, xo * wNow));
-            inst.setMatrixAt(i, m);
-          }
-          grp.add(inst);
-        });
+        const pts = wristPts(sgn, Math.PI * .86);
+        const band = new THREE.Mesh(bandGeometry(pts, { w0: attach.w - .3, w1: attach.w * (bracelet === 'integrated' ? .62 : .8), t0: 2.7, t1: 2.2, center: C, seg: 160 }), bmat);
+        band.castShadow = true; grp.add(band);
+        const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
+        const f0 = frameAt(curve, .012, C);
+        const end = new THREE.Mesh(new RoundedBoxGeometry(attach.w - .2, 3, 4.2, 4, .8), bm);
+        end.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(f0.X, f0.N, f0.T)); end.position.copy(f0.p); grp.add(end);
       });
       const clasp = part('clasp', 'Folding clasp', 'A deployant clasp with a safety catch and on-the-fly micro-adjustment — the bracelet\'s "buckle".', [0, 0, -12], [0, 0, wrist.zc - wrist.b - 2], [0, 0, -1]);
-      const cl = new THREE.Mesh(new RoundedBoxGeometry(attach.w * .82, 3, 26, 4, 1.2), pm); cl.position.set(0, 0, wrist.zc - wrist.b - .5); clasp.add(cl);
-      const crest = new THREE.Mesh(new RoundedBoxGeometry(attach.w * .3, 3.3, 10, 3, .8), bm); crest.position.set(0, 0, wrist.zc - wrist.b - .5); clasp.add(crest);
+      const cz = wrist.zc - wrist.b - .6, cw = attach.w * .8;
+      const cl = new THREE.Mesh(new RoundedBoxGeometry(cw, 2.4, 24, 4, .9), bm); cl.position.set(0, 0, cz); clasp.add(cl);
+      for (const sx of [-1, 1]) { const rim = new THREE.Mesh(new RoundedBoxGeometry(.9, 2.6, 24.2, 3, .4), pm); rim.position.set(sx * (cw / 2 - .3), 0, cz); clasp.add(rim); }
+      const crest = new THREE.Mesh(new RoundedBoxGeometry(cw * .26, 2.6, 5, 3, .6), bm); crest.position.set(0, 0, cz - .1); clasp.add(crest);
       clasp.children.forEach(m => m.rotation.x = Math.PI / 2);
       strapParts = ['bracelet12', 'bracelet6', 'clasp'];
     } else {
       const kind = sp.strap; const col = sp.strapColor;
-      const smat = new THREE.MeshPhysicalMaterial({ map: strapTexture(kind, col), roughness: kind === 'rubber' ? .6 : kind === 'alligator' ? .52 : .78, clearcoat: kind === 'alligator' ? .18 : 0, clearcoatRoughness: .5, envMapIntensity: .45, sheen: kind === 'nato' || kind === 'calf' ? .5 : .2, sheenColor: new THREE.Color(col).multiplyScalar(1.6), sheenRoughness: .7 });
+      const smat = strapMaterial(kind, col);
       const sName = { alligator: 'Alligator strap', calf: 'Calfskin strap', rubber: 'Rubber strap', nato: 'NATO strap' }[kind] || 'Strap';
       const top = part('strap12', `${sName} — 12 o'clock`, strapDesc(kind) + ' This side carries the buckle.', [0, 13, -4], [0, attach.y + 9, attach.z - 6], [0, .7, .5]);
       const bot = part('strap6', `${sName} — 6 o'clock`, 'The long side with the adjustment holes, finished with a tapered tip that tucks into the keepers.', [0, -13, -4], [0, -attach.y - 9, attach.z - 6], [0, -.7, .5]);
@@ -629,7 +672,11 @@ export function buildWatch(sp) {
       [[-bw / 2, 0], [bw / 2, 0]].forEach(([x]) => { const s2 = new THREE.Mesh(new RoundedBoxGeometry(1.3, 1.6, 9, 3, .5), polish); s2.position.set(x, 1.2, 1.5); frame.add(s2); });
       const front = new THREE.Mesh(new THREE.CylinderGeometry(.9, .9, bw + 1.2, 24), polish); front.rotation.z = Math.PI / 2; front.position.set(0, 1.4, 5.8); frame.add(front);
       const tongue = new THREE.Mesh(new RoundedBoxGeometry(.9, .8, 7, 2, .3), polish); tongue.position.set(0, 2.2, 2.4); frame.add(tongue);
-      const keeper = new THREE.Mesh(new THREE.TorusGeometry(1, .5, 8, 4), smat); keeper.scale.set(wEnd / 2 + .6, 2.4, 1); keeper.position.set(0, .4, -4); keeper.rotation.z = Math.PI / 4; frame.add(keeper);
+      const kf = frameAt(bc, .93, C), keeper = new THREE.Group(); buckle.add(keeper);
+      keeper.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(kf.X, kf.N, kf.T)); keeper.position.copy(kf.p);
+      const kw = wEnd + 1.2, kt = .7, inner = 2.4 + 2.2;
+      [[0, inner / 2 + kt / 2, kw, kt], [0, -2.4 / 2 - kt / 2, kw, kt]].forEach(([x, y, w2, h2]) => { const b = new THREE.Mesh(new RoundedBoxGeometry(w2, h2, 3.2, 2, .25), smat); b.position.set(x, y, 0); keeper.add(b); });
+      [-1, 1].forEach(sx => { const b = new THREE.Mesh(new RoundedBoxGeometry(kt, inner + kt * 2, 3.2, 2, .25), smat); b.position.set(sx * (kw / 2 - kt / 2), (inner / 2 - 2.4 / 2) / 2, 0); keeper.add(b); });
       strapParts = ['strap12', 'strap6', 'buckle'];
     }
     const bars = part('springbars', 'Spring bars', 'Spring-loaded pins that pass through the strap and click into holes inside the lugs.', [0, 0, 0], [attach.w * .3, attach.y, attach.z], [0, 1, 0]);
@@ -732,16 +779,16 @@ export const SIGNATURE = { name: 'MechWatch Signature', brand: 'MechWatch', D: 4
 export function createStage(canvas, { bloom = true, shadows = true, floorY = null, exposure = 1.0, alpha = true } = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = exposure;
+  renderer.toneMapping = THREE.NeutralToneMapping; renderer.toneMappingExposure = exposure;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.shadowMap.enabled = shadows; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
   scene.environment = studioEnvironment(renderer);
   const camera = new THREE.PerspectiveCamera(26, 1, 1, 2000);
-  const key = new THREE.DirectionalLight(0xffe4c0, 1.6); key.position.set(40, 90, 70); key.castShadow = shadows;
+  const key = new THREE.DirectionalLight(0xfff6ee, 1.5); key.position.set(40, 90, 70); key.castShadow = shadows;
   key.shadow.mapSize.set(2048, 2048); Object.assign(key.shadow.camera, { left: -90, right: 90, top: 90, bottom: -90, near: 10, far: 400 }); key.shadow.bias = -.0004; key.shadow.radius = 6;
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0xffa860, 1.2); rim.position.set(-60, 30, -80); scene.add(rim);
+  const rim = new THREE.DirectionalLight(0xffd6ae, .7); rim.position.set(-60, 30, -80); scene.add(rim);
   let floor = null;
   if (floorY !== null) { floor = new THREE.Mesh(new THREE.CircleGeometry(300, 64), new THREE.ShadowMaterial({ opacity: .45 })); floor.rotation.x = -Math.PI / 2; floor.position.y = floorY; floor.receiveShadow = true; scene.add(floor); }
   let composer = null, bloomPass = null;

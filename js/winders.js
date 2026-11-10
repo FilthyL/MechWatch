@@ -64,8 +64,8 @@ export function initGallery({ canvas, ui, info }) {
   const { scene, camera } = stage;
   scene.background = new THREE.Color(0x070403); scene.fog = new THREE.Fog(0x070403, 360, 820);
   camera.fov = 30; camera.near = 5; camera.far = 2000;
-  scene.add(new THREE.HemisphereLight(0xffe2bf, 0x150a05, .35));
-  const spot = new THREE.SpotLight(0xffe0b0, 9000, 0, .32, .75, 1.6); spot.position.set(0, 160, 150); scene.add(spot, spot.target);
+  scene.add(new THREE.HemisphereLight(0xfff4ea, 0x17110c, .38));
+  const spot = new THREE.SpotLight(0xfff3e6, 9000, 0, .32, .75, 1.6); spot.position.set(0, 160, 150); scene.add(spot, spot.target);
   const S = shared();
   // the room: fluted wall, walnut shelf with brass nosing
   const wall = new THREE.Mesh(new THREE.PlaneGeometry(9000, 700), new THREE.MeshStandardMaterial({ map: fluting(), roughness: .8 })); wall.position.set(0, 60, -72); scene.add(wall);

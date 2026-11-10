@@ -4,7 +4,7 @@
 // ═══════════════════════════════════════════════════════════════
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/OrbitControls.js';
-import { studioEnvironment, bandGeometry, strapTexture } from './watch3d.js';
+import { studioEnvironment, bandGeometry, strapMaterial } from './watch3d.js';
 import { PARTS3D_INFO } from './data.js';
 
 const TAU = Math.PI * 2;
@@ -152,7 +152,7 @@ export function init() {
   const viewer = document.getElementById('viewer');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .9;
+  renderer.toneMapping = THREE.NeutralToneMapping; renderer.toneMappingExposure = .95;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
@@ -165,10 +165,10 @@ export function init() {
   canvas.style.touchAction = 'pan-y';
 
   // lights
-  scene.add(new THREE.HemisphereLight(0xffe6c4, 0x22120a, .6));
-  const key = new THREE.DirectionalLight(0xffe2b8, 2.3); key.position.set(40, 80, 50); scene.add(key);
-  const rim = new THREE.DirectionalLight(0xffb866, 1.5); rim.position.set(-60, 10, -40); scene.add(rim);
-  const under = new THREE.DirectionalLight(0xffd8a0, .7); under.position.set(10, -60, 30); scene.add(under);
+  scene.add(new THREE.HemisphereLight(0xfff4e8, 0x1a1410, .55));
+  const key = new THREE.DirectionalLight(0xfff4ea, 2.1); key.position.set(40, 80, 50); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xffd2a4, .9); rim.position.set(-60, 10, -40); scene.add(rim);
+  const under = new THREE.DirectionalLight(0xfff0e0, .5); under.position.set(10, -60, 30); scene.add(under);
 
   // materials
   const M = {
@@ -469,7 +469,7 @@ export function init() {
 
   /* ── strap & buckle — they leave the lugs and fall away like a real strap ── */
   {
-    const leather = new THREE.MeshPhysicalMaterial({ map: strapTexture('alligator', '#3a1c0c'), roughness: .52, clearcoat: .18, clearcoatRoughness: .5, envMapIntensity: .45 });
+    const leather = strapMaterial('alligator', '#3a1c0c');
     const mk = (id, sgn) => {
       const g = part(id, 21.9, .9, 0, 0, [0, -6, sgn * 34]); parts[id].zOut = sgn;
       const pts = [[0, -21.6], [-.4, -27], [-2.2, -33], [-6.5, -38.5], [-13, -41.5], [-21, -42], [-28, -40.5]].map(([y, z]) => new THREE.Vector3(0, y, sgn * -z));
