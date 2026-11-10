@@ -8,7 +8,7 @@ A cinematic, interactive atlas of horology — from quartz to grand complication
 | | Chapter | What's in it |
 |---|---|---|
 | — | **Opening titles** | A winding loader (crown turns, power reserve fills to 42 h), letterboxed title card and lens flare |
-| — | **Overture** | A live 3D rose-gold signature watch head, dial-on to you — no strap, just the watch — with a gentle parallax that turns it over to show its movement as you scroll |
+| — | **Overture** | A live 3D 18k gold pocket chronometer — grand feu enamel dial, Breguet numerals and blued hands — hanging dial-on from its chain like a slow pendulum; scroll and it turns to show its engine-turned back |
 | I | **Prologue** | 500 years of milestones on a pinned, sideways-scrolling timeline |
 | II | **Anatomy** | Labelled exterior of a dive watch |
 | III | **Quartz** | Animated signal chain + live 15-stage binary divider (32,768 Hz → 1 Hz) |

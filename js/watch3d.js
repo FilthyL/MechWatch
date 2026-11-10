@@ -124,7 +124,6 @@ export function strapMaterial(type = 'alligator', color = '#3a1d0e') {
   const P = { alligator: { roughness: .36, clearcoat: .45, clearcoatRoughness: .3, bumpScale: 3.2 }, calf: { roughness: .58, clearcoat: .1, clearcoatRoughness: .6, bumpScale: 1.1 }, rubber: { roughness: .7, clearcoat: 0, bumpScale: .9 }, nato: { roughness: .9, clearcoat: 0, bumpScale: 2.2, sheen: .5, sheenColor: base.clone(), sheenRoughness: .8 } }[type] || {};
   return new THREE.MeshPhysicalMaterial({ map, bumpMap: bump, envMapIntensity: .85, ...P });
 }
-export const strapTexture = (type, color) => strapMaterial(type, color).map;
 /* A bracelet as one continuous band whose links are carved into colour, roughness and relief maps:
    satin outer links, polished centres, crisp grooves between — no faceted "tiles". */
 export function braceletMaterial(type = 'oyster', key = 'steel') {
@@ -284,6 +283,22 @@ function movementTexture() {
     g.fillStyle = '#b8913f'; g.font = '600 34px "Libre Caslon Text", serif'; g.textAlign = 'center'; g.fillText('MECHWATCH · 25 JEWELS', c, w * .2);
   });
 }
+function engineTurned() {
+  return canvasTex(1024, 1024, (g, w) => {
+    const c = w / 2; g.fillStyle = '#7a7a7a'; g.fillRect(0, 0, w, w);
+    // barleycorn: a rose-engine pattern of concentric waves cut by radial facets
+    for (let k = 0; k < 120; k++) {
+      const r0 = c * .26 + k * c * .0062; g.beginPath();
+      for (let i = 0; i <= 720; i++) { const a = i / 720 * TAU, r = r0 + c * .006 * Math.sin(a * 48 + k * .9); i ? g.lineTo(c + r * Math.cos(a), c + r * Math.sin(a)) : g.moveTo(c + r * Math.cos(a), c + r * Math.sin(a)); }
+      g.strokeStyle = k % 2 ? 'rgba(255,255,255,.55)' : 'rgba(0,0,0,.55)'; g.lineWidth = 2.6; g.stroke();
+    }
+    // polished cartouche with an engraved monogram
+    g.fillStyle = '#9a9a9a'; g.beginPath(); g.arc(c, c, c * .24, 0, TAU); g.fill();
+    g.strokeStyle = '#cfcfcf'; g.lineWidth = 6; g.beginPath(); g.arc(c, c, c * .24, 0, TAU); g.stroke();
+    g.fillStyle = '#4a4a4a'; g.font = 'italic 400 150px "Libre Caslon Text", Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('MW', c, c + 8);
+    g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 3; [c * .985, c * .955].forEach(r => { g.beginPath(); g.arc(c, c, r, 0, TAU); g.stroke(); });
+  }, { srgb: false });
+}
 function engravedBack(text) {
   return canvasTex(1024, 1024, (g, w) => {
     const c = w / 2; g.fillStyle = '#808080'; g.fillRect(0, 0, w, w);
@@ -410,7 +425,9 @@ export function buildWatch(sp) {
   const caseG = part('case', 'Case', `The housing, machined from ${sp.metalName || sp.metal}. Brushed flats, polished flanks and chamfers.`, [0, 0, 0], [r * .99, -r * .25, (zB + zT) / 2], [1, -.2, 0]);
   let caseShape;
   if (isRound) {
-    const prof = [[r * .55, zB], [r - .9, zB], [r - .15, zB + .9], [r + .12, (zB + zT) / 2], [r - .1, zT - .7], [r - .7, zT], [Rd + .4, zT]];
+    const prof = sp.shape === 'pocket'
+      ? [[r * .55, zB], [r - 2, zB], [r - .5, zB + 1.6], [r + .1, (zB + zT) / 2], [r - .4, zT - 1.3], [r - 1.4, zT], [Rd + .4, zT]]
+      : [[r * .55, zB], [r - .9, zB], [r - .15, zB + .9], [r + .12, (zB + zT) / 2], [r - .1, zT - .7], [r - .7, zT], [Rd + .4, zT]];
     caseG.add(new THREE.Mesh(latheZ(prof, 200), brush));
   } else {
     caseShape = shapeKind === 'octagon' ? squircle(r * 1.02, r * 1.08, 3.4, 160, .04) : shapeKind === 'nautilus' ? squircle(r, r, 4.2) : shapeKind === 'santos' ? squircle(r, r, 7) : shapeKind === 'cushion' ? squircle(r, r, 3.1) : shapeKind === 'tonneau' ? squircle(r * .86, r * 1.12, 2.7, 160, .09) : shapeKind === 'digital' ? roundRect(W, H, 6) : roundRect(W - 1, H, 2.6);
@@ -570,7 +587,8 @@ export function buildWatch(sp) {
   const sapp = sp.cheapGlass ? new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0, roughness: .02, transparent: true, opacity: .1, depthWrite: false, envMapIntensity: 1.6, iridescence: .22, iridescenceIOR: 1.5, iridescenceThicknessRange: [220, 380] }) : sapphire();
   if (isRound || ['octagon', 'cushion'].includes(shapeKind)) {
     const R0 = isRound ? Rd + .5 : Rd + .4, sph = 60, th = Math.asin(R0 / sph);
-    const cap = new THREE.SphereGeometry(sph, 96, 12, 0, TAU, 0, th); cap.scale(1, .2, 1); cap.rotateX(Math.PI / 2); cap.translate(0, 0, zBz - sph * .2 * Math.cos(th) + .2);
+    const dome = sp.shape === 'pocket' ? .38 : .2;
+    const cap = new THREE.SphereGeometry(sph, 96, 12, 0, TAU, 0, th); cap.scale(1, dome, 1); cap.rotateX(Math.PI / 2); cap.translate(0, 0, zBz - sph * dome * Math.cos(th) + .2);
     crysG.add(new THREE.Mesh(cap, sapp));
   } else {
     const s = shapeKind === 'nautilus' ? squircle(Rd + .5, Rd + .5, 4.6) : shapeKind === 'santos' ? squircle(Rd + .5, Rd + .5, 7) : shapeKind === 'tonneau' ? squircle(Rd * .84, Rd * 1.12, 2.6, 128, .08) : roundRect(W - 5, H - 5.6, 1.4);
@@ -605,12 +623,11 @@ export function buildWatch(sp) {
   }
 
   /* ── caseback ── */
-  const exhib = sp.caseback !== 'solid';
-  if (sp.cheapGlass) sp._cheap = true;
-  const backG = part('caseback', exhib ? 'Exhibition caseback' : 'Screw-down caseback', exhib ? 'A sapphire window onto the movement: perlage, Côtes de Genève, blued screws and a gold-segment rotor that spins as you move.' : 'Solid steel, screwed down against a gasket and engraved — for water resistance.', [0, 0, -11], [r * .3, -r * .3, zB - T * .1], [0, 0, -1]);
+  const exhib = !['solid', 'engine'].includes(sp.caseback);
+  const backG = part('caseback', exhib ? 'Exhibition caseback' : sp.caseback === 'engine' ? 'Engine-turned caseback' : 'Screw-down caseback', exhib ? 'A sapphire window onto the movement: perlage, Côtes de Genève, blued screws and a gold-segment rotor that spins as you move.' : sp.caseback === 'engine' ? 'Hand-cut barleycorn guilloché on a rose engine, around a polished cartouche engraved with a monogram.' : 'Solid steel, screwed down against a gasket and engraved — for water resistance.', [0, 0, -11], [r * .3, -r * .3, zB - T * .1], [0, 0, -1]);
   const bOuter = isRound ? r * .9 : Math.min(W, H) * .42;
   const backRing = new THREE.Mesh(latheZ([[bOuter * (exhib ? .72 : .86), zB - T * .07], [bOuter, zB - T * .05], [bOuter + .5, zB + .2], [bOuter + .5, zB + .6]], 160), exhib ? polish : brush);
-  if (!exhib) { const eg = engravedBack('WATER RESISTANT · 300 M · STAINLESS STEEL · SAPHIR'); const disc = new THREE.Mesh(new THREE.CircleGeometry(bOuter * .87, 96), new THREE.MeshPhysicalMaterial({ color: METAL[sp.metal] ?? METAL.steel, metalness: 1, roughness: .3, roughnessMap: eg, bumpMap: eg, bumpScale: 2 })); disc.rotation.y = Math.PI; disc.position.z = zB - T * .07; backG.add(disc); }
+  if (!exhib) { const eg = sp.caseback === 'engine' ? engineTurned() : engravedBack('WATER RESISTANT · 300 M · STAINLESS STEEL · SAPHIR'); const disc = new THREE.Mesh(new THREE.CircleGeometry(bOuter * .87, 96), new THREE.MeshPhysicalMaterial({ color: METAL[sp.metal] ?? METAL.steel, metalness: 1, roughness: .3, roughnessMap: eg, bumpMap: eg, bumpScale: sp.caseback === 'engine' ? 1.2 : 2 })); disc.rotation.y = Math.PI; disc.position.z = zB - T * .07; backG.add(disc); }
   backG.add(backRing);
   let rotor = null;
   if (exhib) {
@@ -621,7 +638,7 @@ export function buildWatch(sp) {
     const hub = new THREE.Mesh(new THREE.CylinderGeometry(bOuter * .15, bOuter * .15, .9, 32), metal('white', 'polished')); hub.rotation.x = Math.PI / 2; rotor.add(hub);
     const win = new THREE.Mesh(new THREE.CircleGeometry(bOuter * .74, 96), sp.cheapGlass ? sapp : sapphire()); win.rotation.y = Math.PI; win.position.z = zB - T * .065; backG.add(win);
   }
-  for (let i = 0; i < 6; i++) { const a = i / 6 * TAU; const n = new THREE.Mesh(new THREE.BoxGeometry(2.2, .9, .6), metal('black')); n.position.set(Math.cos(a) * bOuter * .96, Math.sin(a) * bOuter * .96, zB - T * .05); n.rotation.z = a; backG.add(n); }
+  for (let i = 0; i < (sp.caseback === 'engine' ? 0 : 6); i++) { const a = i / 6 * TAU; const n = new THREE.Mesh(new THREE.BoxGeometry(2.2, .9, .6), metal('black')); n.position.set(Math.cos(a) * bOuter * .96, Math.sin(a) * bOuter * .96, zB - T * .05); n.rotation.z = a; backG.add(n); }
 
   /* ── strap or bracelet, wrapped around a wrist-shaped ellipse ── */
   const isPocket = sp.shape === 'pocket';
@@ -693,9 +710,18 @@ export function buildWatch(sp) {
     const bars = part('springbars', 'Spring bars', 'Spring-loaded pins that pass through the strap and click into holes inside the lugs.', [0, 0, 0], [attach.w * .3, attach.y, attach.z], [0, 1, 0]);
     for (const sy of [1, -1]) { const b = new THREE.Mesh(new THREE.CylinderGeometry(.85, .85, attach.w + 1.2, 16), metal('steel', 'polished')); b.rotation.z = Math.PI / 2; b.position.set(0, sy * attach.y, attach.z); bars.add(b); }
   } else if (isPocket) {
-    const bow = part('lugs', 'Bow & pendant', 'A pocket watch hangs from a bow on its pendant, with the crown at 12.', [0, 10, 0], [0, r + 8, crownZ], [0, 1, .3]);
-    const t = new THREE.Mesh(new THREE.TorusGeometry(7, 1.1, 16, 48), polish); t.position.set(0, r + 9, crownZ); bow.add(t);
-    crownG.rotation.z = Math.PI / 2;
+    // the pendant, a fluted crown, and a bow hinged on either side of the pendant
+    crownG.clear(); crownG.rotation.set(0, 0, 0);
+    const cp = parts.find(p => p.group === crownG); cp.anchor.set(3.4, r + 7, crownZ); cp.normal.set(.4, 1, .3).normalize(); cp.explode.set(0, 10, 0); cp.name = 'Pendant & crown'; cp.desc = 'The pendant carries the winding stem; the fluted crown winds and, pulled out, sets the hands.';
+    const yT = r - .4;
+    const neck = new THREE.Mesh(new THREE.LatheGeometry([[0, 0], [2.7, 0], [2.3, 1.4], [2.1, 3.2], [2.5, 4.4], [0, 4.4]].map(([a, b]) => new THREE.Vector2(a, b)), 64), polish); neck.position.set(0, yT, crownZ); crownG.add(neck);
+    const cg = new THREE.CylinderGeometry(3.4, 3.4, 4.2, 120, 1); { const p = cg.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i), rr2 = Math.hypot(x, z); if (Math.abs(rr2 - 3.4) < 1e-3) { const phi = Math.atan2(x, z), nr = 3.4 - .2 * (.5 - .5 * Math.cos(28 * phi)); p.setX(i, x / rr2 * nr); p.setZ(i, z / rr2 * nr); } } cg.computeVertexNormals(); }
+    const crown = new THREE.Mesh(cg, polish); crown.position.set(0, yT + 6.5, crownZ); crownG.add(crown);
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(2.9, 32, 12, 0, TAU, 0, Math.PI / 2), polish); cap.scale.set(1, .4, 1); cap.position.set(0, yT + 8.6, crownZ); crownG.add(cap);
+    const bow = part('lugs', 'Bow', 'The ring the chain hangs from, hinged on pivots either side of the pendant so the watch can turn.', [0, 18, 0], [0, yT + 17.2, crownZ], [0, 1, .3]);
+    const gap = 1.25, R = 7.4, yc = yT + 3.2 + R * Math.cos(gap / 2);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(R, 1.15, 20, 96, TAU - gap), polish); ring.rotation.z = -Math.PI / 2 + gap / 2; ring.position.set(0, yc, crownZ); bow.add(ring);
+    for (const sx of [-1, 1]) { const k = new THREE.Mesh(new THREE.SphereGeometry(1.35, 24, 12), polish); k.position.set(sx * R * Math.sin(gap / 2), yc - R * Math.cos(gap / 2), crownZ); bow.add(k); }
   }
 
   /* ── wrist cushion (display) ── */
@@ -784,6 +810,7 @@ export const ARCHETYPE_SPECS = {
   digital: { name: 'Digital LCD archetype', brand: 'MechWatch', shape: 'digital', D: 35, H: 38, T: 8.5, LW: 18, metal: 'carbon', dial: '#9fab8f', dialType: 'lcd', hands: 'none', strap: 'rubber', strapColor: '#151515', crown: 'buttons', caseback: 'solid' },
   tourbillon: { name: 'Tourbillon archetype', brand: 'MechWatch', D: 41, T: 11.5, L2L: 49, LW: 21, metal: 'plat', dial: '#2a2c31', dialType: 'tourbillon', bezel: 'thin', hands: 'breguet', strap: 'alligator', strapColor: '#151012', line: 'TOURBILLON' },
 };
+export const POCKET = { name: 'MechWatch Pocket Chronometer', brand: 'MechWatch', shape: 'pocket', D: 50, T: 13.5, metal: 'gold', dial: '#f6f1e6', dialType: 'enamel', bezel: 'thin', hands: 'breguet', subsec: true, caseback: 'engine', line: 'CHRONOMÈTRE' };
 export const SIGNATURE = { name: 'MechWatch Signature', brand: 'MechWatch', D: 40, T: 10.5, L2L: 47, LW: 20, metal: 'rose', dial: '#4a2a14', dialType: 'guilloche', bezel: 'thin', hands: 'dauphine', date: true, strap: 'alligator', strapColor: '#2a1509', crown: 'std', line: 'CHRONOMÈTRE · 28 800 A/h' };
 
 /* ───────────────────────── a reusable studio stage ───────────────────────── */

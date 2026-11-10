@@ -124,7 +124,7 @@ function cursor() {
   const c = $('#cursor'); let x = innerWidth / 2, y = innerHeight / 2, tx = x, ty = y;
   addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; c.classList.add('on'); }, { passive: true });
   document.addEventListener('pointerleave', () => c.classList.remove('on'));
-  document.addEventListener('pointerover', e => c.classList.toggle('hot', !!e.target.closest('a,button,input,.lbl,.pt,.watch-card,#movementCanvas,.tl-item,.bp-tabs')));
+  document.addEventListener('pointerover', e => c.classList.toggle('hot', !!e.target.closest('a,button,input,.lbl,.pt,.cat-row,#movementCanvas,#galleryCanvas,.tl-item,.bp-tabs')));
   const loop = () => { x += (tx - x) * .22; y += (ty - y) * .22; c.style.transform = `translate(${x}px,${y}px)`; requestAnimationFrame(loop); };
   loop();
 }
@@ -202,7 +202,6 @@ function choreograph() {
       start: 'top 94%', once: true,
       onEnter: b => {
         G.to(b, { opacity: 1, y: 0, stagger: .09, duration: 1.2, ease: 'expo.out', overwrite: true });
-        b.forEach(card => { const spot = card.querySelector('.spot'); if (spot) G.fromTo(spot, { opacity: 0 }, { keyframes: { opacity: [0, .8, .1, .55, .2, .7, .6] }, duration: 1.3, delay: .3, onComplete: () => G.set(spot, { clearProps: 'opacity' }) }); });
       },
     });
   };
