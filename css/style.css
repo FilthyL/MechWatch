@@ -786,3 +786,25 @@ body{font:400 16.5px/1.78 var(--serif)}
 .insp-parts li b{font-family:var(--caps)}
 .lbl{font-family:var(--serif); font-size:.9rem}
 .lbl b{font-family:var(--caps)}
+.intro-skip{left:24px; right:auto; font:italic 400 .95rem var(--serif); letter-spacing:0; text-transform:none}
+
+/* ════════════════════════════════════════════════════════════
+   Sunray brown — the whole page is a brushed chocolate sunburst dial
+   ════════════════════════════════════════════════════════════ */
+:root{ --bg:#24140a; --bg-2:#1c1008; --bg-3:#2c190c; }
+body{background:#231309}
+.sunray{position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden;
+  background:
+    repeating-conic-gradient(from 0deg at 50% 38%, rgba(255,214,160,.045) 0deg .32deg, rgba(0,0,0,.07) .32deg .64deg, rgba(255,214,160,.02) .64deg .9deg, rgba(0,0,0,.04) .9deg 1.25deg),
+    radial-gradient(ellipse 85% 75% at 50% 38%, #5b3820 0%, #432714 38%, #2b180b 72%, #170c05 100%)}
+.sunray-sheen{position:absolute; left:50%; top:38%; width:260vmax; height:260vmax; transform:translate(-50%,-50%); will-change:transform; mix-blend-mode:soft-light;
+  background:conic-gradient(from -20deg, transparent 0deg, rgba(255,222,170,.55) 22deg, transparent 52deg, transparent 180deg, rgba(255,222,170,.5) 202deg, transparent 232deg, transparent 360deg)}
+.sunray::after{content:""; position:absolute; inset:0; background:radial-gradient(ellipse 120% 90% at 50% 40%, transparent 50%, rgba(10,5,2,.55) 100%)}
+/* let the sunray show through the main sections */
+.chapter-dark{background:radial-gradient(ellipse at 50% 30%, rgba(0,0,0,.18) 0%, rgba(0,0,0,.32) 70%)}
+.chapter-rich{background:repeating-radial-gradient(circle at 86% 12%, rgba(255,214,160,.03) 0 1px, transparent 1px 8px)}
+.chapter-lux{background:linear-gradient(180deg, rgba(40,10,6,.35), rgba(30,8,5,.55))}
+.chapter-digital{background:none}
+.hero-bg{background:radial-gradient(ellipse 60% 70% at 72% 48%, rgba(255,200,130,.10), transparent 70%)}
+.frame{background:linear-gradient(180deg, rgba(30,17,8,.62), rgba(16,9,4,.72))}
+.nav.scrolled{background:linear-gradient(180deg, rgba(34,19,9,.95), rgba(34,19,9,.85))}

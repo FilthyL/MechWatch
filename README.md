@@ -8,7 +8,7 @@ A cinematic, interactive atlas of horology — from quartz to grand complication
 | | Chapter | What's in it |
 |---|---|---|
 | — | **Opening titles** | A winding loader (crown turns, power reserve fills to 42 h), letterboxed title card and lens flare |
-| — | **Overture** | A live 3D rose-gold signature watch that follows your hand and turns over to show its movement as you scroll |
+| — | **Overture** | A live 3D rose-gold signature watch head — no strap, just the watch — that follows your hand and turns over to show its movement as you scroll |
 | I | **Prologue** | 500 years of milestones on a pinned, sideways-scrolling timeline |
 | II | **Anatomy** | Labelled exterior of a dive watch |
 | III | **Quartz** | Animated signal chain + live 15-stage binary divider (32,768 Hz → 1 Hz) |
@@ -18,7 +18,7 @@ A cinematic, interactive atlas of horology — from quartz to grand complication
 | VII | **Complications** | Working chronograph, real moon phase, GMT, perpetual calendar, tourbillon, power reserve and an audible minute repeater |
 | VIII | **Calibres** | 18 legendary movements, sortable |
 | IX | **Digital** | LED, LCD (working buttons), Spring Drive glide dial, exploded LCD stack |
-| X | **The Vault** | 37 haute-horlogerie references under glass cloches — **click any one to inspect it in 3D** |
+| X | **The Vault** | **The Winder Wall** — 37 haute-horlogerie references, each turning in its own 3D glass watch winder (walnut, brass, suede-lined drum, LED ring, engraved plaque; two turns, pause, two turns back). Pick one: the door swings open, the winder slides aside and the watch floats out into the 3D Loupe. Plus a catalogue index, auction records and the houses |
 | ✕ | **Smartwatches** | The garbage list. Filed under protest, with REJECTED stamps |
 
 ## The Loupe — every watch in 3D
@@ -30,6 +30,9 @@ Every Vault reference, every blueprint archetype, the anatomy diver and the hero
 - orbit, zoom, a ×4 loupe view, a disassemble slider and numbered part hotspots
 
 ## Watch-native interface
+- **Sunray brown** — the whole page background is a brushed chocolate sunburst dial; its bow-tie sheen turns as you move the mouse (or tilt your phone), like tilting a real dial.
+- **Type** — Libre Caslon Display & Text for an engraved, printed-catalogue voice; Jost (a Futura cut, the typeface of countless dials) for small print and numerals.
+- **Controls that are watch parts** — primary actions are knurled crowns that turn on hover, small actions are chronograph pushers, toggles are bezels with a pip marking the active setting.
 - **The dial navigator** — the page is a dial: twelve chapters are twelve hours. The hour hand shows your chapter, the minute hand your progress within it, the bezel the whole page, and the crown turns as you scroll.
 - Rotating dive-bezel rings behind every chapter title, iris "aperture" reveals between worlds.
 

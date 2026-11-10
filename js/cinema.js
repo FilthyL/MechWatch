@@ -261,8 +261,19 @@ function choreograph() {
   addEventListener('load', () => ST.refresh());
 }
 
+/* Sunray dial background: the bow-tie sheen turns as you move, like tilting a brushed dial. */
+function sunray() {
+  const el = document.getElementById('sunraySheen'); if (!el) return;
+  let a = 0, ta = 0, tilt = 0;
+  addEventListener('pointermove', e => { ta = (e.clientX / innerWidth - .5) * 70 + (e.clientY / innerHeight - .5) * 25; }, { passive: true });
+  addEventListener('deviceorientation', e => { if (e.gamma != null) ta = e.gamma * 1.4; }, { passive: true });
+  const loop = () => { tilt = scrollY * .02; a += (ta + tilt - a) * .06; el.style.transform = `translate(-50%,-50%) rotate(${a.toFixed(2)}deg)`; requestAnimationFrame(loop); };
+  if (!reduce) loop();
+}
+
 export function initCinema() {
   navAndProgress();
+  sunray();
   navDial();
   bezelRings();
   dust();

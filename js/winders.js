@@ -73,6 +73,14 @@ export function initGallery({ canvas, ui, info }) {
   const nose = new THREE.Mesh(new THREE.BoxGeometry(9000, 2, 2), S.brass); nose.position.set(0, -H / 2 - 1, 42); scene.add(nose);
   const nose2 = nose.clone(); nose2.position.y = -H / 2 - 11; scene.add(nose2);
 
+  // a volumetric beam with drifting dust over the focused winder
+  const beamTex = canvasTex(64, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(.7, 'rgba(255,255,255,.25)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(7, 78, 300, 48, 1, true), new THREE.MeshBasicMaterial({ map: beamTex, color: 0xffd7a0, transparent: true, opacity: .11, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false }));
+  beam.position.set(0, 96, -6); scene.add(beam);
+  const NM = 360, mpos = new Float32Array(NM * 3), mseed = new Float32Array(NM);
+  for (let k = 0; k < NM; k++) { const r = Math.sqrt(Math.random()) * 60, a = Math.random() * TAU; mpos[k * 3] = Math.cos(a) * r; mpos[k * 3 + 1] = -50 + Math.random() * 240; mpos[k * 3 + 2] = Math.sin(a) * r * .6 + 10; mseed[k] = Math.random() * 10; }
+  const mgeo = new THREE.BufferGeometry(); mgeo.setAttribute('position', new THREE.BufferAttribute(mpos, 3));
+  const motes = new THREE.Points(mgeo, new THREE.PointsMaterial({ color: 0xffe2b0, size: 1.3, transparent: true, opacity: .7, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); scene.add(motes);
   let winders = [], focus = 0, camX = 0, drag = 0, state = 'idle', visible = false, paused = false, mx = 0, tmx = 0;
   const queue = [];
 
@@ -213,10 +221,15 @@ export function initGallery({ canvas, ui, info }) {
     const a = camera.aspect || 1.6, Wv = a > 1.2 ? 330 : 150, dist = Wv / (2 * Math.tan(15 * Math.PI / 180) * a);
     if (state === 'idle') { camX += (focus * SP + drag - camX) * Math.min(1, dt * 5); mx += (tmx - mx) * .05; camera.position.set(camX + mx * 18, 26, dist); camera.lookAt(camX, 2, -22); }
     spot.position.set(focus * SP, 170, 140); spot.target.position.set(focus * SP, 0, -20);
+    beam.position.x += (focus * SP - beam.position.x) * Math.min(1, dt * 4); motes.position.x = beam.position.x;
+    beam.material.opacity = state === 'idle' ? .11 + Math.sin(t * .7) * .015 : .04;
+    for (let k = 0; k < NM; k++) { mpos[k * 3 + 1] += dt * (1.5 + (mseed[k] % 1) * 2.5); mpos[k * 3] += Math.sin(t * .4 + mseed[k]) * dt * 1.2; if (mpos[k * 3 + 1] > 190) mpos[k * 3 + 1] = -50; }
+    mgeo.attributes.position.needsUpdate = true;
     // winders: the classic winding program — two turns, pause, two turns back, pause
     winders.forEach(wd => {
       if (Math.abs(wd.root.position.x - camX) > SP * 4.5) { wd.root.visible = false; return; }
       wd.root.visible = true;
+      if (state === 'idle') wd.root.position.z += ((wd.i === focus ? 10 : 0) - wd.root.position.z) * Math.min(1, dt * 4);
       if (wd.spinning) {
         const ph = (t + wd.phase) % 16;
         const ang = ph < 6 ? ease(ph / 6) * 2 * TAU : ph < 8 ? 2 * TAU : ph < 14 ? 2 * TAU - ease((ph - 8) / 6) * 2 * TAU : 0;
