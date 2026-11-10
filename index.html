@@ -55,12 +55,14 @@
     <a href="#complications"><i>VII</i>Complications</a>
     <a href="#calibers"><i>VIII</i>Calibres</a>
     <a href="#digital"><i>IX</i>Digital</a>
-    <a href="#vault"><i>X</i>The Vault</a>
+    <a href="#vault"><i>X</i>Vault</a>
+    <a href="#atelier"><i>XI</i>Atelier</a>
     <a href="#garbage" class="nav-bin">Smartwatches</a>
   </nav>
   <div class="nav-time" id="navTime" title="Your local time">--:--:--</div>
   <button class="nav-burger" id="navBurger" aria-label="Open menu"><span></span><span></span></button>
 </header>
+<button class="tick-toggle" id="tickToggle" aria-pressed="false" aria-label="Escapement tick sound" title="Hear the escapement"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g class="bal"><circle cx="12" cy="12" r="6.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M12 5.8V18.2M6.6 15.1L17.4 8.9M6.6 8.9L17.4 15.1" stroke="currentColor" stroke-width=".8"/></g><path class="w" d="M20.2 8.2a7 7 0 0 1 0 7.6M3.8 8.2a7 7 0 0 0 0 7.6" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
 
 <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
 <section class="hero" id="top">
@@ -449,6 +451,34 @@
 </section>
 
 <!-- ═══════════════════════════ THE BIN ═══════════════════════════ -->
+<section class="chapter chapter-atelier" id="atelier">
+  <div class="chapter-head">
+    <span class="roman" aria-hidden="true">XI</span>
+    <p class="chapter-no">Chapter XI · The Atelier</p>
+    <h2 class="display">Commission<br><em>your own</em></h2>
+    <p class="chapter-intro">Everything in this book, on one bench. Choose a case and its metal, a dial and its hands, the complications and the strap — the watch is built in front of you and runs on your time. Turn it over, open it in the Loupe, or send the link to whoever should buy it for you.</p>
+    <div class="complexity"><span>Complexity</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+  </div>
+  <div class="atelier" id="atelierRoot">
+    <div class="at-stage">
+      <canvas id="atelierCanvas" aria-label="Your watch in 3D. Drag sideways to turn it."></canvas>
+      <p class="at-hint">Drag to turn it over</p>
+      <div class="gal-plaque at-plaque" id="atPlaque">
+        <p class="tag">MechWatch · Atelier</p>
+        <h3 class="display" id="atName">Classique</h3>
+        <p class="gal-ref" id="atRef"></p>
+        <dl class="gal-specs" id="atSpecs"></dl>
+        <div class="gal-foot"><b class="gal-price" id="atPrice"></b><button class="btn btn-brass" id="atLoupe"><span>Open in the Loupe</span></button></div>
+      </div>
+    </div>
+    <div class="at-side">
+      <div class="at-panel" id="atPanel" role="group" aria-label="Configure your watch"></div>
+      <div class="at-actions"><button class="btn-mini" id="atRandom">Surprise me</button><button class="btn-mini" id="atShare">Copy link</button></div>
+      <p class="small muted at-note">The estimate is the atelier's guess at a fair retail price for a piece like this, not a quotation.</p>
+    </div>
+  </div>
+</section>
+
 <section class="chapter chapter-bin" id="garbage">
   <div class="chapter-head">
     <span class="roman roman-bin" aria-hidden="true">✕</span>

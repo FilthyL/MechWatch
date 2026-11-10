@@ -32,7 +32,7 @@ const P = (r, deg) => [r * Math.sin(deg * Math.PI / 180), -r * Math.cos(deg * Ma
 /* The page is a dial: twelve chapters are twelve hours. */
 function navDial() {
   const host = $('#navdial'); if (!host) return;
-  const secs = [['#top', 'Overture', 'XII'], ['#history', 'Prologue', 'I'], ['#anatomy', 'Anatomy', 'II'], ['#quartz', 'Quartz', 'III'], ['#movement', 'The Movement', 'IV'], ['#escapement', 'Escapement', 'V'], ['#blueprints', 'Blueprints', 'VI'], ['#complications', 'Complications', 'VII'], ['#calibers', 'Calibres', 'VIII'], ['#digital', 'Digital', 'IX'], ['#vault', 'The Vault', 'X'], ['#garbage', 'Smartwatches', 'XI']].map(([sel, n, r]) => ({ el: $(sel), n, r, sel })).filter(x => x.el);
+  const secs = [['#top', 'Overture', 'XII'], ['#history', 'Prologue', 'I'], ['#anatomy', 'Anatomy', 'II'], ['#quartz', 'Quartz', 'III'], ['#movement', 'The Movement', 'IV'], ['#escapement', 'Escapement', 'V'], ['#blueprints', 'Blueprints', 'VI'], ['#complications', 'Complications', 'VII'], ['#calibers', 'Calibres', 'VIII'], ['#digital', 'Digital', 'IX'], ['#vault', 'The Vault', 'X'], ['#atelier', 'The Atelier', 'XI']].map(([sel, n, r]) => ({ el: $(sel), n, r, sel })).filter(x => x.el);
   const svg = svgEl('svg', { viewBox: '-70 -70 140 140', role: 'img', 'aria-label': 'Chapter dial' }, host);
   svg.innerHTML = `<defs><linearGradient id="nd-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0c4"/><stop offset=".3" stop-color="#c79a4a"/><stop offset=".55" stop-color="#f5dc9a"/><stop offset=".8" stop-color="#7a5520"/><stop offset="1" stop-color="#e9c97f"/></linearGradient>
     <radialGradient id="nd-d" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#4a2a14"/><stop offset=".7" stop-color="#22120a"/><stop offset="1" stop-color="#0d0704"/></radialGradient></defs>
@@ -279,5 +279,5 @@ export function initCinema() {
   dust();
   cursor();
   if (!G || !ST) { $('#intro')?.remove(); document.body.classList.remove('is-intro'); fallbackReveal(); return; }
-  intro(() => { choreograph(); ST.refresh(); });
+  intro(() => { choreograph(); ST.refresh(); window.mwReady = true; dispatchEvent(new Event('mw-ready')); });
 }

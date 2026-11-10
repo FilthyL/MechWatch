@@ -52,13 +52,13 @@ export function init() {
     for (let i = 0; i < 160; i++) { const a = Math.random() * 6.283, r = Math.random() * 100; el('ellipse', { cx: r * Math.cos(a), cy: r * Math.sin(a), rx: 2 + Math.random() * 4, ry: .8, fill: '#fff', opacity: .7, transform: `rotate(${Math.random() * 180} ${r * Math.cos(a)} ${r * Math.sin(a)})` }, g); }
     for (let i = 0; i < 60; i++) { const [x1, y1] = polar(101, i * 6), [x2, y2] = polar(i % 5 ? 97 : 90, i * 6); el('line', { x1, y1, x2, y2, stroke: '#333', 'stroke-width': i % 5 ? .5 : 1.4 }, g); }
     for (let i = 0; i < 12; i++) { const gg = el('g', { transform: `rotate(${i * 30})` }, g); el('rect', { x: i ? -2.2 : -4.6, y: -86, width: i ? 4.4 : 9.2, height: 16, fill: 'url(#sd-steel)', stroke: '#555', 'stroke-width': .4 }, gg); }
-    const pr = el('path', { d: 'M-1 0 L0 -26 L1 0Z', fill: '#2b4fa8' }, g); el('circle', { cx: -44, cy: 0, r: 2, fill: '#2b4fa8' }, g);
+    const pr = el('path', { d: 'M-1 0 L0 -26 L1 0Z', fill: '#a8843e' }, g); el('circle', { cx: -44, cy: 0, r: 2, fill: '#a8843e' }, g);
     for (let i = 0; i <= 6; i++) { const [x1, y1] = polar(28, -120 + i * 40), [x2, y2] = polar(32, -120 + i * 40); el('line', { x1: x1 - 44, y1, x2: x2 - 44, y2, stroke: '#333', 'stroke-width': .6 }, g); }
     const t = (y, txt, sz, f = '#333', fam = 'Libre Caslon Text') => { const n = el('text', { x: 0, y, 'text-anchor': 'middle', 'font-size': sz, fill: f, 'font-family': fam }, g); n.textContent = txt; };
-    t(-40, 'MECHWATCH', 8); t(36, 'SPRING DRIVE', 5, '#2b4fa8'); t(46, 'GLIDE · ±1 s / DAY', 4, '#777', 'Jost');
+    t(-40, 'MECHWATCH', 8); t(36, 'SPRING DRIVE', 5, '#a8843e'); t(46, 'GLIDE · ±1 s / DAY', 4, '#777', 'Jost');
     const H = el('path', { d: 'M-3 10 L-2.2 -48 L0 -56 L2.2 -48 L3 10Z', fill: 'url(#sd-steel)', stroke: '#444', 'stroke-width': .4 }, g);
     const M = el('path', { d: 'M-2.4 12 L-1.6 -82 L0 -90 L1.6 -82 L2.4 12Z', fill: 'url(#sd-steel)', stroke: '#444', 'stroke-width': .4 }, g);
-    const S = el('path', { d: 'M-.6 22 L-.6 -96 L.6 -96 L.6 22Z', fill: '#2b4fa8' }, g); el('circle', { r: 3.4, fill: '#2b4fa8' }, g);
+    const S = el('path', { d: 'M-.6 22 L-.6 -96 L.6 -96 L.6 22Z', fill: '#a8843e' }, g); el('circle', { r: 3.4, fill: '#a8843e' }, g);
     whenVisible(g, () => { const d = new Date(), s2 = d.getSeconds() + d.getMilliseconds() / 1000, m = d.getMinutes() + s2 / 60, h = d.getHours() % 12 + m / 60;
       S.setAttribute('transform', `rotate(${s2 * 6})`); M.setAttribute('transform', `rotate(${m * 6})`); H.setAttribute('transform', `rotate(${h * 30})`); pr.setAttribute('transform', `translate(-44 0) rotate(${70})`); });
   }

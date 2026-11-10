@@ -19,6 +19,7 @@ A cinematic, interactive atlas of horology — from quartz to grand complication
 | VIII | **Calibres** | 18 legendary movements, sortable |
 | IX | **Digital** | LED, LCD (working buttons), Spring Drive glide dial, exploded LCD stack |
 | X | **The Vault** | **The Winder Wall** — 37 haute-horlogerie references, each turning in its own 3D glass watch winder (walnut, brass, suede-lined drum, LED ring, engraved plaque; two turns, pause, two turns back). Pick one: the door swings open, the winder slides aside and the watch floats out into the 3D Loupe. Plus a catalogue index, auction records and the houses |
+| XI | **The Atelier** | Commission your own: case (round, cushion, tonneau, octagon, Tank, pocket), metal, diameter, dial and colour, hands, bezel, complications and strap, built live in 3D on a display cushion, with a spec sheet, an atelier estimate, a shareable link and the Loupe |
 | ✕ | **Smartwatches** | The garbage list. Filed under protest, with REJECTED stamps |
 
 ## The Loupe — every watch in 3D
@@ -34,6 +35,7 @@ Every Vault reference, every blueprint archetype, the anatomy diver and the hero
 - **Controls that are watch parts** — primary actions are knurled crowns that turn on hover, small actions are chronograph pushers, toggles are bezels with a pip marking the active setting.
 - **The dial navigator** — the page is a dial: twelve chapters are twelve hours. The hour hand shows your chapter, the minute hand your progress within it, the bezel the whole page, and the crown turns as you scroll.
 - Rotating dive-bezel rings behind every chapter title, iris "aperture" reveals between worlds.
+- **Hear it run** — a brass balance-wheel button in the corner turns on a quiet escapement tick, eight beats a second, in step with every seconds hand on the page.
 
 ## Tech
 No build step — hand-written HTML/CSS/JS. Vendored: three.js r170 with OrbitControls, RoundedBoxGeometry and the bloom post-processing chain (`vendor/three`), GSAP 3.13 with ScrollTrigger & SplitText (`vendor/gsap`). Everything else (watch faces, blueprints, dials, textures) is generated in code.

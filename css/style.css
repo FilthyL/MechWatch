@@ -85,7 +85,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .nav-burger{display:none; background:none; border:0; width:40px; height:40px; position:relative}
 .nav-burger span{position:absolute; left:10px; right:10px; height:1px; background:var(--gold-2)}
 .nav-burger span:first-child{top:16px} .nav-burger span:last-child{top:24px}
-@media (max-width:1240px){
+@media (max-width:1400px){
   .nav-links{position:fixed; inset:64px 12px auto 12px; flex-direction:column; background:rgba(20,13,7,.97); border:1px solid var(--line-2); padding:12px; transform:translateY(-12px); opacity:0; pointer-events:none; transition:.4s var(--ease)}
   .nav-links.open{opacity:1; transform:none; pointer-events:auto}
   .nav-links a{font-size:.8rem; padding:12px 14px}
@@ -759,3 +759,53 @@ body{font:400 16.5px/1.78 var(--serif)}
 .lbl{font-family:var(--serif); font-size:.9rem}
 .lbl b{font-family:var(--caps)}
 .intro-skip{left:24px; right:auto; font:italic 400 .95rem var(--serif); letter-spacing:0; text-transform:none}
+
+/* ═════════════ v5 — the Atelier ═════════════ */
+.chapter-atelier{background:radial-gradient(ellipse 70% 45% at 50% 0%, rgba(255,214,150,.07), transparent 70%), repeating-linear-gradient(100deg, rgba(0,0,0,.12) 0 1px, transparent 1px 7px), linear-gradient(180deg, #170d07 0%, #120a05 60%, #0c0604 100%)}
+.atelier{display:grid; grid-template-columns:minmax(0,1.45fr) minmax(300px,.7fr); gap:28px; align-items:start}
+.at-stage{position:relative; height:min(80vh,780px); min-height:560px; border:1px solid var(--line-2); overflow:hidden; box-shadow:0 60px 120px -50px rgba(0,0,0,.9);
+  background:radial-gradient(ellipse 46% 42% at 62% 44%, rgba(255,214,150,.16), transparent 72%), radial-gradient(ellipse 120% 80% at 50% 110%, #2a170b 0%, #120a05 55%, #070403 100%)}
+.at-stage::after{content:""; position:absolute; inset:14px; border:1px dashed rgba(201,163,90,.14); pointer-events:none}
+.at-stage canvas{position:absolute; inset:0; width:100%; height:100%; cursor:grab}
+.at-stage canvas:active{cursor:grabbing}
+.at-hint{position:absolute; right:26px; top:22px; margin:0; font:400 .78rem var(--caps); color:var(--dim); letter-spacing:.04em; z-index:2}
+.at-plaque{width:min(400px, calc(100% - 60px))}
+.at-side{position:sticky; top:92px}
+.at-panel{border:1px solid var(--line-2); border-top:2px solid var(--gold-3); padding:6px 20px 10px; background:linear-gradient(180deg, rgba(20,12,6,.72), rgba(9,5,3,.88))}
+.at-row{padding:10px 0 8px; border-bottom:1px solid var(--line); transition:opacity .3s}
+.at-row:last-child{border-bottom:0}
+.at-row.off{opacity:.3; pointer-events:none}
+.at-label{margin:0; font:500 .6rem var(--caps); letter-spacing:.2em; text-transform:uppercase; color:var(--dim)}
+.at-label span{color:var(--gold); letter-spacing:.08em; text-transform:none; font-size:.72rem}
+.at-row .seg button{padding:14px 7px 4px; font-size:.78rem}
+.at-row .seg button:disabled, .at-sw:disabled{opacity:.28; cursor:not-allowed}
+.at-swatches{display:flex; flex-wrap:wrap; gap:10px; padding:10px 0 4px}
+.at-sw{width:26px; height:26px; border-radius:50%; border:1px solid rgba(255,240,200,.28); background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.35), transparent 55%), var(--c); box-shadow:0 2px 6px rgba(0,0,0,.6); cursor:pointer; transition:transform .25s var(--ease)}
+.at-sw:hover{transform:scale(1.12)}
+.at-sw.active{outline:1px solid var(--gold-2); outline-offset:3px}
+.at-row input[type=range]{width:100%; margin:16px 0 8px}
+.at-actions{display:flex; gap:22px; padding:14px 2px 0}
+.at-note{margin:12px 2px 0; font-size:.78rem}
+.atelier.no3d .at-stage canvas{display:none}
+@media (max-width:1100px){ .atelier{grid-template-columns:1fr} .at-side{position:static} }
+@media (max-width:860px){
+  .at-stage{height:auto; min-height:0; display:flex; flex-direction:column}
+  .at-stage canvas{position:relative; height:62vh}
+  .at-plaque{position:relative; left:auto; bottom:auto; width:auto; border-width:1px 0 0; padding:18px}
+  .at-hint{top:14px; right:18px}
+}
+
+/* nav: eleven chapters and the appendix in one line */
+@media (min-width:1401px) and (max-width:1640px){ .nav-links{gap:0} .nav-links a{padding:8px 7px} .nav-links a i{margin-right:4px} }
+/* escapement sound toggle: a brass-bezelled balance in the corner that swings while the watch ticks */
+.tick-toggle{position:fixed; left:22px; bottom:22px; z-index:70; width:46px; height:46px; display:grid; place-items:center; padding:0; border:0; border-radius:50%; cursor:pointer; color:var(--muted);
+  background:radial-gradient(circle, #1d1009 0 60%, transparent 61%), conic-gradient(from 200deg, #7a5520, #f5dc9a, #c79a4a, #fff0c4, #8a6a32, #7a5520); box-shadow:0 10px 24px rgba(0,0,0,.6); transition:color .3s, box-shadow .3s}
+.tick-toggle:hover{color:var(--gold-2)}
+.tick-toggle .w{opacity:0; transition:opacity .3s}
+.tick-toggle .bal{transform-origin:12px 12px}
+.tick-toggle[aria-pressed="true"]{color:var(--gold-2); box-shadow:0 10px 24px rgba(0,0,0,.6), 0 0 0 5px rgba(201,163,90,.14)}
+.tick-toggle[aria-pressed="true"] .w{opacity:1}
+.tick-toggle[aria-pressed="true"] .bal{animation:balance .25s ease-in-out infinite alternate}
+@keyframes balance{from{transform:rotate(-70deg)}to{transform:rotate(70deg)}}
+@media (prefers-reduced-motion: reduce){ .tick-toggle[aria-pressed="true"] .bal{animation:none} }
+@media (max-width:860px){ .tick-toggle{left:14px; bottom:14px; width:40px; height:40px} }

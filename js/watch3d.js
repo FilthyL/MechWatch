@@ -567,7 +567,7 @@ function handGroup(style, len, w, mat, lume, z) {
 export function buildWatch(sp) {
   sp = { D: 40, T: 12, shape: 'round', metal: 'steel', dial: '#121316', dialType: 'sunburst', bezel: 'plain', hands: 'baton', strap: 'alligator', strapColor: '#2a160c', LW: 20, ...sp };
   const root = new THREE.Group(); root.name = 'watch';
-  const parts = []; const tickers = [];
+  const parts = [];
   const part = (id, name, desc, explode, anchor, normal) => { const g = new THREE.Group(); g.name = id; root.add(g); parts.push({ id, name, desc, group: g, explode: new THREE.Vector3(...explode), anchor: new THREE.Vector3(...anchor), normal: new THREE.Vector3(...normal).normalize() }); return g; };
   const shadowed = o => { o.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } }); return o; };
 
@@ -582,6 +582,18 @@ export function buildWatch(sp) {
   const Rd = isRound ? r * (bezelInsert ? .76 : sp.bezel === 'fluted' ? .8 : sp.bezel === 'thin' ? .9 : sp.bezel === 'screws' ? .74 : .86)
     : shapeKind === 'octagon' ? r * .74 : shapeKind === 'nautilus' ? r * .78 : shapeKind === 'cushion' ? r * .74 : shapeKind === 'tonneau' ? r * .7 : shapeKind === 'santos' ? r * .78 : r * .8;
 
+  // bezel outline and its opening, for every shape that is not round (the case is cut to the same opening)
+  const bezelShapes = () => {
+    let outer, inner;
+    if (shapeKind === 'octagon') { outer = octagon(r * .93, 2.4); inner = squircle(Rd, Rd, 2); }
+    else if (shapeKind === 'nautilus') { outer = squircle(r * .94, r * .94, 4.6); inner = squircle(Rd, Rd, 4.6); }
+    else if (shapeKind === 'santos') { outer = squircle(r * .96, r * .96, 7); inner = squircle(Rd, Rd, 7); }
+    else if (shapeKind === 'cushion') { outer = (() => { const s = new THREE.Shape(); s.absarc(0, 0, r * .9, 0, TAU, false); return s; })(); inner = squircle(Rd, Rd, 2); }
+    else if (shapeKind === 'tonneau') { outer = squircle(r * .82, r * 1.06, 2.7, 160, .09); inner = squircle(Rd * .82, Rd * 1.1, 2.6, 160, .08); }
+    else if (shapeKind === 'digital') { outer = roundRect(W - 2, H - 2, 5); inner = roundRect(W - 9, H - 13, 3); }
+    else { outer = roundRect(W - 1.6, H - 1.6, 2.2); inner = roundRect(W - 5.4, H - 6, 1.2); }
+    return [outer, inner];
+  };
   /* ── case middle & lugs ── */
   const caseG = part('case', 'Case', `The housing, machined from ${sp.metalName || sp.metal}. Brushed flats, polished flanks and chamfers.`, [0, 0, 0], [r * .99, -r * .25, (zB + zT) / 2], [1, -.2, 0]);
   let caseShape;
@@ -592,8 +604,13 @@ export function buildWatch(sp) {
     caseG.add(new THREE.Mesh(latheZ(prof, 200), brush));
   } else {
     caseShape = shapeKind === 'octagon' ? squircle(r * 1.02, r * 1.08, 3.4, 160, .04) : shapeKind === 'nautilus' ? squircle(r, r, 4.2) : shapeKind === 'santos' ? squircle(r, r, 7) : shapeKind === 'cushion' ? squircle(r, r, 3.1) : shapeKind === 'tonneau' ? squircle(r * .86, r * 1.12, 2.7, 160, .09) : shapeKind === 'digital' ? roundRect(W, H, 6) : roundRect(W - 1, H, 2.6);
+    // the case is a frame around the bezel opening, so the dial sits in it rather than under solid metal;
+    // a plate closes the opening from behind
+    const opening = bezelShapes()[1], caseMat = shapeKind === 'digital' ? metal('carbon') : brush;
+    caseShape.holes.push(holePath(opening));
     const g = ext(caseShape, zT - zB - 1.2, .6, 96); g.translate(0, 0, zB + .6);
-    caseG.add(new THREE.Mesh(g, shapeKind === 'digital' ? metal('carbon') : brush));
+    caseG.add(new THREE.Mesh(g, caseMat));
+    const seat = new THREE.Mesh(new THREE.ShapeGeometry(opening, 64), caseMat); seat.position.z = zB + .7; caseG.add(seat);
   }
   // attach geometry for straps
   let attach = { y: 0, z: -T * .16, w: sp.LW || 20 };
@@ -655,14 +672,7 @@ export function buildWatch(sp) {
       bezelG.add(new THREE.Mesh(latheZ([[Rd, zT + (sp.bezel === 'thin' ? .4 : 0)], [rr, zT], [rr + .05, zT + .5], [rr - .5, zBz - (sp.bezel === 'thin' ? .6 : 0)], [Rd + .5, zBz - (sp.bezel === 'thin' ? .4 : 0)]], 200), polish));
     }
   } else {
-    let outer, inner;
-    if (shapeKind === 'octagon') { outer = octagon(r * .93, 2.4); inner = squircle(Rd, Rd, 2); }
-    else if (shapeKind === 'nautilus') { outer = squircle(r * .94, r * .94, 4.6); inner = squircle(Rd, Rd, 4.6); }
-    else if (shapeKind === 'santos') { outer = squircle(r * .96, r * .96, 7); inner = squircle(Rd, Rd, 7); }
-    else if (shapeKind === 'cushion') { outer = (() => { const s = new THREE.Shape(); s.absarc(0, 0, r * .9, 0, TAU, false); return s; })(); inner = squircle(Rd, Rd, 2); }
-    else if (shapeKind === 'tonneau') { outer = squircle(r * .82, r * 1.06, 2.7, 160, .09); inner = squircle(Rd * .82, Rd * 1.1, 2.6, 160, .08); }
-    else if (shapeKind === 'digital') { outer = roundRect(W - 2, H - 2, 5); inner = roundRect(W - 9, H - 13, 3); }
-    else { outer = roundRect(W - 1.6, H - 1.6, 2.2); inner = roundRect(W - 5.4, H - 6, 1.2); }
+    const [outer, inner] = bezelShapes();
     outer.holes.push(holePath(inner));
     const g = ext(outer, zBz - zT - .9, .45, 96); g.translate(0, 0, zT + .45);
     bezelG.add(new THREE.Mesh(g, shapeKind === 'digital' ? metal('carbon') : shapeKind === 'tonneau' ? metal('carbon') : polish));

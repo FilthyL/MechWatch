@@ -1,6 +1,7 @@
 import { el, h, polar, metalDefs, TAU, rad } from './util.js';
 import { TIMELINE, ANATOMY, GLOSSARY } from './data.js';
 import { initCinema } from './cinema.js';
+import { initTick } from './tick.js';
 
 const $ = s => document.querySelector(s);
 const T0 = performance.now();
@@ -315,5 +316,8 @@ lazy('#complications', () => import('./complications.js').then(m => m.init()));
 lazy('#calibers', () => import('./calibers.js').then(m => m.init()));
 lazy('#digital', () => import('./digital.js').then(m => m.init()));
 lazy('#vault', () => import('./atlas.js').then(m => m.init()));
+const atelier = () => import('./atelier.js').then(m => m.init());
+if (location.hash.startsWith('#atelier?')) atelier().catch(err => console.error('#atelier', err)); else lazy('#atelier', atelier);
 
 initCinema();
+initTick($('#tickToggle'));
