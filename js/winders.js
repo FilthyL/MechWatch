@@ -43,7 +43,7 @@ function shared() {
   const brass = new THREE.MeshPhysicalMaterial({ color: 0xd2a75c, metalness: 1, roughness: .22 });
   const brassBrushed = new THREE.MeshPhysicalMaterial({ color: 0xc89c52, metalness: 1, roughness: .38, anisotropy: .6 });
   const lining = new THREE.MeshPhysicalMaterial({ map: suede(), color: 0xffffff, roughness: 1, sheen: 1, sheenColor: new THREE.Color(0x8a5634), sheenRoughness: .5 });
-  const glass = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0, roughness: .02, transparent: true, opacity: .1, depthWrite: false, envMapIntensity: 2.6, iridescence: .25, iridescenceIOR: 1.4, side: THREE.DoubleSide });
+  const glass = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0, roughness: .02, transparent: true, opacity: .05, depthWrite: false, envMapIntensity: 1.1, iridescence: .15, iridescenceIOR: 1.4, side: THREE.DoubleSide });
   const geo = {
     back: new RoundedBoxGeometry(W, H, 4, 3, 1.5), side: new RoundedBoxGeometry(5, H, D, 3, 2), top: new RoundedBoxGeometry(W, 5, D, 3, 2), base: new RoundedBoxGeometry(W, 14, D, 3, 2.5),
     liner: new THREE.PlaneGeometry(W - 10, H - 18), door: new RoundedBoxGeometry(W - 12, H - 22, 1.2, 2, .5),
@@ -65,7 +65,7 @@ export function initGallery({ canvas, ui, info }) {
   scene.background = new THREE.Color(0x070403); scene.fog = new THREE.Fog(0x070403, 360, 820);
   camera.fov = 30; camera.near = 5; camera.far = 2000;
   scene.add(new THREE.HemisphereLight(0xfff4ea, 0x17110c, .38));
-  const spot = new THREE.SpotLight(0xfff3e6, 9000, 0, .32, .75, 1.6); spot.position.set(0, 160, 150); scene.add(spot, spot.target);
+  const spot = new THREE.SpotLight(0xfff3e6, 5200, 0, .3, .9, 1.6); spot.position.set(0, 96, 210); // from the front, onto the dial rather than the top of the box scene.add(spot, spot.target);
   const S = shared();
   // the room: fluted wall, walnut shelf with brass nosing
   const wall = new THREE.Mesh(new THREE.PlaneGeometry(9000, 700), new THREE.MeshStandardMaterial({ map: fluting(), roughness: .8 })); wall.position.set(0, 60, -72); scene.add(wall);
@@ -73,14 +73,11 @@ export function initGallery({ canvas, ui, info }) {
   const nose = new THREE.Mesh(new THREE.BoxGeometry(9000, 2, 2), S.brass); nose.position.set(0, -H / 2 - 1, 42); scene.add(nose);
   const nose2 = nose.clone(); nose2.position.y = -H / 2 - 11; scene.add(nose2);
 
-  // a volumetric beam with drifting dust over the focused winder
-  const beamTex = canvasTex(64, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(.7, 'rgba(255,255,255,.25)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
-  const beam = new THREE.Mesh(new THREE.CylinderGeometry(7, 78, 300, 48, 1, true), new THREE.MeshBasicMaterial({ map: beamTex, color: 0xffd7a0, transparent: true, opacity: .11, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false }));
-  beam.position.set(0, 96, -6); scene.add(beam);
+  // a little dust drifting in front of the focused winder
   const NM = 360, mpos = new Float32Array(NM * 3), mseed = new Float32Array(NM);
   for (let k = 0; k < NM; k++) { const r = Math.sqrt(Math.random()) * 60, a = Math.random() * TAU; mpos[k * 3] = Math.cos(a) * r; mpos[k * 3 + 1] = -50 + Math.random() * 240; mpos[k * 3 + 2] = Math.sin(a) * r * .6 + 10; mseed[k] = Math.random() * 10; }
   const mgeo = new THREE.BufferGeometry(); mgeo.setAttribute('position', new THREE.BufferAttribute(mpos, 3));
-  const motes = new THREE.Points(mgeo, new THREE.PointsMaterial({ color: 0xffe2b0, size: 1.3, transparent: true, opacity: .7, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); scene.add(motes);
+  const motes = new THREE.Points(mgeo, new THREE.PointsMaterial({ color: 0xffe2b0, size: 1.1, transparent: true, opacity: .22, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); scene.add(motes);
   let winders = [], focus = 0, camX = 0, drag = 0, state = 'idle', visible = false, paused = false, mx = 0, tmx = 0;
   const queue = [];
 
@@ -93,9 +90,9 @@ export function initGallery({ canvas, ui, info }) {
     add(S.geo.liner, S.lining, 0, 5, -D + 16.2);
     const fr = add(S.geo.frame, S.brass, 0, 0, 12.4);
     const plaque = add(S.geo.plaque, new THREE.MeshPhysicalMaterial({ map: plaqueTex(w), metalness: .9, roughness: .3 }), -6, -H / 2 + 7, 15.4);
-    const statusMat = new THREE.MeshStandardMaterial({ color: 0x3aff8a, emissive: 0x3aff8a, emissiveIntensity: 2 });
+    const statusMat = new THREE.MeshStandardMaterial({ color: 0x3aff8a, emissive: 0x3aff8a, emissiveIntensity: 1 });
     add(S.geo.status, statusMat, W / 2 - 12, -H / 2 + 7, 15.2);
-    const ledMat = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xffc27a, emissiveIntensity: 1.4 });
+    const ledMat = new THREE.MeshStandardMaterial({ color: 0xffd9a8, emissive: 0xffc27a, emissiveIntensity: .7 });
     add(S.geo.led, ledMat, 0, 5, 3.4);
     const drum = new THREE.Group(); drum.position.set(0, 5, 0); box.add(drum);
     drum.add(new THREE.Mesh(S.geo.cup, S.brassBrushed));
@@ -140,7 +137,7 @@ export function initGallery({ canvas, ui, info }) {
     focus = Math.max(0, Math.min(winders.length - 1, i)); drag = 0;
     if (instant) camX = focus * SP;
     for (let k = focus - 3; k <= focus + 3; k++) if (winders[k]) buildWatchFor(winders[k]);
-    winders.forEach(wd => G() ? G().to(wd.ledMat, { emissiveIntensity: wd.i === focus ? 3.2 : 1.1, duration: .6 }) : (wd.ledMat.emissiveIntensity = wd.i === focus ? 3.2 : 1.1));
+    winders.forEach(wd => G() ? G().to(wd.ledMat, { emissiveIntensity: wd.i === focus ? 1.25 : .6, duration: .6 }) : (wd.ledMat.emissiveIntensity = wd.i === focus ? 1.25 : .6));
     const w = winders[focus].w, inf = info(w);
     ui.brand.textContent = w.b; ui.model.innerHTML = inf.model; ui.ref.textContent = inf.ref;
     ui.specs.innerHTML = inf.specs.slice(0, 6).map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
@@ -159,7 +156,7 @@ export function initGallery({ canvas, ui, info }) {
     const up = Math.round(wd.drum.rotation.z / TAU) * TAU;
     tl.to(wd.drum.rotation, { z: up, duration: .7, ease: 'power2.out' })
       .to(wd.door.rotation, { y: -1.95, duration: .9, ease: 'power3.inOut' }, '<')
-      .to(wd.ledMat, { emissiveIntensity: 6, duration: .5 }, '<')
+      .to(wd.ledMat, { emissiveIntensity: 2, duration: .5 }, '<')
       .add(() => { wd.drum.attach(wd.watch.cushion); scene.attach(wd.watch.group); })
       .to(wd.watch.group.position, { z: '+=84', y: '+=6', duration: 1.15, ease: 'power3.inOut' })
       .to(wd.watch.group.rotation, { y: '+=' + TAU, duration: 1.15, ease: 'power2.inOut' }, '<')
@@ -182,7 +179,7 @@ export function initGallery({ canvas, ui, info }) {
       .to(wd.watch.group.position, { x: 0, y: 0, z: 0, duration: 1.1, ease: 'power3.inOut' }, '<')
       .to(wd.watch.group.rotation, { x: 0, y: 0, z: 0, duration: 1.1, ease: 'power3.inOut' }, '<')
       .to(wd.door.rotation, { y: 0, duration: .8, ease: 'power3.inOut' })
-      .to(wd.ledMat, { emissiveIntensity: 3.2, duration: .5 }, '<');
+      .to(wd.ledMat, { emissiveIntensity: 1.25, duration: .5 }, '<');
   }
 
   /* ── interaction ── */
@@ -221,8 +218,7 @@ export function initGallery({ canvas, ui, info }) {
     const a = camera.aspect || 1.6, Wv = a > 1.2 ? 330 : 150, dist = Wv / (2 * Math.tan(15 * Math.PI / 180) * a);
     if (state === 'idle') { camX += (focus * SP + drag - camX) * Math.min(1, dt * 5); mx += (tmx - mx) * .05; camera.position.set(camX + mx * 18, 26, dist); camera.lookAt(camX, 2, -22); }
     spot.position.set(focus * SP, 170, 140); spot.target.position.set(focus * SP, 0, -20);
-    beam.position.x += (focus * SP - beam.position.x) * Math.min(1, dt * 4); motes.position.x = beam.position.x;
-    beam.material.opacity = state === 'idle' ? .11 + Math.sin(t * .7) * .015 : .04;
+    motes.position.x += (focus * SP - motes.position.x) * Math.min(1, dt * 4);
     for (let k = 0; k < NM; k++) { mpos[k * 3 + 1] += dt * (1.5 + (mseed[k] % 1) * 2.5); mpos[k * 3] += Math.sin(t * .4 + mseed[k]) * dt * 1.2; if (mpos[k * 3 + 1] > 190) mpos[k * 3 + 1] = -50; }
     mgeo.attributes.position.needsUpdate = true;
     // winders: the classic winding program — two turns, pause, two turns back, pause
@@ -234,7 +230,7 @@ export function initGallery({ canvas, ui, info }) {
         const ph = (t + wd.phase) % 16;
         const ang = ph < 6 ? ease(ph / 6) * 2 * TAU : ph < 8 ? 2 * TAU : ph < 14 ? 2 * TAU - ease((ph - 8) / 6) * 2 * TAU : 0;
         wd.drum.rotation.z = -ang;
-        wd.statusMat.emissiveIntensity = (ph < 6 || (ph > 8 && ph < 14)) ? 1.2 + Math.sin(t * 6) * .9 : .5;
+        wd.statusMat.emissiveIntensity = (ph < 6 || (ph > 8 && ph < 14)) ? .8 + Math.sin(t * 6) * .4 : .4;
       }
       if (wd.watch && Math.abs(wd.i - focus) <= 2) wd.watch.tick();
     });

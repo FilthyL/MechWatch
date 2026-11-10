@@ -24,7 +24,7 @@ export function init() {
     grid.innerHTML = list.map(({ w }, k) => `<li class="cat-row" data-k="${k}">
       <span class="cr-n">${String(k + 1).padStart(2, '0')}</span>
       <span class="cr-house">${w.b}</span>
-      <span class="cr-model">${w.m}<small>Ref. ${w.ref} · ${w.dia} mm · Cal. ${w.cal}</small></span>
+      <span class="cr-model">${w.m}<small>Ref. ${w.ref} · ${w.size || w.dia + ' mm'} · Cal. ${w.cal}</small></span>
       <span class="cr-cat">${w.cat[0]}</span>
       <span class="cr-price">${w.price ? '≈ ' + usd(w.price) : 'On request'}</span>
       <span class="cr-go" aria-hidden="true"></span></li>`).join('') || `<li class="muted">No references match.</li>`;
@@ -51,9 +51,25 @@ export function init() {
   document.getElementById('houseGrid').innerHTML = [...HOUSES].sort((a, b) => a.y - b.y).map(h => `<div class="house"><span class="m">${h.y} · ${h.c}</span><h5>${h.n}</h5><p>${h.p}</p></div>`).join('');
 }
 
+// where each extra line of a reference's own sheet belongs
+const SHEET_GROUP = { Caseband: 'Case', Lugs: 'Case', Bezel: 'Case', Crystal: 'Case', Dial: 'Dial', Numerals: 'Dial', Hands: 'Dial', Signature: 'Dial', Escapement: 'Movement', Rotor: 'Movement', Finishing: 'Movement' };
+const freq = w => w.vph ? (w.vph / 7200).toFixed(1).replace('.0', '') + ' Hz · ' + w.vph.toLocaleString('en-US') + ' vph' : 'Spring Drive, glide motion';
+const water = wr => typeof wr === 'number' ? `${wr} m · ${wr / 10} bar` : wr;
+
+/** What the plaque and the Loupe say about a Vault reference: a short list, and the full technical sheet in groups. */
 export function vaultInfo(w) {
-  return { brand: w.b, model: w.m.replace(/(\S+)$/, '<em>$1</em>'), ref: `Ref. ${w.ref} · ${w.mat} · Cal. ${w.cal}`,
-    specs: [['Diameter', w.dia + ' mm'], ['Thickness', w.t + ' mm'], ['Calibre', w.cal], ['Power reserve', w.pr], ['Frequency', w.vph ? (w.vph / 7200).toFixed(1).replace('.0', '') + ' Hz · ' + w.vph.toLocaleString('en-US') + ' vph' : 'Spring Drive'], ['Case', w.mat], ['Introduced', w.y], ['Indicative retail', w.price ? '≈ ' + usd(w.price) : 'On request']] };
+  const size = w.size || w.dia + ' mm', price = w.price ? '≈ ' + usd(w.price) : 'On request', extra = g => Object.entries(w.sheet || {}).filter(([k]) => SHEET_GROUP[k] === g);
+  const rows = list => list.filter(([, v]) => v != null && v !== '');
+  const sheet = [
+    ['Case', rows([['Material', w.mat], ['Size', size], ['Thickness', w.t + ' mm'], ...extra('Case'), ['Caseback', w.back], ['Water resistance', water(w.wr)]])],
+    ['Dial', rows(extra('Dial'))],
+    ['Movement', rows([['Calibre', w.cal], ['Winding', w.wind], ['Jewels', w.jw], ['Frequency', freq(w)], ['Power reserve', w.pr], ...extra('Movement')])],
+    ['Functions', rows([['Indications', w.fn]])],
+    ['Strap', rows([['Fitted with', w.band]])],
+    ['Reference', rows([['Introduced', w.y], ['Indicative retail', price]])],
+  ].filter(([, r]) => r.length);
+  return { brand: w.b, model: w.m.replace(/(\S+)$/, '<em>$1</em>'), ref: `Ref. ${w.ref} · ${w.mat} · Cal. ${w.cal}`, sheet,
+    specs: rows([['Size', size], ['Thickness', w.t + ' mm'], ['Calibre', w.cal], ['Power reserve', w.pr || freq(w)], ['Water resistance', typeof w.wr === 'number' ? w.wr + ' m' : 'Not rated'], ['Case', w.mat], ['Indicative retail', price]]) };
 }
 function openVault(ws, k, e) {
   Promise.all([import('./inspector.js'), import('./watch3d.js')]).then(([I, W]) => I.openInspector(ws.map(w => ({ spec: W.specFromVault(w), info: vaultInfo(w) })), k, { x: e.clientX, y: e.clientY }));

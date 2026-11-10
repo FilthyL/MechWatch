@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/OrbitControls.js';
 import { buildWatch, createStage } from './watch3d.js';
 
-let opts = {}, ui = null, stage = null, controls = null, current = null, list = [], idx = 0, running = false, explode = 0, explodeT = 0, selected = null, labelsOn = true;
+let opts = {}, ui = null, stage = null, controls = null, current = null, list = [], idx = 0, running = false, explode = 0, explodeT = 0, selected = null, labelsOn = true, cushionOn = true;
 const views = { front: [0, 8, 158], three: [70, 26, 140], profile: [160, 10, -8], back: [-10, 14, -170], loupe: [0, 2, 58], top: [0, 165, 20] };
 let camTo = null, tgtTo = null;
 const fit = () => { const a = stage.camera.aspect || 1; return a < 1.15 ? Math.min(2.6, 1.2 / a) : 1; };
@@ -30,7 +30,7 @@ function buildUI() {
         <button data-v="three" class="active">¾</button><button data-v="front">Dial</button><button data-v="profile">Crown side</button><button data-v="back">Caseback</button><button data-v="top">Above</button><button data-v="loupe">Loupe ×4</button>
       </div>
       <label class="insp-explode"><span>Assembled</span><input type="range" min="0" max="1000" value="0" aria-label="Disassemble"><span>Exploded</span></label>
-      <div class="seg"><button data-t="labels" class="active">Labels</button><button data-t="spin" class="active">Turntable</button></div>
+      <div class="seg"><button data-t="labels" class="active">Labels</button><button data-t="spin" class="active">Turntable</button><button data-t="cushion" class="active">Cushion</button></div>
     </div>
     <p class="insp-hint">Drag to orbit · scroll or pinch to zoom · click a number</p>
   </div>`);
@@ -52,6 +52,7 @@ function buildUI() {
   ui.querySelectorAll('[data-v]').forEach(b => b.onclick = () => view(b.dataset.v));
   const sl = ui.querySelector('.insp-explode input'); sl.oninput = () => { explodeT = sl.value / 1000; };
   ui.querySelector('[data-t=labels]').onclick = e => { labelsOn = !labelsOn; e.currentTarget.classList.toggle('active', labelsOn); ui.classList.toggle('no-labels', !labelsOn); };
+  ui.querySelector('[data-t=cushion]').onclick = e => { cushionOn = !cushionOn; e.currentTarget.classList.toggle('active', cushionOn); };
   ui.querySelector('[data-t=spin]').onclick = e => { controls.autoRotate = !controls.autoRotate; e.currentTarget.classList.toggle('active', controls.autoRotate); };
   addEventListener('keydown', e => { if (ui.hidden) return; if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
 }
@@ -66,9 +67,9 @@ function load(i) {
   idx = (i + list.length) % list.length;
   const item = list[idx];
   if (current) { stage.scene.remove(current.group); current.dispose(); }
-  current = buildWatch({ ...item.spec, cheapGlass: true });
+  current = buildWatch({ ...item.spec, cheapGlass: true, hiRes: true });
   current.group.rotation.x = -.08;
-  if (current.cushion) current.cushion.visible = false;
+  ui.querySelector('[data-t=cushion]').style.display = current.cushion.children.length ? '' : 'none'; // a pocket watch has none
   stage.scene.add(current.group);
   if (stage.floor) stage.floor.position.y = -(current.wrist?.a ?? 30) - 3;
   ui.querySelector('.insp-brand').textContent = item.info.brand;
@@ -76,7 +77,10 @@ function load(i) {
   ui.querySelector('.insp-ref').textContent = item.info.ref || '';
   ui.querySelector('.insp-count').textContent = list.length > 1 ? `${String(idx + 1).padStart(2, '0')} / ${String(list.length).padStart(2, '0')}` : '';
   ui.querySelector('.insp-pager').style.visibility = list.length > 1 ? 'visible' : 'hidden';
-  ui.querySelector('.insp-specs').innerHTML = (item.info.specs || []).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
+  // a full technical sheet in groups when there is one, otherwise the short list
+  ui.querySelector('.insp-specs').innerHTML = item.info.sheet
+    ? item.info.sheet.map(([grp, rows]) => `<dt class="grp">${grp}</dt>` + rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')).join('')
+    : (item.info.specs || []).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
   // hotspots + part list
   const hot = ui.querySelector('.insp-hot'), ol = ui.querySelector('.insp-parts');
   hot.innerHTML = ''; ol.innerHTML = '';
@@ -99,6 +103,7 @@ function select(p) {
 function go(d) { load(idx + d); }
 
 const v = new THREE.Vector3(), n = new THREE.Vector3(), camDir = new THREE.Vector3();
+const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _q = new THREE.Quaternion(), _i = new THREE.Quaternion();
 function loop() {
   if (!running) return;
   requestAnimationFrame(loop);
@@ -106,8 +111,20 @@ function loop() {
   if (current) {
     current.parts.forEach(p => { const e = p === selected ? Math.max(explode, .55) : explode; p.group.position.copy(p.explode).multiplyScalar(e); });
     current.tick();
+    // the watch sits on its display cushion; the cushion steps aside when the watch is taken apart, a part is lifted out,
+    // or you go round the back, so nothing hides the caseback
+    current.cushion.visible = cushionOn && explode < .03 && !selected && stage.camera.position.z > 8;
+    // seen from behind, the closed strap would cover the caseback: it parts like a curtain while you look
+    const behind = stage.camera.position.z < -20;
+    current.parts.forEach(p => { if (current.strapParts.includes(p.id)) { p.group.visible = !behind || p === selected; p.hs.classList.toggle('gone', !p.group.visible); } });
   }
-  if (camTo) { stage.camera.position.lerp(camTo, .07); controls.target.lerp(tgtTo, .07); if (stage.camera.position.distanceTo(camTo) < .4) camTo = null; }
+  if (camTo) { // swing round the watch on an arc, never through it
+    controls.target.lerp(tgtTo, .07);
+    const from = _a.copy(stage.camera.position).sub(controls.target), to = _b.copy(camTo).sub(tgtTo), l0 = from.length(), l1 = to.length();
+    _q.setFromUnitVectors(from.normalize(), to.normalize()); from.applyQuaternion(_i.identity().slerp(_q, .08)).multiplyScalar(l0 + (l1 - l0) * .08);
+    stage.camera.position.copy(controls.target).add(from);
+    if (stage.camera.position.distanceTo(camTo) < .6) camTo = null;
+  }
   controls.update();
   stage.render();
   // project hotspots
@@ -122,7 +139,7 @@ function loop() {
       const x = (v.x + 1) / 2 * W, y = (1 - v.y) / 2 * H;
       p.hs.style.transform = `translate(${x}px, ${y}px)`;
       p.hs.classList.toggle('back', facing < -.05);
-      p.hs.style.display = v.z > 1 ? 'none' : '';
+      p.hs.style.display = v.z > 1 || p.hs.classList.contains('gone') ? 'none' : '';
     });
   }
 }

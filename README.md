@@ -29,6 +29,9 @@ Every Vault reference, every blueprint archetype, the anatomy diver and the hero
 - sapphire crystals with anti-reflective iridescence, exhibition casebacks with a spinning rotor
 - **straps and bracelets** — alligator, calf, rubber, NATO, Oyster, Jubilee and integrated links — with pin buckles, folding clasps and spring bars, all labelled
 - orbit, zoom, a ×4 loupe view, a disassemble slider and numbered part hotspots
+- **each Vault reference drawn as itself** — its real dial printing, hand shape and metal, date and day windows, sub-dial layout, lug style, bezel and bracelet. The Breguet Classique 5177, for instance, has its fluted case band, welded lugs with screw bars, star-and-lozenge minute track, secret signature, open-tipped blued hands and an engine-turned gold rotor behind the sapphire back; skeleton watches show a running 3D movement
+- **a manufacture-style technical sheet** for every Vault reference, in groups: case, dial, movement, functions, strap. A figure that could not be confirmed is left out rather than guessed
+- the watch sits on a display cushion; the cushion and strap step aside when you turn it over, so the caseback is always in view
 
 ## Watch-native interface
 - **Type** — Libre Caslon Display & Text for an engraved, printed-catalogue voice; Jost (a Futura cut, the typeface of countless dials) for small print and numerals.

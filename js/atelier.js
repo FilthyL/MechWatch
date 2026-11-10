@@ -59,7 +59,7 @@ function toSpec(c) {
     name: nameOf(c, true), brand: 'MechWatch', D: c.size, T: pocket ? 13.5 : chrono ? 13.6 : open ? 11.4 : c.shape === 'rect' ? 7.2 : 10.6,
     shape: c.shape, metal: c.metal, metalName: METAL_NAME[c.metal], dial: OPT.colour[1].find(o => o[0] === c.colour)[2],
     dialType: open ? 'enamel' : c.dial, openDial: open, hands: c.hands, bezel: round ? c.bezel : 'plain',
-    subs: chrono ? 3 : 0, subsec: has('subsec'), date: has('date'), gmt: has('gmt'), power: has('power'),
+    subs: chrono ? 3 : 0, accent: 'red', subsec: has('subsec'), date: has('date'), gmt: has('gmt'), power: has('power'),
     caseback: c.back, crown: c.bezel === 'diver' && round ? 'guard' : 'std',
     line: chrono ? 'CHRONOGRAPHE' : open ? 'SQUELETTE' : pocket ? 'CHRONOMÈTRE' : 'AUTOMATIC',
     LW: Math.round(c.size * (c.shape === 'rect' ? .7 : .5)), L2L: c.size * 1.2,
