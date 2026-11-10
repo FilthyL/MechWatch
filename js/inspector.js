@@ -66,7 +66,7 @@ function load(i) {
   idx = (i + list.length) % list.length;
   const item = list[idx];
   if (current) { stage.scene.remove(current.group); current.dispose(); }
-  current = buildWatch(item.spec);
+  current = buildWatch({ ...item.spec, cheapGlass: true });
   current.group.rotation.x = -.08;
   if (current.cushion) current.cushion.visible = false;
   stage.scene.add(current.group);

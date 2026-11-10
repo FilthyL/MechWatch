@@ -9,9 +9,9 @@ export function initHero() {
   let stage;
   try { stage = createStage(canvas, { bloom: false, shadows: false, exposure: 1.12 }); }
   catch (e) { canvas.remove(); return; }
-  const w = buildWatch({ ...SIGNATURE, headOnly: true });
+  const w = buildWatch({ ...SIGNATURE, headOnly: true, cheapGlass: true });
   const pivot = new THREE.Group(); pivot.add(w.group); w.group.position.z = 2; stage.scene.add(pivot);
-  stage.camera.fov = 22; stage.camera.position.set(0, 1, 150); stage.camera.lookAt(0, 0, 0);
+  stage.camera.fov = 22; stage.camera.position.set(0, 0, 182); stage.camera.lookAt(0, 0, 0);
   let mx = 0, my = 0, tx = 0, ty = 0, prog = 0, visible = true, first = true;
   addEventListener('pointermove', e => { tx = e.clientX / innerWidth - .5; ty = e.clientY / innerHeight - .5; }, { passive: true });
   new ResizeObserver(() => { stage.resize(); stage.camera.lookAt(0, 0, 0); }).observe(canvas);
@@ -24,9 +24,10 @@ export function initHero() {
     const t = now / 1000;
     mx += (tx - mx) * .05; my += (ty - my) * .05;
     const flip = THREE.MathUtils.smoothstep(prog, .05, .85) * Math.PI;
-    pivot.rotation.y = -.5 + mx * .6 + flip + Math.sin(t * .35) * .12;
-    pivot.rotation.x = .16 + my * .32 + Math.sin(t * .5) * .05;
-    pivot.rotation.z = Math.sin(t * .27) * .04;
+    // dial-on to the viewer: only a gentle parallax with the hand, no three-quarter angle
+    pivot.rotation.y = mx * .16 + flip + Math.sin(t * .35) * .025;
+    pivot.rotation.x = my * .12 + Math.sin(t * .5) * .015;
+    pivot.rotation.z = 0;
     pivot.position.y = Math.sin(t * .8) * .9;
     w.tick();
     stage.render();

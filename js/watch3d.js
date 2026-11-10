@@ -526,8 +526,8 @@ export function buildWatch(sp) {
   const lume = darkDial && !['dauphine', 'breguet'].includes(sp.hands);
   const hourStyle = sp.hands === 'mercedes' ? 'mercedes' : sp.hands, minStyle = sp.hands === 'mercedes' ? 'sword' : sp.hands;
   const hScale = isRect ? Math.min(W, H) / 2 * .85 : Rd;
-  const HH = sp.hands !== 'none' && sp.dialType !== 'lcd' && sp.dialType !== 'zeitwerk' ? handGroup(hourStyle, hScale * .56, hScale * .085, handMat, lume, zDial + .5) : null;
-  const MH = HH ? handGroup(minStyle, hScale * (isRect ? .95 : .86), hScale * .065, handMat, lume, zDial + .9) : null;
+  const HH = sp.hands !== 'none' && sp.dialType !== 'lcd' && sp.dialType !== 'zeitwerk' ? handGroup(hourStyle, hScale * .56, hScale * (sp.hands === 'dauphine' ? .13 : .095), handMat, lume, zDial + .5) : null;
+  const MH = HH ? handGroup(minStyle, hScale * (isRect ? .95 : .86), hScale * (sp.hands === 'dauphine' ? .1 : .072), handMat, lume, zDial + .9) : null;
   let SH = null;
   if (HH) {
     handsG.add(HH, MH);
@@ -564,7 +564,7 @@ export function buildWatch(sp) {
 
   /* ── crystal ── */
   const crysG = part('crystal', 'Crystal', isRect && shapeKind === 'digital' ? 'Mineral glass over the liquid-crystal display.' : 'Synthetic sapphire (9 on the Mohs scale), domed, with an anti-reflective coating that glints blue-violet at an angle.', [0, 0, 14], [Rd * .45, Rd * .4, zBz + .9], [.2, .2, 1]);
-  const sapp = sp.cheapGlass ? new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0, roughness: .02, transparent: true, opacity: .16, depthWrite: false, envMapIntensity: 2.2, iridescence: .5, iridescenceIOR: 1.6, iridescenceThicknessRange: [180, 420] }) : sapphire();
+  const sapp = sp.cheapGlass ? new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0, roughness: .02, transparent: true, opacity: .1, depthWrite: false, envMapIntensity: 1.6, iridescence: .22, iridescenceIOR: 1.5, iridescenceThicknessRange: [220, 380] }) : sapphire();
   if (isRound || ['octagon', 'cushion'].includes(shapeKind)) {
     const R0 = isRound ? Rd + .5 : Rd + .4, sph = 60, th = Math.asin(R0 / sph);
     const cap = new THREE.SphereGeometry(sph, 96, 12, 0, TAU, 0, th); cap.scale(1, .2, 1); cap.rotateX(Math.PI / 2); cap.translate(0, 0, zBz - sph * .2 * Math.cos(th) + .2);
