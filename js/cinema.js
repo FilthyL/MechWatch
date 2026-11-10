@@ -178,7 +178,7 @@ function intro(onDone) {
     .to(el, { backgroundColor: 'rgba(5,3,2,0)', duration: 1.6, ease: 'power2.inOut' }, '-=.8')
     .to('.intro .bar-t', { yPercent: -100, duration: 1.6, ease: 'expo.inOut' }, '<')
     .to('.intro .bar-b', { yPercent: 100, duration: 1.6, ease: 'expo.inOut' }, '<')
-    .from('#heroWatchWrap', { scale: 2.1, rotate: -24, filter: 'blur(8px) brightness(.25)', opacity: 0, duration: 2.6, ease: 'expo.out', clearProps: 'filter,transform,opacity' }, '<-.3')
+    .from(document.querySelectorAll('#heroWatchWrap, #heroGL'), { scale: 2.1, rotate: -24, filter: 'blur(8px) brightness(.25)', opacity: 0, duration: 2.6, ease: 'expo.out', clearProps: 'filter,transform,opacity' }, '<-.3')
     .from(splitLines($('#heroTitle')), { yPercent: 115, duration: 1.5, stagger: .16, ease: 'expo.out' }, '<+.55')
     .from('.eyebrow', { opacity: 0, letterSpacing: '1.2em', duration: 1.6, ease: 'expo.out' }, '<')
     .from(['#heroLede', '#heroCta', '#heroStats'], { opacity: 0, y: 34, stagger: .14, duration: 1.2, ease: 'power3.out' }, '<+.4')
@@ -206,10 +206,23 @@ function choreograph() {
     });
   };
 
-  // hero push-in as you leave
-  G.to('#heroWatchWrap', { scale: 1.12, yPercent: 10, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true, onUpdate: self => window.MW_HERO && window.MW_HERO.setProgress(self.progress) } });
-  G.to('.hero-copy', { yPercent: -28, opacity: 0, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
-  G.to('.beam', { opacity: 0, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: '80% top', scrub: true } });
+  // hero: scrolling brings the camera in on the pocket watch's dial
+  const zoomTo = p => window.MW_HERO && window.MW_HERO.setProgress(p);
+  mm.add('(min-width: 901px) and (prefers-reduced-motion: no-preference)', () => {
+    // the page holds while the lens closes in, then lets go
+    G.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '.hero', start: 'top top', end: '+=90%', pin: true, scrub: true, onUpdate: s => zoomTo(Math.min(1, s.progress / .8)) } })
+      .to('.hero-copy', { xPercent: -12, autoAlpha: 0, duration: .45 }, 0)
+      .to(['.scroll-cue', '.hero-caption'], { autoAlpha: 0, duration: .12 }, 0)
+      .to('.beam', { opacity: 0, duration: .6 }, 0)
+      .to({}, { duration: 1 }, 0);
+    return () => zoomTo(0);
+  });
+  mm.add('(max-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
+    ST.create({ trigger: '.hero', start: 'top top', end: 'bottom top', onUpdate: s => zoomTo(s.progress) });
+    G.to('.hero-copy', { yPercent: -28, opacity: 0, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+    G.to('.beam', { opacity: 0, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: '80% top', scrub: true } });
+    return () => zoomTo(0);
+  });
 
   // chapter title cards
   $$('.chapter-head').forEach(head => {

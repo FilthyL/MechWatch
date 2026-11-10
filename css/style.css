@@ -555,7 +555,9 @@ body{background:
 .hero-watch{aspect-ratio:1/1.02; max-width:700px; width:100%; margin:0 auto}
 .hero-watch svg#heroWatch{position:absolute; inset:6%; width:88%; transition:opacity 1.2s}
 .hero-watch.has3d svg#heroWatch{opacity:0}
-.hero-canvas{position:absolute; left:-14%; top:-14%; width:128%; height:128%; cursor:zoom-in; z-index:2}
+.hero-gl{position:absolute; inset:0; z-index:2; pointer-events:none; transform-origin:75% 50%}
+.hero-gl canvas{display:block; width:100%; height:100%}
+.hero.on-watch{cursor:zoom-in}
 .hero-caption{position:absolute; left:0; right:0; bottom:-26px}
 
 /* chapter bezel rings */
