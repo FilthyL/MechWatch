@@ -34,6 +34,8 @@ export function studioEnvironment(renderer, { fill = .22 } = {}) {
   box(18, 3, [0, -4, 16], 1.3, 0xffffff);       // low front fill
   box(10, 2.4, [0, 8, -16], 1.6, 0xffcf96);     // a thin amber rim — the only warm note
   box(3, 3, [9, 12, 10], 6.0);                  // hot kicker for sparkle
+  box(9, 7, [-5, 0, 17], 1.5);                  // front beauty light, brighter on the left…
+  box(9, 7, [5, 0, 17], .55);                   // …so faceted hands show a lit and a shaded plane
   const pm = new THREE.PMREMGenerator(renderer);
   const tex = pm.fromScene(s, .02).texture; pm.dispose();
   return tex;
