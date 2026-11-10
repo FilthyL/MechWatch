@@ -323,7 +323,7 @@ function latheZ(profile, seg = 160, displace) {
 function normalizeUV(geo) { geo.computeBoundingBox(); const b = geo.boundingBox, uv = geo.attributes.uv, p = geo.attributes.position; for (let i = 0; i < uv.count; i++) uv.setXY(i, (p.getX(i) - b.min.x) / (b.max.x - b.min.x), (p.getY(i) - b.min.y) / (b.max.y - b.min.y)); uv.needsUpdate = true; return geo; }
 const M4 = new THREE.Matrix4();
 /** Swept band (strap) along points; width along X, thickness along the curve normal. */
-export function bandGeometry(pts, { w0 = 20, w1 = 16, t0 = 3.6, t1 = 2.2, center = new THREE.Vector3(0, 0, -30), seg = 140, axis = new THREE.Vector3(1, 0, 0) } = {}) {
+export function bandGeometry(pts, { w0 = 20, w1 = 16, t0 = 3.6, t1 = 2.2, center = new THREE.Vector3(0, 0, -30), seg = 140, axis = new THREE.Vector3(1, 0, 0), tip = 0 } = {}) {
   const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
   const P = curve.getSpacedPoints(seg), L = curve.getLength();
   // padded profile: flat underside, rounded edges, a gentle dome on top (edges ~60% of centre thickness)
@@ -338,7 +338,8 @@ export function bandGeometry(pts, { w0 = 20, w1 = 16, t0 = 3.6, t1 = 2.2, center
     const t = i / seg, T = curve.getTangentAt(Math.min(.999, t)).normalize();
     const N = new THREE.Vector3().crossVectors(T, axis).normalize();
     const out = p.clone().sub(center); if (N.dot(out) < 0) N.negate();
-    const w = w0 + (w1 - w0) * t, th = t0 + (t1 - t0) * Math.min(1, t * 2.2);
+    let w = w0 + (w1 - w0) * t; const th = t0 + (t1 - t0) * Math.min(1, t * 2.2);
+    if (tip && t > 1 - tip) { const q = (t - (1 - tip)) / tip; w *= .3 + .7 * Math.sqrt(Math.max(0, 1 - q * q)); }
     prof.forEach(([px, py]) => { const v = p.clone().addScaledVector(axis, px * w).addScaledVector(N, py * th); pos.push(v.x, v.y, v.z); uv.push(px + .5, t * L / (w0 * 2.2)); });
   });
   for (let i = 0; i < seg; i++) for (let k = 0; k < np; k++) { const a = i * np + k, b = i * np + (k + 1) % np, c = a + np, d = b + np; idx.push(a, c, b, b, c, d); }
@@ -628,10 +629,13 @@ export function buildWatch(sp) {
   const wrist = { a: Math.max(32, attach.y + 9), b: 22.5 };
   wrist.zc = -T * .5 - wrist.b + 1.2;
   const C = new THREE.Vector3(0, 0, wrist.zc);
-  const wristPts = (sgn, endAng) => {
+  const wristPts = (sgn, endAng, lift = 0, liftFrom = Infinity) => {
     const pts = [new THREE.Vector3(0, sgn * attach.y, attach.z), new THREE.Vector3(0, sgn * (attach.y + 3.6), attach.z - 1.4), new THREE.Vector3(0, sgn * (attach.y + 6.6), attach.z - 4.8)];
-    const a0 = Math.asin(clamp((attach.y + 8.2) / wrist.a, -.98, .98));
-    for (let k = 0; k <= 10; k++) { const al = a0 + (endAng - a0) * k / 10; pts.push(new THREE.Vector3(0, sgn * wrist.a * Math.sin(al), wrist.zc + wrist.b * Math.cos(al))); }
+    const a0 = Math.asin(clamp((attach.y + 8.2) / wrist.a, -.98, .98)), n = Math.max(10, Math.round((endAng - a0) / .12));
+    for (let k = 0; k <= n; k++) {
+      const al = a0 + (endAng - a0) * k / n, u = clamp((al - liftFrom) / .16, 0, 1), up = lift * u * u * (3 - 2 * u);
+      pts.push(new THREE.Vector3(0, sgn * (wrist.a + up) * Math.sin(al), wrist.zc + (wrist.b + up) * Math.cos(al)));
+    }
     return pts;
   };
   if (!isPocket && !sp.headOnly) {
@@ -642,7 +646,7 @@ export function buildWatch(sp) {
       const bot = part('bracelet6', 'Bracelet — 6 o\'clock side', 'Solid links joined by pins or screws; removable links size it to the wrist.', [0, -13, -5], [-attach.w * .3, -attach.y - 9, attach.z - 6], [0, -.7, .5]);
       const bmat = braceletMaterial(bracelet, sp.metal);
       [[top, 1], [bot, -1]].forEach(([grp, sgn]) => {
-        const pts = wristPts(sgn, Math.PI * .86);
+        const pts = wristPts(sgn, Math.PI * .915);
         const band = new THREE.Mesh(bandGeometry(pts, { w0: attach.w - .3, w1: attach.w * (bracelet === 'integrated' ? .62 : .8), t0: 2.7, t1: 2.2, center: C, seg: 160 }), bmat);
         band.castShadow = true; grp.add(band);
         const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
@@ -652,8 +656,8 @@ export function buildWatch(sp) {
       });
       const clasp = part('clasp', 'Folding clasp', 'A deployant clasp with a safety catch and on-the-fly micro-adjustment — the bracelet\'s "buckle".', [0, 0, -12], [0, 0, wrist.zc - wrist.b - 2], [0, 0, -1]);
       const cz = wrist.zc - wrist.b - .6, cw = attach.w * .8;
-      const cl = new THREE.Mesh(new RoundedBoxGeometry(cw, 2.4, 24, 4, .9), bm); cl.position.set(0, 0, cz); clasp.add(cl);
-      for (const sx of [-1, 1]) { const rim = new THREE.Mesh(new RoundedBoxGeometry(.9, 2.6, 24.2, 3, .4), pm); rim.position.set(sx * (cw / 2 - .3), 0, cz); clasp.add(rim); }
+      const cl = new THREE.Mesh(new RoundedBoxGeometry(cw, 2.6, 21, 4, .9), bm); cl.position.set(0, 0, cz); clasp.add(cl);
+      for (const sx of [-1, 1]) { const rim = new THREE.Mesh(new RoundedBoxGeometry(.9, 2.8, 21.2, 3, .4), pm); rim.position.set(sx * (cw / 2 - .3), 0, cz); clasp.add(rim); }
       const crest = new THREE.Mesh(new RoundedBoxGeometry(cw * .26, 2.6, 5, 3, .6), bm); crest.position.set(0, 0, cz - .1); clasp.add(crest);
       clasp.children.forEach(m => m.rotation.x = Math.PI / 2);
       strapParts = ['bracelet12', 'bracelet6', 'clasp'];
@@ -664,21 +668,26 @@ export function buildWatch(sp) {
       const top = part('strap12', `${sName} — 12 o'clock`, strapDesc(kind) + ' This side carries the buckle.', [0, 13, -4], [0, attach.y + 9, attach.z - 6], [0, .7, .5]);
       const bot = part('strap6', `${sName} — 6 o'clock`, 'The long side with the adjustment holes, finished with a tapered tip that tucks into the keepers.', [0, -13, -4], [0, -attach.y - 9, attach.z - 6], [0, -.7, .5]);
       const wEnd = Math.max(14, attach.w * .8);
-      top.add(new THREE.Mesh(bandGeometry(wristPts(1, Math.PI * .9), { w0: attach.w, w1: wEnd, t0: kind === 'nato' ? 1.4 : 3.8, t1: kind === 'nato' ? 1.4 : 2.4, center: C }), smat));
-      bot.add(new THREE.Mesh(bandGeometry(wristPts(-1, Math.PI * .97), { w0: attach.w, w1: wEnd, t0: kind === 'nato' ? 1.4 : 3.8, t1: kind === 'nato' ? 1.4 : 2.4, center: C }), smat));
-      const buckle = part('buckle', kind === 'rubber' && sp.deployant ? 'Deployant buckle' : 'Pin buckle', 'Solid metal, matched to the case. The tongue passes through a hole; the keepers hold the tail.', [0, 0, -12], [0, wrist.a * Math.sin(Math.PI * .9), wrist.zc + wrist.b * Math.cos(Math.PI * .9) - 2], [0, .2, -1]);
-      const bc = new THREE.CatmullRomCurve3(wristPts(1, Math.PI * .9), false, 'centripetal'); const f = frameAt(bc, .985, C);
+      const tA = kind === 'nato' ? 1.4 : 3.8, tB = kind === 'nato' ? 1.4 : 2.4, END12 = Math.PI * .935, END6 = Math.PI * 1.28, LIFT = tB + .3;
+      top.add(new THREE.Mesh(bandGeometry(wristPts(1, END12), { w0: attach.w, w1: wEnd, t0: tA, t1: tB, center: C }), smat));
+      const tailPts = wristPts(-1, END6, LIFT, Math.PI * .985);
+      bot.add(new THREE.Mesh(bandGeometry(tailPts, { w0: attach.w, w1: wEnd * .96, t0: tA, t1: tB, center: C, seg: 180, tip: .07 }), smat));
+      // adjustment holes on the tail, just past the keeper
+      const tc = new THREE.CatmullRomCurve3(tailPts, false, 'centripetal'), holeMat = new THREE.MeshBasicMaterial({ color: 0x080503 });
+      [.855, .88, .905].forEach(tt => { const f = frameAt(tc, tt, C); const h = new THREE.Mesh(new THREE.CircleGeometry(.72, 20), holeMat); h.position.copy(f.p).addScaledVector(f.N, tB / 2 + .03); h.lookAt(f.p.clone().addScaledVector(f.N, 10)); bot.add(h); });
+      const buckle = part('buckle', kind === 'rubber' && sp.deployant ? 'Deployant buckle' : 'Pin buckle', 'Solid metal, matched to the case. The tail passes through the frame, the tongue through a hole, and the keeper holds the tail flat.', [0, 0, -12], [0, wrist.a * Math.sin(Math.PI * .935), wrist.zc + wrist.b * Math.cos(Math.PI * .935) - 2], [0, .2, -1]);
+      const bc = new THREE.CatmullRomCurve3(wristPts(1, END12), false, 'centripetal'); const f = frameAt(bc, .985, C);
       const frame = new THREE.Group(); frame.matrixAutoUpdate = true; buckle.add(frame);
       const basis = new THREE.Matrix4().makeBasis(f.X, f.N, f.T); frame.quaternion.setFromRotationMatrix(basis); frame.position.copy(f.p);
       const bw = wEnd + 2.6;
-      [[-bw / 2, 0], [bw / 2, 0]].forEach(([x]) => { const s2 = new THREE.Mesh(new RoundedBoxGeometry(1.3, 1.6, 9, 3, .5), polish); s2.position.set(x, 1.2, 1.5); frame.add(s2); });
-      const front = new THREE.Mesh(new THREE.CylinderGeometry(.9, .9, bw + 1.2, 24), polish); front.rotation.z = Math.PI / 2; front.position.set(0, 1.4, 5.8); frame.add(front);
-      const tongue = new THREE.Mesh(new RoundedBoxGeometry(.9, .8, 7, 2, .3), polish); tongue.position.set(0, 2.2, 2.4); frame.add(tongue);
-      const kf = frameAt(bc, .93, C), keeper = new THREE.Group(); buckle.add(keeper);
+      [[-bw / 2, 0], [bw / 2, 0]].forEach(([x]) => { const s2 = new THREE.Mesh(new RoundedBoxGeometry(1.3, 3.6, 9, 3, .5), polish); s2.position.set(x, 2.1, 1.5); frame.add(s2); });
+      const front = new THREE.Mesh(new THREE.CylinderGeometry(.9, .9, bw + 1.2, 24), polish); front.rotation.z = Math.PI / 2; front.position.set(0, 2.4, 5.8); frame.add(front);
+      const tongue = new THREE.Mesh(new RoundedBoxGeometry(.9, .8, 7, 2, .3), polish); tongue.position.set(0, 3.2, 2.4); frame.add(tongue);
+      const kf = frameAt(bc, .9, C), keeper = new THREE.Group(); buckle.add(keeper);
       keeper.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(kf.X, kf.N, kf.T)); keeper.position.copy(kf.p);
-      const kw = wEnd + 1.2, kt = .7, inner = 2.4 + 2.2;
-      [[0, inner / 2 + kt / 2, kw, kt], [0, -2.4 / 2 - kt / 2, kw, kt]].forEach(([x, y, w2, h2]) => { const b = new THREE.Mesh(new RoundedBoxGeometry(w2, h2, 3.2, 2, .25), smat); b.position.set(x, y, 0); keeper.add(b); });
-      [-1, 1].forEach(sx => { const b = new THREE.Mesh(new RoundedBoxGeometry(kt, inner + kt * 2, 3.2, 2, .25), smat); b.position.set(sx * (kw / 2 - kt / 2), (inner / 2 - 2.4 / 2) / 2, 0); keeper.add(b); });
+      const kw = wEnd + 1.4, kt = .7, lo = -tB / 2 - .15 - kt / 2, hi = tB / 2 + LIFT + .15 + kt / 2;
+      [lo, hi].forEach(y => { const b = new THREE.Mesh(new RoundedBoxGeometry(kw, kt, 3.2, 2, .25), smat); b.position.set(0, y, 0); keeper.add(b); });
+      [-1, 1].forEach(sx => { const b = new THREE.Mesh(new RoundedBoxGeometry(kt, hi - lo + kt, 3.2, 2, .25), smat); b.position.set(sx * (kw / 2 - kt / 2), (hi + lo) / 2, 0); keeper.add(b); });
       strapParts = ['strap12', 'strap6', 'buckle'];
     }
     const bars = part('springbars', 'Spring bars', 'Spring-loaded pins that pass through the strap and click into holes inside the lugs.', [0, 0, 0], [attach.w * .3, attach.y, attach.z], [0, 1, 0]);
