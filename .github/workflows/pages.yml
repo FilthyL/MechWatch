@@ -9,6 +9,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: write # only to clear a stale site bundle when a run is re-run (see below)
 
 concurrency:
   group: pages
@@ -26,6 +27,16 @@ jobs:
         run: |
           mkdir _site
           cp -r index.html css js vendor .nojekyll _site/
+      # Re-running a run uploads the site bundle again under the same name, and the deploy step
+      # refuses to choose between two. Remove the bundle left by the earlier attempt first.
+      - name: Clear the site bundle from an earlier attempt
+        if: github.run_attempt != '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" \
+            --jq '.artifacts[] | select(.name == "github-pages") | .id' |
+            xargs -r -I{} gh api -X DELETE "repos/${{ github.repository }}/actions/artifacts/{}"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
